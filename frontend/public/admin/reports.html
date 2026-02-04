@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Reports - NNAK Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="px-6 mb-8">
+                <div class="flex items-center gap-3 font-bold text-xl text-gray-800">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-sm">N
+                    </div>
+                    NNAK Admin
+                </div>
+            </div>
+            <nav>
+                <div class="nav-category">Overview</div>
+                <a href="admin.html" class="sidebar-link">
+                    <svg data-lucide="layout-dashboard"></svg> Dashboard
+                </a>
+                <a href="members.html" class="sidebar-link">
+                    <svg data-lucide="users"></svg> Members
+                </a>
+                <a href="events.html" class="sidebar-link">
+                    <svg data-lucide="calendar"></svg> Events
+                </a>
+                <a href="payments.html" class="sidebar-link">
+                    <svg data-lucide="credit-card"></svg> Payments
+                </a>
+                <div class="nav-category">System</div>
+                <a href="settings.html" class="sidebar-link">
+                    <svg data-lucide="settings"></svg> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold">Analytics & Reports</h1>
+                    <p class="text-sm text-muted">Deep dive into membership growth and financial performance</p>
+                </div>
+                <div
+                    class="date-range-picker bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 shadow-sm">
+                    Last 12 Months
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Member Growth -->
+                <div class="card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-6">Member Growth</h3>
+                    <div class="h-[300px]">
+                        <canvas id="memberGrowthChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Revenue -->
+                <div class="card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-6">Revenue Overview</h3>
+                    <div class="h-[300px]">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Membership Types -->
+                <div class="card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-6">Membership Distribution</h3>
+                    <div class="h-[250px] flex justify-center">
+                        <canvas id="membershipPieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Stats -->
+                <div class="card bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                    <h3 class="font-bold text-gray-800 mb-6">Performance Summary</h3>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <div class="text-sm text-gray-500 mb-1">New Members (This Month)</div>
+                            <div class="text-2xl font-bold text-gray-900" id="statNewMembers">--</div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <div class="text-sm text-gray-500 mb-1">Total Revenue (YTD)</div>
+                            <div class="text-2xl font-bold text-gray-900" id="statRevenue">--</div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <div class="text-sm text-gray-500 mb-1">Expiring Soon</div>
+                            <div class="text-2xl font-bold text-orange-600" id="statExpiring">--</div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <div class="text-sm text-gray-500 mb-1">Pending Payments</div>
+                            <div class="text-2xl font-bold text-blue-600" id="statPending">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+
+        async function initCharts() {
+            // 1. Fetch Data
+            const memberData = await AdminAPI.getAnalytics('members');
+            const paymentData = await AdminAPI.getAnalytics('payments');
+
+            if (!memberData || !paymentData) return;
+
+            // 2. Populate Summary
+            document.getElementById('statExpiring').textContent = memberData.expiring_soon;
+
+            // Calculate new members (last month from array)
+            const lastMonthMembers = memberData.new_members_per_month[memberData.new_members_per_month.length - 1];
+            document.getElementById('statNewMembers').textContent = lastMonthMembers ? lastMonthMembers.count : 0;
+
+            document.getElementById('statRevenue').textContent = formatCurrency(paymentData.total_revenue);
+            document.getElementById('statPending').textContent = formatCurrency(paymentData.pending_payments.pending_amount || 0);
+
+            // 3. Render Charts
+            renderMemberChart(memberData.new_members_per_month);
+            renderRevenueChart(paymentData.revenue_per_month);
+            renderPieChart(memberData.by_type);
+        }
+
+        function renderMemberChart(data) {
+            const ctx = document.getElementById('memberGrowthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.month),
+                    datasets: [{
+                        label: 'New Members',
+                        data: data.map(d => d.count),
+                        borderColor: '#00d26a',
+                        backgroundColor: 'rgba(0, 210, 106, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        function renderRevenueChart(data) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.month),
+                    datasets: [{
+                        label: 'Revenue (KES)',
+                        data: data.map(d => d.total_amount),
+                        backgroundColor: '#0D8ABC',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        function renderPieChart(data) {
+            const ctx = document.getElementById('membershipPieChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.name),
+                    datasets: [{
+                        data: data.map(d => d.count),
+                        backgroundColor: ['#00d26a', '#0D8ABC', '#f59e0b', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+        }
+
+        initCharts();
+    </script>
+</body>
+
+</html>

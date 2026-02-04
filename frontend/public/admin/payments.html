@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments & Transactions - NNAK Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="px-6 mb-8">
+                <div class="flex items-center gap-3 font-bold text-xl text-gray-800">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-sm">N
+                    </div>
+                    NNAK Admin
+                </div>
+            </div>
+            <nav>
+                <div class="nav-category">Overview</div>
+                <a href="admin.html" class="sidebar-link">
+                    <svg data-lucide="layout-dashboard"></svg> Dashboard
+                </a>
+                <a href="members.html" class="sidebar-link">
+                    <svg data-lucide="users"></svg> Members
+                </a>
+                <a href="events.html" class="sidebar-link">
+                    <svg data-lucide="calendar"></svg> Events
+                </a>
+                <a href="payments.html" class="sidebar-link active">
+                    <svg data-lucide="credit-card"></svg> Payments
+                </a>
+                <div class="nav-category">System</div>
+                <a href="settings.html" class="sidebar-link">
+                    <svg data-lucide="settings"></svg> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1 class="text-2xl font-bold">Financial Transactions</h1>
+                    <p class="text-sm text-muted">View all M-Pesa and membership payments</p>
+                </div>
+                <div class="flex gap-3">
+                    <button class="btn btn-outline" onclick="loadPayments()">
+                        <svg data-lucide="refresh-cw" width="18"></svg> Refresh
+                    </button>
+                    <button class="btn btn-primary">
+                        <svg data-lucide="download" width="18"></svg> Export Report
+                    </button>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="search-bar" style="width: 300px;">
+                    <svg data-lucide="search" width="18" class="text-muted"></svg>
+                    <input type="text" placeholder="Search by Invoice or M-Pesa Code...">
+                </div>
+
+                <select class="form-select" style="width: 150px;" id="statusFilter" onchange="loadPayments()">
+                    <option value="">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                </select>
+
+                <select class="form-select" style="width: 150px;">
+                    <option value="">Payment Type</option>
+                    <option value="membership">Membership</option>
+                    <option value="event">Event</option>
+                </select>
+            </div>
+
+            <!-- Data Table -->
+            <div class="card p-0 overflow-hidden">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Date</th>
+                            <th>Member</th>
+                            <th>Description</th>
+                            <th>Reference</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center py-8">Loading payments...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50">
+                    <span class="text-sm text-muted" id="paginationInfo">Showing 1-20</span>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline px-3 py-1 text-sm bg-white" style="width: auto;">Prev</button>
+                        <button class="btn btn-outline px-3 py-1 text-sm" style="width: auto;">Next</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+
+        async function loadPayments(page = 1) {
+            const status = document.getElementById('statusFilter').value;
+            const tbody = document.getElementById('paymentsTableBody');
+
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8">Loading...</td></tr>`;
+
+            const data = await AdminAPI.getPayments(page, 20, status);
+
+            if (data && data.payments) {
+                renderPayments(data.payments);
+                if (data.pagination) {
+                    document.getElementById('paginationInfo').innerText = `Showing page ${data.pagination.page} of ${data.pagination.pages} (${data.pagination.total} total)`;
+                }
+            } else {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-500">Failed to load payments</td></tr>`;
+            }
+        }
+
+        function renderPayments(payments) {
+            const tbody = document.getElementById('paymentsTableBody');
+            if (payments.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-muted">No transactions found</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = payments.map(p => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="font-mono text-sm font-bold text-gray-700">${p.invoice_number}</td>
+                    <td class="text-sm text-gray-500">${formatDate(p.created_at)}</td>
+                    <td>
+                        <div class="text-sm font-medium text-gray-900">${p.first_name || 'Guest'} ${p.last_name || ''}</div>
+                        <div class="text-xs text-muted">${p.email || '-'}</div>
+                    </td>
+                    <td class="text-sm text-gray-600">${p.description || p.payment_type}</td>
+                    <td class="font-mono text-xs text-gray-500">${p.transaction_reference || '-'}</td>
+                    <td class="font-bold text-gray-900">${formatCurrency(p.amount)}</td>
+                    <td>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${getStatusClass(p.payment_status)}">
+                            ${p.payment_status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50" title="View"><svg data-lucide="eye" width="16"></svg></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'completed': return 'bg-green-100 text-green-700';
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'failed': return 'bg-red-100 text-red-700';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        loadPayments();
+    </script>
+</body>
+
+</html>

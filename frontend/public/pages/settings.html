@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - NNAK Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS (CDN for reliability) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        /* Custom overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .h-screen {
+            height: 100vh;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .settings-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            margin-bottom: 24px;
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .setting-nav-btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+
+        .setting-nav-btn:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .setting-nav-btn.active {
+            background: #f0fdf4;
+            color: #166534;
+            font-weight: 600;
+        }
+
+        .premium-btn {
+            background: linear-gradient(135deg, #00d26a 0%, #00b359 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 210, 106, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .premium-btn:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+    <script src="../js/sidebar.js"></script>
+
+    <!-- CONTENT -->
+    <main class="admin-main flex-1 flex flex-col overflow-hidden bg-slate-50 relative">
+
+        <!-- Header -->
+        <header
+            class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm lg:shadow-none">
+            <!-- Mobile Menu Button -->
+            <button class="lg:hidden text-gray-500 hover:text-gray-700 mr-2">
+                <svg data-lucide="menu" width="24"></svg>
+            </button>
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-dm-sans">Settings</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Manage account and system preferences</p>
+            </div>
+            <!-- Dynamic Action Button based on Tab -->
+            <button id="headerActionBtn" onclick="saveCurrentTab()"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-green-600/20 hover:scale-[1.02] transform transition bg-[#059669] text-white">
+                Save Changes
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-hidden flex">
+            <!-- Settings Sidebar -->
+            <div class="w-64 bg-white border-r border-gray-100 p-4 space-y-1 overflow-y-auto">
+                <div class="text-xs font-bold text-gray-400 uppercase px-4 mb-2">General</div>
+                <button class="setting-nav-btn active" onclick="switchTab('profile', this)"><svg data-lucide="user"
+                        width="18"></svg> Profile</button>
+                <button class="setting-nav-btn" onclick="switchTab('security', this)"><svg data-lucide="lock"
+                        width="18"></svg> Security</button>
+                <button class="setting-nav-btn" onclick="Msg.info('Notifications settings coming soon')"><svg
+                        data-lucide="bell" width="18"></svg> Notifications</button>
+
+                <div class="text-xs font-bold text-gray-400 uppercase px-4 mt-6 mb-2">System</div>
+                <button class="setting-nav-btn" onclick="Msg.info('Team management coming soon')"><svg
+                        data-lucide="users" width="18"></svg> Team Members</button>
+                <button class="setting-nav-btn" onclick="Msg.info('Billing settings coming soon')"><svg
+                        data-lucide="credit-card" width="18"></svg> Billing</button>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div class="max-w-3xl space-y-6">
+
+                    <!-- Profile Section -->
+                    <div id="tab-profile" class="settings-section active">
+                        <div class="settings-card">
+                            <h2 class="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50">Profile
+                                Information</h2>
+
+                            <div class="flex items-center gap-6 mb-8">
+                                <div class="relative group">
+                                    <div id="profileAvatar"
+                                        class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-2xl font-bold text-gray-500 border-4 border-white shadow-sm overflow-hidden bg-cover bg-center">
+                                        <!-- Initials or Image injected here -->
+                                        AD
+                                    </div>
+                                    <div id="uploadLoader"
+                                        class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white text-xs opacity-0 transition-opacity">
+                                        Uploading...
+                                    </div>
+                                </div>
+                                <div>
+                                    <input type="file" id="photoInput" accept="image/*" class="hidden"
+                                        onchange="handlePhotoUpload(this)">
+                                    <button onclick="document.getElementById('photoInput').click()"
+                                        class="text-sm font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg hover:bg-green-100 transition">
+                                        Change Photo
+                                    </button>
+                                    <p class="text-xs text-gray-500 mt-2">JPG, GIF or PNG. Max size of 2MB</p>
+                                </div>
+                            </div>
+
+                            <form id="profileForm">
+                                <input type="hidden" name="id" id="userId">
+                                <div class="grid grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">First Name</label>
+                                        <input type="text" name="first_name" id="firstName" required
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Last Name</label>
+                                        <input type="text" name="last_name" id="lastName" required
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-6 mb-6">
+                                    <div class="col-span-2">
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Email
+                                            Address</label>
+                                        <input type="email" name="email" id="email" required readonly
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none bg-gray-50 text-gray-500 cursor-not-allowed"
+                                            title="Contact Support to change email">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Phone</label>
+                                        <input type="tel" name="phone" id="phone"
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Occupation</label>
+                                        <input type="text" name="occupation" id="occupation"
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Security Section -->
+                    <div id="tab-security" class="settings-section">
+                        <div class="settings-card">
+                            <h2 class="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50">Security</h2>
+
+                            <form id="passwordForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Current Password</label>
+                                    <input type="password" id="currentPassword" required
+                                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                </div>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">New Password</label>
+                                        <input type="password" id="newPassword" required minlength="6"
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Confirm
+                                            Password</label>
+                                        <input type="password" id="confirmPassword" required minlength="6"
+                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 transition-colors">
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-xs mt-4">
+                                    Password must be at least 6 characters long and include numbers/symbols for better
+                                    security.
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        lucide.createIcons();
+
+        const Msg = {
+            success: (msg) => Swal.fire({ title: 'Success', text: msg, icon: 'success', timer: 1500, showConfirmButton: false }),
+            error: (msg) => Swal.fire({ title: 'Error', text: msg, icon: 'error' }),
+            info: (msg) => Swal.fire({ title: 'Info', text: msg, icon: 'info' })
+        };
+
+        let currentTab = 'profile';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await AuthService.getProfile();
+            if (user) {
+                populateProfile(user);
+            }
+        });
+
+        function populateProfile(user) {
+            document.getElementById('userId').value = user.id;
+            document.getElementById('firstName').value = user.first_name || '';
+            document.getElementById('lastName').value = user.last_name || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('occupation').value = user.occupation || '';
+
+            updateAvatarUI(user.profile_photo, user.first_name, user.last_name);
+        }
+
+        function updateAvatarUI(photoUrl, fName, lName) {
+            const avatar = document.getElementById('profileAvatar');
+            if (photoUrl) {
+                avatar.style.backgroundImage = `url('${photoUrl}')`;
+                avatar.textContent = '';
+            } else {
+                avatar.style.backgroundImage = 'none';
+                avatar.textContent = (fName?.[0] || 'A') + (lName?.[0] || 'U');
+            }
+        }
+
+        function switchTab(tabName, btn) {
+            currentTab = tabName;
+
+            // Tab Buttons
+            document.querySelectorAll('.setting-nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Sections
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Button Text
+            const actionBtn = document.getElementById('headerActionBtn');
+            if (tabName === 'profile') actionBtn.textContent = 'Save Changes';
+            else if (tabName === 'security') actionBtn.textContent = 'Update Password';
+            else actionBtn.textContent = 'Save';
+        }
+
+        async function saveCurrentTab() {
+            if (currentTab === 'profile') {
+                await saveProfile();
+            } else if (currentTab === 'security') {
+                await changePassword();
+            } else {
+                Msg.info('No actions available for this section yet.');
+            }
+        }
+
+        async function saveProfile() {
+            const id = document.getElementById('userId').value;
+            const data = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                occupation: document.getElementById('occupation').value,
+            };
+
+            // Basic validation
+            if (!data.first_name || !data.last_name) return Msg.error('Name fields are required');
+
+            try {
+                // Reuse AdminAPI from admin.js if included, but here we might need raw fetch or AuthService helpers
+                // We'll use fetch directly to put to /api/members/:id as planned
+                const response = await fetch(`/api/members/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    Msg.success('Profile updated successfully');
+                    // Update session/UI if needed (AuthService might need refresh)
+                } else {
+                    throw new Error(result.error || 'Failed to update profile');
+                }
+            } catch (err) {
+                Msg.error(err.message);
+            }
+        }
+
+        async function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+
+            if (!current || !newPass || !confirmPass) return Msg.error('All password fields are required');
+            if (newPass !== confirmPass) return Msg.error('New passwords do not match');
+            if (newPass.length < 6) return Msg.error('Password must be at least 6 characters');
+
+            try {
+                const response = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        current_password: current,
+                        new_password: newPass
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    Msg.success('Password changed successfully');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    throw new Error(result.error || 'Failed to change password');
+                }
+            } catch (err) {
+                Msg.error(err.message);
+            }
+        }
+
+        async function handlePhotoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const loader = document.getElementById('uploadLoader');
+            loader.style.opacity = '1';
+
+            try {
+                // Post to UploadController
+                const response = await fetch('http://localhost:8000/index.php?request=api/upload/image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update UI with new URL
+                    updateAvatarUI(result.url, document.getElementById('firstName').value, document.getElementById('lastName').value);
+                    Msg.success('Photo updated!');
+                } else {
+                    throw new Error(result.error || 'Upload failed');
+                }
+            } catch (err) {
+                Msg.error(err.message);
+            } finally {
+                loader.style.opacity = '0';
+                input.value = ''; // Reset input
+            }
+        }
+    </script>
+</body>
+
+</html>

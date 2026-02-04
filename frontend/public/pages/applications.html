@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - NNAK Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=cal-sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS (CDN for reliability) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        /* Custom overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Page-specific overrides if necessary, but preferring styles.css */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pill.pending {
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #ffedd5;
+        }
+
+        .status-pill.active {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #dcfce7;
+        }
+
+        .status-pill.rejected {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fee2e2;
+        }
+
+        .empty-state {
+            padding: 60px 0;
+            text-align: center;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+    <script src="../js/sidebar.js"></script>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main flex-1 flex flex-col overflow-hidden relative" style="margin-left: 0;">
+        <!-- Header -->
+        <!-- Header -->
+        <header
+            class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm lg:shadow-none">
+            <!-- Mobile Menu Button -->
+            <button class="lg:hidden text-gray-500 hover:text-gray-700 mr-2">
+                <svg data-lucide="menu" width="24"></svg>
+            </button>
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-dm-sans">Membership Applications</h1>
+                <p class="text-sm text-gray-500 mt-0.5" id="appCountLabel">Loading applications...</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="loadApplications()"
+                    class="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+                    <svg data-lucide="refresh-cw" width="16"></svg> Refresh
+                </button>
+                <button onclick="exportApplications()"
+                    class="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+                    <svg data-lucide="download" width="16"></svg> Export List
+                </button>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-container">
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-muted uppercase tracking-wide">Pending Review</div>
+                        <div class="text-2xl font-bold text-main mt-1" id="statPending">--</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
+                        <svg data-lucide="clock" width="20"></svg>
+                    </div>
+                </div>
+                <!-- Add other stats if needed, or keep it simple -->
+                <div class="stat-card flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-muted uppercase tracking-wide">Today's Applicants</div>
+                        <div class="text-2xl font-bold text-main mt-1" id="statToday">--</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                        <svg data-lucide="calendar" width="20"></svg>
+                    </div>
+                </div>
+                <div class="stat-card flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-muted uppercase tracking-wide">Avg. Processing</div>
+                        <div class="text-2xl font-bold text-main mt-1">24h</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                        <svg data-lucide="zap" width="20"></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar & Search -->
+            <div class="card mb-6 flex flex-col md:flex-row justify-between items-center gap-4 p-4">
+                <div class="relative w-full md:w-96">
+                    <div
+                        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+                        <svg data-lucide="search" width="16"></svg>
+                    </div>
+                    <input type="text" id="searchInput" onkeyup="handleSearch(event)" class="form-input"
+                        style="padding-left: 36px; background: #f9fafb; border: 1px solid transparent;"
+                        placeholder="Search applicant name or email...">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-muted uppercase">Sort:</span>
+                    <select class="form-input" style="width: auto; padding: 6px 12px; font-size: 0.85rem;"
+                        onchange="handleSort(this.value)">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card p-0 overflow-hidden" style="border: 1px solid var(--border-color);">
+                <div class="overflow-x-auto">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Applicant</th>
+                                <th style="width: 25%;">Contact Info</th>
+                                <th style="width: 15%;">Applied On</th>
+                                <th style="width: 15%;">Status</th>
+                                <th style="text-align: right; width: 15%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appTableBody">
+                            <!-- JS Injected -->
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <div style="margin: 20px 0;">Loading applications...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50/50">
+                    <span class="text-xs font-bold text-muted uppercase" id="paginationInfo">Showing 0-0 of 0</span>
+                    <div class="flex gap-2">
+                        <button id="prevBtn" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.75rem;"
+                            disabled>Previous</button>
+                        <button id="nextBtn" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.75rem;"
+                            disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/admin.js"></script>
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // State
+        let allApps = [];
+        let filteredApps = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
+        let searchQuery = '';
+        let sortOrder = 'newest';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // ensure sidebar active state isn't overwritten by generic logic if we manually set it, 
+            // but admin.js handles it dynamically. Let's rely on admin.js or valid href matching.
+            loadApplications();
+        });
+
+        async function loadApplications() {
+            setLoadingState(true);
+            try {
+                // Fetch Pending members
+                const result = await AdminAPI.getMembers(1, 1000, ''); // Fetch all to client-side filter for now for better UX on small datasets
+
+                if (result) {
+                    // Ensure we handle both structure types if API changes
+                    const data = Array.isArray(result) ? result : (result.members || []);
+                    // Filter for 'pending' only
+                    allApps = data.filter(m => m.status === 'pending');
+                    filteredApps = [...allApps];
+                    renderTable();
+                } else {
+                    throw new Error("Invalid data");
+                }
+            } catch (e) {
+                console.error(e);
+                showErrorState();
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function setLoadingState(isLoading) {
+            const tbody = document.getElementById('appTableBody');
+            if (isLoading) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><div class="animate-pulse">Fetching data...</div></td></tr>`;
+            }
+        }
+
+        function showErrorState() {
+            const tbody = document.getElementById('appTableBody');
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-state" style="color: var(--error-text);">
+                <svg data-lucide="alert-triangle" width="24" style="margin: 0 auto 8px; display: block;"></svg>
+                Failed to load applications. <br>
+                <button onclick="loadApplications()" class="btn btn-outline mt-2">Try Again</button>
+            </td></tr>`;
+            lucide.createIcons();
+        }
+
+        function handleSearch(e) {
+            searchQuery = e.target.value.toLowerCase().trim();
+            applyFilters();
+        }
+
+        function handleSort(value) {
+            sortOrder = value;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            filteredApps = allApps.filter(m =>
+                (m.first_name + ' ' + m.last_name).toLowerCase().includes(searchQuery) ||
+                m.email.toLowerCase().includes(searchQuery)
+            );
+
+            if (sortOrder === 'newest') {
+                filteredApps.sort((a, b) => new Date(b.join_date || b.created_at) - new Date(a.join_date || a.created_at));
+            } else {
+                filteredApps.sort((a, b) => new Date(a.join_date || a.created_at) - new Date(b.join_date || b.created_at));
+            }
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            // Update Stats
+            document.getElementById('statPending').textContent = allApps.length;
+            document.getElementById('appCountLabel').textContent = `${allApps.length} Applications Pending`;
+
+            // Mock Today Count logic
+            const todayCount = allApps.filter(m => {
+                const d = new Date(m.join_date || m.created_at);
+                const today = new Date();
+                return d.getDate() === today.getDate() &&
+                    d.getMonth() === today.getMonth() &&
+                    d.getFullYear() === today.getFullYear();
+            }).length;
+            document.getElementById('statToday').textContent = todayCount;
+
+
+            // Pagination Logic
+            const total = filteredApps.length;
+            const totalPages = Math.ceil(total / itemsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredApps.slice(start, end);
+
+            // UI Updates
+            document.getElementById('paginationInfo').textContent = total > 0
+                ? `Showing ${start + 1}-${Math.min(end, total)} of ${total}`
+                : 'No results';
+
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+
+            document.getElementById('prevBtn').onclick = () => { currentPage--; renderTable(); };
+            document.getElementById('nextBtn').onclick = () => { currentPage++; renderTable(); };
+
+            const tbody = document.getElementById('appTableBody');
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">
+                    <svg data-lucide="check-circle" width="32" style="margin: 0 auto 12px; color: var(--primary); display: block;"></svg>
+                    No pending applications found.
+                </td></tr>`;
+                lucide.createIcons();
+                return;
+            }
+
+            tbody.innerHTML = pageItems.map(m => {
+                const initials = (m.first_name?.[0] || '') + (m.last_name?.[0] || '');
+                const dateStr = new Date(m.join_date || m.created_at).toLocaleDateString();
+                const timeStr = new Date(m.join_date || m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return `
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="avatar-initials">${initials || '??'}</div>
+                            <div>
+                                <div class="font-bold text-gray-900 text-sm">${m.first_name} ${m.last_name}</div>
+                                <div class="text-xs text-muted uppercase tracking-wide">${m.occupation || 'Member'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-2 text-sm text-muted">
+                                <svg data-lucide="mail" width="12"></svg> ${m.email}
+                            </div>
+                             <div class="flex items-center gap-2 text-xs text-muted">
+                                <svg data-lucide="phone" width="12"></svg> ${m.phone || 'N/A'}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                         <div class="text-sm font-medium text-gray-900">${dateStr}</div>
+                         <div class="text-xs text-muted">${timeStr}</div>
+                    </td>
+                    <td>
+                        <span class="status-pill pending">Pending Review</span>
+                    </td>
+                    <td class="text-right">
+                        <div class="flex justify-end gap-2">
+                             <button onclick="approveMember('${m.id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.75rem;">
+                                <svg data-lucide="check" width="14"></svg> Approve
+                            </button>
+                            <button onclick="rejectMember('${m.id}')" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.75rem; color: #ef4444; border-color: #fee2e2;">
+                                <svg data-lucide="x" width="14"></svg> Reject
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        async function approveMember(id) {
+            const result = await Swal.fire({
+                title: 'Grant Access?',
+                text: "User will receive full member privileges immediately.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#059669',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Yes, Approve',
+                customClass: {
+                    popup: 'rounded-2xl'
+                }
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await AdminAPI.updateMember(id, { status: 'active' });
+                    Swal.fire({
+                        title: 'Approved!',
+                        text: 'Member activated successfully.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    loadApplications();
+                } catch (e) {
+                    Swal.fire('Error', 'Failed to approve member', 'error');
+                }
+            }
+        }
+
+        async function rejectMember(id) {
+            const result = await Swal.fire({
+                title: 'Reject Application?',
+                text: "This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Yes, Reject',
+                customClass: {
+                    popup: 'rounded-2xl'
+                }
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    // Assuming 'suspended' or Delete is desired.
+                    await AdminAPI.updateMember(id, { status: 'suspended' });
+                    Swal.fire({
+                        title: 'Rejected',
+                        text: 'Application rejected.',
+                        icon: 'info',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    loadApplications();
+                } catch (e) {
+                    Swal.fire('Error', 'Failed to reject', 'error');
+                }
+            }
+        }
+
+        function exportApplications() {
+            Swal.fire('Exporting', 'Downloading CSV...', 'info');
+            // Future Implementation
+        }
+
+    </script>
+</body>
+
+</html>

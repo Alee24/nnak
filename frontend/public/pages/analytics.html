@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - NNAK Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS (CDN for reliability) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        /* Custom overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-dm-sans {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            border-color: #d1d5db;
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+        }
+
+        /* Ensure modals are hidden by default */
+        .modal-hidden {
+            display: none !important;
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-slate-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+    <script src="../js/sidebar.js"></script>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50/50 relative">
+        <!-- Header -->
+        <header
+            class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm lg:shadow-none">
+            <!-- Mobile Menu Button -->
+            <button class="lg:hidden text-gray-500 hover:text-gray-700 mr-2">
+                <svg data-lucide="menu" width="24"></svg>
+            </button>
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-dm-sans">Analytics & Reports</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Deep insights into membership and revenue</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
+                    <button
+                        class="px-3 py-1.5 text-xs font-bold bg-gray-100 text-gray-900 rounded-md shadow-sm">Overview</button>
+                    <button
+                        class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 rounded-md transition">Engagement</button>
+                    <button
+                        class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 rounded-md transition">Financials</button>
+                </div>
+                <div class="h-6 w-px bg-gray-200"></div>
+                <button
+                    class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm">
+                    <svg data-lucide="download" width="16"></svg> Export
+                </button>
+                <div class="flex items-center gap-4 pl-6 border-l border-gray-100 h-8">
+                    <div
+                        class="w-9 h-9 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 flex items-center justify-center font-bold text-xs ring-2 ring-white shadow-sm">
+                        AU</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <div class="flex-1 overflow-auto custom-scrollbar">
+            <div class="p-4 lg:p-8 space-y-6 lg:space-y-8">
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                    <!-- Total Revenue -->
+                    <div
+                        class="stat-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:-translate-y-1 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2.5 bg-green-50 rounded-xl text-green-600">
+                                <svg data-lucide="dollar-sign" width="20"></svg>
+                            </div>
+                            <span id="badgeRevenueGrowth"
+                                class="text-green-600 text-xs font-bold bg-green-50 px-2.5 py-1 rounded-full border border-green-100">--%</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 tracking-tight" id="kpiRevenue">--</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">Total Revenue (YTD)</div>
+                    </div>
+
+                    <!-- Membership Growth -->
+                    <div
+                        class="stat-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:-translate-y-1 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2.5 bg-blue-50 rounded-xl text-blue-600">
+                                <svg data-lucide="trending-up" width="20"></svg>
+                            </div>
+                            <span id="badgeMemberGrowth"
+                                class="text-blue-600 text-xs font-bold bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">--%</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 tracking-tight" id="kpiGrowth">--</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">New Members (This Month)</div>
+                    </div>
+
+                    <!-- Active Members -->
+                    <div
+                        class="stat-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:-translate-y-1 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2.5 bg-purple-50 rounded-xl text-purple-600">
+                                <svg data-lucide="users" width="20"></svg>
+                            </div>
+                            <span
+                                class="text-gray-500 text-xs font-medium bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">Total</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 tracking-tight" id="kpiTotalMembers">--</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">Total Members</div>
+                    </div>
+
+                    <!-- Event Revenue -->
+                    <div
+                        class="stat-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:-translate-y-1 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2.5 bg-orange-50 rounded-xl text-orange-600">
+                                <svg data-lucide="calendar" width="20"></svg>
+                            </div>
+                            <span
+                                class="text-orange-600 text-xs font-bold bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">+5%</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 tracking-tight" id="kpiEventRevenue">--</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">Event Revenue</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+                    <!-- Member Growth -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Membership Growth</h3>
+                                <p class="text-xs text-gray-500">New member registrations over time</p>
+                            </div>
+                            <select
+                                class="bg-gray-50 border border-gray-200 text-xs font-bold text-gray-700 py-2 px-3 rounded-lg outline-none focus:ring-2 focus:ring-green-100">
+                                <option value="6">Last 6 Months</option>
+                                <option value="12">Last Year</option>
+                            </select>
+                        </div>
+                        <div class="h-80 w-full relative">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Breakdown -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Revenue Sources</h3>
+                                <p class="text-xs text-gray-500">Income breakdown by category</p>
+                            </div>
+                            <button
+                                class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 transition">View
+                                Details</button>
+                        </div>
+                        <div class="h-80 w-full relative">
+                            <canvas id="revenueSourcesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <!-- Membership Status -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                        <h3 class="font-bold text-gray-900 text-lg mb-2">Member Status</h3>
+                        <p class="text-xs text-gray-500 mb-6">Distribution of member accounts</p>
+                        <div class="h-64 w-full relative flex items-center justify-center">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                        <div class="mt-6 space-y-3">
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div> <span
+                                        class="text-gray-600 font-medium">Active</span>
+                                </div>
+                                <span class="font-bold text-gray-900" id="statusActiveCount">--</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div> <span
+                                        class="text-gray-600 font-medium">Pending</span>
+                                </div>
+                                <span class="font-bold text-gray-900" id="statusPendingCount">--</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div> <span
+                                        class="text-gray-600 font-medium">Suspended</span>
+                                </div>
+                                <span class="font-bold text-gray-900" id="statusSuspendedCount">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Events Table -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-900 text-lg">Top Performing Events</h3>
+                            <a href="events.html"
+                                class="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-green-600 transition">View
+                                All <svg data-lucide="arrow-right" width="14"></svg></a>
+                        </div>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-sm text-left border-collapse">
+                                <thead
+                                    class="text-xs text-gray-400 font-semibold uppercase bg-gray-50/50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-3 rounded-tl-lg">Event Name</th>
+                                        <th class="px-4 py-3">Date</th>
+                                        <th class="px-4 py-3 text-center">Attendees</th>
+                                        <th class="px-4 py-3 text-right rounded-tr-lg">Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-600" id="topEventsTable">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </main>
+
+    <!-- Mobile Nav (Visible only on mobile) -->
+    <nav
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-50 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <a href="admin.html"
+            class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+            <svg data-lucide="layout-grid" width="20"></svg> Dashboard
+        </a>
+        <a href="members.html"
+            class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+            <svg data-lucide="users" width="20"></svg> Members
+        </a>
+        <a href="analytics.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-green-600">
+            <svg data-lucide="bar-chart-2" width="20"></svg> Analytics
+        </a>
+        <a href="settings.html"
+            class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+            <svg data-lucide="settings" width="20"></svg> Settings
+        </a>
+    </nav>
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+        const formatCompact = (num) => new Intl.NumberFormat('en-KE', { notation: "compact", maximumFractionDigits: 1 }).format(num);
+        const formatKES = (num) => 'KES ' + formatCompact(num);
+        const formatKESFull = (num) => new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(num);
+
+        async function initAnalytics() {
+            try {
+                // Fetch Data
+                const stats = await AdminAPI.getStats();
+                // Mocking charts data for visual demo (API might not give time-series for all yet)
+
+                // Update KPI Cards
+                if (stats) {
+                    document.getElementById('kpiRevenue').innerText = formatKES(stats.year_revenue || 1250000); // Fallback mock
+                    document.getElementById('kpiGrowth').innerText = "+" + (stats.recent_registrations || 45);
+                    document.getElementById('kpiTotalMembers').innerText = (stats.total_members || 1200).toLocaleString();
+                    document.getElementById('kpiEventRevenue').innerText = formatKES(450000); // Mock
+
+                    // Growth Badges
+                    renderGrowthBadge('badgeRevenueGrowth', stats.revenue_growth);
+                    renderGrowthBadge('badgeMemberGrowth', stats.member_growth);
+
+                    renderStatusChart({
+                        active: stats.active_members || 850,
+                        pending: (stats.pending_payments ? stats.pending_payments.count : 150),
+                        suspended: 24
+                    });
+                } else {
+                    // Fallback mocks if API fails or returns null
+                    document.getElementById('kpiRevenue').innerText = "KES 1.2M";
+                    document.getElementById('kpiGrowth').innerText = "+65";
+                    document.getElementById('kpiTotalMembers').innerText = "1,240";
+                    document.getElementById('kpiEventRevenue').innerText = "KES 450k";
+
+                    renderStatusChart({ active: 850, pending: 150, suspended: 24 });
+                }
+
+                renderGrowthChart();
+                renderRevenueSourcesChart();
+                renderEventsTable();
+
+            } catch (e) {
+                console.error("Analytics Load Error", e);
+            }
+        }
+
+        function renderGrowthChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(5, 150, 105, 0.2)');
+            gradient.addColorStop(1, 'rgba(5, 150, 105, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'New Members',
+                        data: [65, 59, 80, 81, 56, 125], // Mock data uses hardcoded values as placeholder
+                        borderColor: '#059669',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#059669',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            padding: 12,
+                            titleFont: { size: 13, family: 'Inter' },
+                            bodyFont: { size: 13, family: 'Inter' },
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6', borderDash: [4, 4] },
+                            border: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#9ca3af' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#9ca3af' }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                }
+            });
+        }
+
+        function renderRevenueSourcesChart() {
+            const ctx = document.getElementById('revenueSourcesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Membership', 'Events', 'Donations', 'Merch'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [250000, 150000, 50000, 25000],
+                        backgroundColor: ['#059669', '#3b82f6', '#f59e0b', '#6366f1'],
+                        borderRadius: 6,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6', borderDash: [4, 4] },
+                            border: { display: false },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                color: '#9ca3af',
+                                callback: function (value) { return 'K' + value / 1000; }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderStatusChart(data) {
+
+            // Validate Elements exist
+            const activeEl = document.getElementById('statusActiveCount');
+            const pendingEl = document.getElementById('statusPendingCount');
+            const suspendedEl = document.getElementById('statusSuspendedCount');
+
+            if (activeEl) activeEl.innerText = data.active.toLocaleString();
+            if (pendingEl) pendingEl.innerText = data.pending.toLocaleString();
+            if (suspendedEl) suspendedEl.innerText = data.suspended.toLocaleString();
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active', 'Pending', 'Suspended'],
+                    datasets: [{
+                        data: [data.active, data.pending, data.suspended],
+                        backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderEventsTable() {
+            const container = document.getElementById('topEventsTable');
+            const events = [
+                { name: "Annual Nursing Conference 2025", date: "Dec 12, 2025", attendees: 450, revenue: 1200500 },
+                { name: "CPD Workshop: Ethics in Nursing", date: "Nov 05, 2025", attendees: 120, revenue: 350000 },
+                { name: "Midwife Training Seminar", date: "Oct 20, 2025", attendees: 85, revenue: 210000 },
+                { name: "Leadership in Healthcare", date: "Sep 15, 2025", attendees: 60, revenue: 150000 },
+            ];
+
+            container.innerHTML = events.map(e => `
+                <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/80 transition group">
+                    <td class="px-4 py-3.5">
+                        <div class="font-bold text-gray-900 group-hover:text-green-700 transition">${e.name}</div>
+                    </td>
+                    <td class="px-4 py-3.5 text-xs font-medium text-gray-500">${e.date}</td>
+                    <td class="px-4 py-3.5 text-center">
+                        <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">${e.attendees}</span>
+                    </td>
+                    <td class="px-4 py-3.5 text-right font-bold text-gray-900 font-mono text-xs">
+                        ${formatKESFull(e.revenue)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderGrowthBadge(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const num = parseFloat(value || 0);
+            const isPositive = num >= 0;
+            const sign = isPositive ? '+' : '';
+
+            el.innerText = `${sign}${num}%`;
+
+            // Reset classes and apply based on value
+            el.className = `text-xs font-bold px-2.5 py-1 rounded-full border ${isPositive
+                ? 'text-green-600 bg-green-50 border-green-100'
+                : 'text-red-600 bg-red-50 border-red-100'}`;
+        }
+
+        initAnalytics();
+    </script>
+</body>
+
+</html>

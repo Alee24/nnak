@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - NNAK</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 font-inter text-slate-900">
+
+    <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar fixed w-64 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col z-50">
+            <!-- Brand -->
+            <div class="h-20 flex items-center px-8 border-b border-gray-100 mb-6">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-[#059669] to-[#047857] rounded-xl flex items-center justify-center text-white font-bold mr-3 shadow-md">
+                    N</div>
+                <span class="font-bold text-lg tracking-tight text-gray-900">Member Portal</span>
+            </div>
+
+            <!-- Nav -->
+            <nav class="flex-1 px-4 space-y-1">
+                <a href="dashboard.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="layout-grid" width="18"></svg> Dashboard
+                </a>
+                <a href="card.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="credit-card" width="18"></svg> ID Card
+                </a>
+                <a href="payment.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="zap" width="18"></svg> Payments
+                </a>
+                <a href="events.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="calendar" width="18"></svg> Events
+                </a>
+                <a href="profile.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-[#047857] bg-[#d1fae5] rounded-xl transition">
+                    <svg data-lucide="user" width="18"></svg> My Profile
+                </a>
+            </nav>
+
+            <!-- User Footer -->
+            <div class="p-4 border-t border-gray-100">
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition cursor-pointer group">
+                    <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs"
+                        id="sidebarAvatar">?</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-bold text-gray-900 truncate" id="sidebarName">Loading...</div>
+                        <div class="text-xs text-gray-500 truncate" id="sidebarEmail">...</div>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-400 group-hover:text-red-500 transition"><svg
+                            data-lucide="log-out" width="16"></svg></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-main flex-col h-screen overflow-hidden lg:ml-64 bg-slate-50 relative">
+
+            <!-- Sticky Header -->
+            <header
+                class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Logo -->
+                    <div
+                        class="lg:hidden w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold">
+                        N</div>
+                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
+                </div>
+
+                <button form="profileForm" type="submit"
+                    class="btn-primary flex items-center gap-2 px-5 py-2.5 rounded-full text-sm shadow-lg shadow-green-200/50"
+                    id="saveBtnHeader">
+                    <svg data-lucide="save" width="18"></svg> Save Changes
+                </button>
+            </header>
+
+            <!-- Scrollable Body -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10 pb-24 lg:pb-10">
+
+                <div class="max-w-4xl mx-auto">
+
+                    <form id="profileForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                        <!-- Left Col: Identity Card -->
+                        <div class="lg:col-span-1">
+                            <div
+                                class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center sticky top-6">
+                                <div class="relative w-32 h-32 mx-auto mb-4 group cursor-pointer">
+                                    <img id="avatarPreview" src="https://via.placeholder.com/150" alt="Profile"
+                                        class="w-full h-full rounded-full object-cover border-4 border-white shadow-lg group-hover:opacity-90 transition">
+                                    <label for="avatarInput"
+                                        class="absolute bottom-0 right-0 bg-gray-900 text-white p-2 rounded-full cursor-pointer hover:bg-green-600 transition shadow-md">
+                                        <svg data-lucide="camera" width="16"></svg>
+                                    </label>
+                                    <input type="file" id="avatarInput" accept="image/*" class="hidden">
+                                </div>
+
+                                <h2 class="text-lg font-bold text-gray-900" id="userName">Loading...</h2>
+                                <p class="text-sm text-gray-500 mb-4" id="userEmail">...</p>
+
+                                <div class="inline-flex items-center px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100"
+                                    id="userStatus">
+                                    Active Member
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-gray-100 text-left space-y-4">
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wide">Member
+                                            ID</label>
+                                        <div
+                                            class="font-mono text-sm font-medium text-gray-900 bg-gray-50 px-3 py-2 rounded-lg mt-1 border border-gray-200 flex justify-between items-center">
+                                            <input type="text" id="memberId" value="..." disabled
+                                                class="bg-transparent border-none w-full text-gray-600 cursor-not-allowed text-sm p-0 focus:ring-0">
+                                            <svg data-lucide="lock" width="12" class="text-gray-400"></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Col: Edit Form -->
+                        <div class="lg:col-span-2 space-y-6">
+
+                            <!-- Personal Details -->
+                            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                                <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+                                    <h3 class="font-bold text-gray-900">Personal Information</h3>
+                                    <p class="text-sm text-gray-500">Update your contact details and employment.</p>
+                                </div>
+                                <div class="p-6 space-y-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                                            <input type="text" id="fullName" disabled
+                                                class="form-input bg-gray-50 text-gray-500 cursor-not-allowed">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">Email
+                                                Address</label>
+                                            <input type="email" id="email" disabled
+                                                class="form-input bg-gray-50 text-gray-500 cursor-not-allowed">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">Phone
+                                                Number</label>
+                                            <input type="tel" id="phone" class="form-input" placeholder="+254 7...">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">Work
+                                                Station</label>
+                                            <input type="text" id="workStation" class="form-input"
+                                                placeholder="e.g. Kenyatta National Hospital">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security -->
+                            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                                <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+                                    <h3 class="font-bold text-gray-900">Security</h3>
+                                    <p class="text-sm text-gray-500">Manage your password.</p>
+                                </div>
+                                <div class="p-6">
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-700 mb-2">New Password</label>
+                                        <input type="password" id="newPassword" class="form-input"
+                                            placeholder="Leave blank to keep current password">
+                                        <p class="text-xs text-gray-400 mt-2">At least 8 characters, including a number
+                                            and symbol.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Save Button -->
+                            <div class="lg:hidden">
+                                <button type="submit" class="btn-primary w-full py-3 rounded-xl shadow-lg"
+                                    id="saveBtnMobile">
+                                    Save Changes
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast Notification -->
+        <div id="toast"
+            class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[100] transition-all duration-300 opacity-0 translate-y-10 pointer-events-none flex items-center gap-3">
+            <svg data-lucide="check-circle" width="18" class="text-green-400"></svg>
+            <span id="toastMsg" class="font-medium text-sm">Profile Updated</span>
+        </div>
+
+        <!-- Mobile Bottom Nav -->
+        <nav
+            class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-50 pb-safe">
+            <a href="dashboard.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="layout-grid" width="20"></svg> Home
+            </a>
+            <a href="card.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="credit-card" width="20"></svg> ID Card
+            </a>
+            <a href="events.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="calendar" width="20"></svg> Events
+            </a>
+            <a href="profile.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-green-600">
+                <svg data-lucide="user" width="20"></svg> Profile
+            </a>
+        </nav>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        lucide.createIcons();
+        if (!requireAuth()) { }
+
+        async function loadProfile() {
+            try {
+                const profile = await AuthService.getProfile();
+                const user = profile;
+
+                // Sidebar
+                document.getElementById('sidebarName').textContent = user.first_name + ' ' + user.last_name;
+                document.getElementById('sidebarEmail').textContent = user.email;
+                document.getElementById('sidebarAvatar').textContent = user.first_name[0];
+
+                // Profile Header
+                document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userStatus').textContent = user.status || 'Active Member';
+
+                // Form Fields
+                document.getElementById('memberId').value = user.member_id || 'PENDING';
+                document.getElementById('fullName').value = `${user.first_name} ${user.last_name}`;
+                document.getElementById('email').value = user.email;
+                document.getElementById('phone').value = user.phone_number || '';
+                document.getElementById('workStation').value = user.work_station || '';
+
+                if (user.profile_photo) {
+                    document.getElementById('avatarPreview').src = user.profile_photo;
+                } else {
+                    document.getElementById('avatarPreview').src = `https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=random&color=fff`;
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Handle Image Preview
+        document.getElementById('avatarInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Handle both buttons for UI feedback
+            const btnHeader = document.getElementById('saveBtnHeader');
+            const btnMobile = document.getElementById('saveBtnMobile');
+
+            const setBtnState = (loading) => {
+                if (loading) {
+                    btnHeader.innerHTML = 'Saving...';
+                    btnHeader.disabled = true;
+                    if (btnMobile) { btnMobile.innerHTML = 'Saving...'; btnMobile.disabled = true; }
+                } else {
+                    btnHeader.innerHTML = '<svg data-lucide="save" width="18"></svg> Save Changes';
+                    btnHeader.disabled = false;
+                    lucide.createIcons();
+                    if (btnMobile) { btnMobile.innerHTML = 'Save Changes'; btnMobile.disabled = false; }
+                }
+            };
+
+            setBtnState(true);
+
+            const phone = document.getElementById('phone').value;
+            const workstation = document.getElementById('workStation').value;
+            const password = document.getElementById('newPassword').value;
+
+            try {
+                const updates = {
+                    phone_number: phone,
+                    work_station: workstation
+                };
+                if (password) updates.password = password;
+
+                await API.post('auth/update-profile', updates);
+
+                showToast('Profile Updated Successfully');
+
+            } catch (error) {
+                console.error(error);
+                showToast('Update failed: ' + error.message, true);
+            } finally {
+                setBtnState(false);
+            }
+        });
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+
+            toastMsg.textContent = msg;
+            if (isError) {
+                toast.querySelector('svg').style.color = '#f87171'; // Red
+            } else {
+                toast.querySelector('svg').style.color = '#4ade80'; // Green
+            }
+
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+            }, 3000);
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await AuthService.logout();
+        });
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - NNAK Admin</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Alerts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Tailwind CSS (CDN for reliability) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        /* Custom overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-dm-sans {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            border-color: #d1d5db;
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+        }
+
+        /* Ensure modals are hidden by default */
+        .modal-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+    <script src="../js/sidebar.js"></script>
+
+    <!-- CONTENT -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50/50 relative">
+
+        <!-- Header -->
+        <header
+            class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm lg:shadow-none">
+            <!-- Mobile Menu Button -->
+            <button class="lg:hidden text-gray-500 hover:text-gray-700 mr-2">
+                <svg data-lucide="menu" width="24"></svg>
+            </button>
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-dm-sans">Financial Overview</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Track and manage all association payments</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="Swal.fire('Info', 'Export feature coming soon', 'info')"
+                    class="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+                    <svg data-lucide="download" width="16"></svg> Export Report
+                </button>
+                <button onclick="openRecordPaymentModal()"
+                    class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-green-600/20 hover:scale-[1.02] transform transition bg-[#059669] text-white">
+                    <svg data-lucide="plus" width="18"></svg> <span class="hidden md:inline">Record Payment</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-auto custom-scrollbar">
+            <div class="p-8 space-y-8">
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="summary-card p-5 rounded-2xl relative overflow-hidden group bg-white">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <svg data-lucide="wallet" width="64" height="64" class="text-green-600"></svg>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Revenue</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mt-2 mb-1">KES <span id="totalRevenue">0.00</span>
+                        </div>
+                        <div
+                            class="text-xs font-medium text-green-600 bg-green-50 inline-block px-2 py-0.5 rounded-full">
+                            +12% vs last month</div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="summary-card p-5 rounded-2xl relative overflow-hidden group bg-white">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <svg data-lucide="clock" width="64" height="64" class="text-yellow-600"></svg>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending
+                                Payments</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mt-2 mb-1">KES <span
+                                id="pendingRevenue">0.00</span></div>
+                        <div class="text-xs font-medium text-gray-500">Awaiting validation</div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="summary-card p-5 rounded-2xl relative overflow-hidden group bg-white">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <svg data-lucide="users" width="64" height="64" class="text-blue-600"></svg>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Recent
+                                Transactions</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mt-2 mb-1" id="recentCount">0</div>
+                        <div class="text-xs font-medium text-gray-500">Transactions this week</div>
+                    </div>
+                </div>
+
+                <!-- Filters & Table Section -->
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-1">
+                    <!-- Filters Toolbar -->
+                    <div
+                        class="p-4 flex flex-col md:flex-row gap-4 justify-between items-center border-b border-gray-100">
+                        <div class="relative w-full md:w-96 group">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg data-lucide="search" width="16"
+                                    class="text-gray-400 group-focus-within:text-green-500 transition"></svg>
+                            </div>
+                            <input type="text" id="searchInput" onkeyup="debounceSearch()"
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition"
+                                placeholder="Search by Invoice #, Member Name...">
+                        </div>
+
+                        <div class="flex gap-3">
+                            <select id="statusFilter" onchange="loadPayments()"
+                                class="bg-gray-50 border border-gray-200 text-sm text-gray-700 py-2.5 px-4 rounded-xl outline-none focus:bg-white focus:border-green-500 focus:ring-4 focus:ring-green-500/10 cursor-pointer transition">
+                                <option value="">All Statuses</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <select id="typeFilter" onchange="loadPayments()"
+                                class="bg-gray-50 border border-gray-200 text-sm text-gray-700 py-2.5 px-4 rounded-xl outline-none focus:bg-white focus:border-green-500 focus:ring-4 focus:ring-green-500/10 cursor-pointer transition">
+                                <option value="">All Types</option>
+                                <option value="membership">Membership</option>
+                                <option value="event">Event</option>
+                                <option value="donation">Donation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto min-h-[400px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50/50 border-b border-gray-100">
+                                    <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Invoice / Info</th>
+                                    <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Member</th>
+                                    <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Amount</th>
+                                    <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Payment Method</th>
+                                    <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">Date
+                                    </th>
+                                    <th
+                                        class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">
+                                        Status</th>
+                                    <th
+                                        class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsTableBody" class="divide-y divide-gray-50 text-sm">
+                                <tr>
+                                    <td colspan="7" class="text-center py-24">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div
+                                                class="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-3">
+                                            </div>
+                                            <span class="text-gray-400 font-medium">Loading transactions...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="p-4 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-500" id="paginationInfo">Showing 0 results</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changePage(-1)" id="prevBtn"
+                                class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50">Previous</button>
+                            <button onclick="changePage(1)" id="nextBtn"
+                                class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Record Payment Modal -->
+    <div id="recordPaymentModal"
+        class="modal-hidden hidden fixed inset-0 bg-gray-900/60 z-[100] flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div
+            class="bg-white w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 scale-100 transform transition-transform">
+            <div
+                class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Record Payment</h3>
+                    <p class="text-xs text-gray-500">Manually log an external transaction</p>
+                </div>
+                <button onclick="closeModal('recordPaymentModal')"
+                    class="p-2 rounded-full text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition">
+                    <svg data-lucide="x" width="20"></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <form id="recordPaymentForm" class="space-y-5">
+
+                    <!-- Search Member -->
+                    <div class="space-y-1 relative">
+                        <label class="text-sm font-medium text-gray-700">Select Member <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input type="text" id="memberSearchInput" placeholder="Search by name or email..."
+                                oninput="handleMemberSearch(this.value)"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-green-500 focus:ring-4 focus:ring-green-500/10 outline-none transition pl-10">
+                            <svg data-lucide="search" width="16" class="absolute left-3.5 top-3.5 text-gray-400"></svg>
+                        </div>
+                        <input type="hidden" name="member_id" id="selectedMemberId" required>
+
+                        <!-- Search Results Dropdown -->
+                        <div id="memberSearchResults"
+                            class="absolute w-full bg-white border border-gray-100 shadow-xl rounded-xl mt-1 hidden max-h-48 overflow-y-auto z-50">
+                        </div>
+
+                        <!-- Selected Member Display -->
+                        <div id="selectedMemberDisplay"
+                            class="hidden p-3 bg-green-50 border border-green-100 rounded-xl flex items-center justify-between mt-2">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-xs">
+                                    SM</div>
+                                <div>
+                                    <div class="text-sm font-bold text-green-900" id="selMemName">Member Name</div>
+                                    <div class="text-xs text-green-700" id="selMemEmail">email@example.com</div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="clearSelectedMember()"
+                                class="text-green-600 hover:text-green-800 text-xs font-bold hover:underline">Change</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Amount (KES) <span
+                                    class="text-red-500">*</span></label>
+                            <input type="number" name="amount" required min="1" placeholder="e.g. 1000"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/10 outline-none transition">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Payment Type <span
+                                    class="text-red-500">*</span></label>
+                            <select name="payment_type" required
+                                class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/10 outline-none transition bg-white">
+                                <option value="membership">Membership</option>
+                                <option value="event">Event</option>
+                                <option value="donation">Donation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Method <span
+                                    class="text-red-500">*</span></label>
+                            <select name="payment_method" required
+                                class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/10 outline-none transition bg-white">
+                                <option value="mpesa">M-Pesa</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="cash">Cash</option>
+                                <option value="cheque">Cheque</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700">Ref No.</label>
+                            <input type="text" name="transaction_reference" placeholder="e.g. QKH..."
+                                class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/10 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-gray-700">Status</label>
+                        <select name="payment_status"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/10 outline-none transition bg-white">
+                            <option value="completed">Completed (Paid)</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-gray-700">Description (Optional)</label>
+                        <textarea name="description" rows="2" placeholder="Notes..."
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/10 outline-none transition resize-none"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50 rounded-b-2xl">
+                <button onclick="closeModal('recordPaymentModal')"
+                    class="px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200/50 transition">Cancel</button>
+                <button onclick="submitPayment()"
+                    class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20 transition flex items-center gap-2">
+                    <span id="submitBtnText">Record Payment</span>
+                    <div id="submitBtnLoader"
+                        class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+        let currentPage = 1;
+        let searchTimeout;
+
+        // Utility to format currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
+        };
+
+        // Load Initial Data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPayments();
+            loadStats();
+        });
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadPayments();
+            }, 300);
+        }
+
+        async function loadPayments() {
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('searchInput').value;
+            const tbody = document.getElementById('paymentsTableBody');
+
+            try {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-24"><div class="flex flex-col items-center justify-center"><div class="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-3"></div><span class="text-sm font-medium text-gray-400">Loading transactions...</span></div></td></tr>`;
+
+                // Uses the AdminAPI wrapper which handles auth
+                const data = await AdminAPI.getPayments(currentPage, 20, status);
+
+                if (data && data.payments && data.payments.length > 0) {
+                    tbody.innerHTML = data.payments.map(p => `
+                        <tr class="group hover:bg-gray-50 transition border-b border-gray-50 last:border-none">
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-gray-900 text-sm font-dm-sans">${p.invoice_number || 'N/A'}</div>
+                                <div class="text-[11px] text-gray-400 mt-1 truncate max-w-[150px]" title="${p.description || ''}">${p.description || 'No description'}</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 flex items-center justify-center font-bold text-xs ring-2 ring-white shadow-sm">
+                                        ${p.first_name ? p.first_name[0] : 'U'}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-900 text-sm">${p.first_name} ${p.last_name}</div>
+                                        <div class="text-[11px] text-gray-400 mt-0.5">${p.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-gray-900 text-sm font-mono tracking-tight">${formatCurrency(p.amount)}</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="capitalize text-sm font-medium text-gray-700 flex items-center gap-2">
+                                     ${p.payment_method}
+                                     <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono">${p.transaction_reference ? '#' + p.transaction_reference.substring(0, 6) : ''}</span>
+                                </span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="text-sm font-medium text-gray-700">${new Date(p.created_at).toLocaleDateString()}</div>
+                                <div class="text-[11px] text-gray-400 mt-0.5">${new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                ${getStatusPill(p.payment_status)}
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <button class="p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-green-600 hover:border-green-200 transition shadow-sm group-hover:visible" title="View Details">
+                                    <svg data-lucide="arrow-up-right" width="16"></svg>
+                                </button>
+                            </td>
+                        </tr>
+                     `).join('');
+                    updatePagination(data.pagination);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-24"><div class="flex flex-col items-center"><div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-3"><svg data-lucide="inbox" width="24"></svg></div><span class="text-gray-500 font-medium">No transactions found</span></div></td></tr>`;
+                }
+                lucide.createIcons();
+            } catch (e) {
+                console.error(e);
+                // Only show toast if not a redirect
+                if (e.message !== 'Session expired') {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-red-500 font-medium">Error loading data. ${e.message}</td></tr>`;
+                }
+            }
+        }
+
+        async function loadStats() {
+            // Placeholder for stats loading
+            try {
+                // Fetch stats if API exists, or calculate locally for now
+                document.getElementById('totalRevenue').innerText = '0.00';
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function getStatusPill(status) {
+            const map = {
+                completed: { class: 'bg-green-50 text-green-700 border-green-200', text: 'Paid' },
+                pending: { class: 'bg-yellow-50 text-yellow-700 border-yellow-200', text: 'Pending' },
+                failed: { class: 'bg-red-50 text-red-700 border-red-200', text: 'Failed' }
+            };
+            const s = (status || '').toLowerCase();
+            const config = map[s] || { class: 'bg-gray-50 text-gray-600 border-gray-200', text: s };
+
+            return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${config.class} uppercase tracking-wide shadow-sm">${config.text}</span>`;
+        }
+
+        function changePage(d) {
+            currentPage += d;
+            loadPayments();
+        }
+
+        function updatePagination(meta) {
+            if (!meta) return;
+            document.getElementById('paginationInfo').innerText = `Showing page ${meta.page} of ${meta.pages} (${meta.total} total)`;
+            document.getElementById('prevBtn').disabled = meta.page <= 1;
+            document.getElementById('nextBtn').disabled = meta.page >= meta.pages;
+        }
+
+        // --- Create Payment Logic ---
+        function openRecordPaymentModal() {
+            const modal = document.getElementById('recordPaymentModal');
+            modal.classList.remove('hidden', 'modal-hidden');
+            document.getElementById('recordPaymentForm').reset();
+            clearSelectedMember();
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden', 'modal-hidden');
+        }
+
+        // Member Search (Autocomplete)
+        let searchMemTimeout;
+        async function handleMemberSearch(query) {
+            if (query.length < 2) {
+                document.getElementById('memberSearchResults').classList.add('hidden');
+                return;
+            }
+
+            clearTimeout(searchMemTimeout);
+            searchMemTimeout = setTimeout(async () => {
+                try {
+                    const res = await AdminAPI.getMembers(1, 10, '', query);
+                    const list = document.getElementById('memberSearchResults');
+
+                    if (res && res.members && res.members.length > 0) {
+                        list.classList.remove('hidden');
+                        list.innerHTML = res.members.map(m => `
+                            <div onclick="selectMember('${m.id}', '${m.first_name} ${m.last_name}', '${m.email}')" 
+                                class="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-none flex items-center justify-between group">
+                                <div>
+                                    <div class="text-sm font-bold text-gray-900 group-hover:text-green-700">${m.first_name} ${m.last_name}</div>
+                                    <div class="text-xs text-gray-500">${m.email}</div>
+                                </div>
+                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">${m.member_id || 'N/A'}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        list.classList.remove('hidden');
+                        list.innerHTML = `<div class="p-3 text-sm text-gray-500 text-center">No members found</div>`;
+                    }
+                } catch (e) {
+                    console.error("Search error", e);
+                }
+            }, 300);
+        }
+
+        function selectMember(id, name, email) {
+            document.getElementById('selectedMemberId').value = id;
+            document.getElementById('memberSearchInput').parentElement.classList.add('hidden');
+            document.getElementById('memberSearchResults').classList.add('hidden');
+
+            const disp = document.getElementById('selectedMemberDisplay');
+            disp.classList.remove('hidden');
+            document.getElementById('selMemName').innerText = name;
+            document.getElementById('selMemEmail').innerText = email;
+        }
+
+        function clearSelectedMember() {
+            document.getElementById('selectedMemberId').value = '';
+            document.getElementById('memberSearchInput').value = '';
+            document.getElementById('memberSearchInput').parentElement.classList.remove('hidden');
+            document.getElementById('selectedMemberDisplay').classList.add('hidden');
+        }
+
+        async function submitPayment() {
+            const form = document.getElementById('recordPaymentForm');
+            if (!form.reportValidity()) return;
+
+            if (!document.getElementById('selectedMemberId').value) {
+                Swal.fire('Error', 'Please select a member first', 'error');
+                return;
+            }
+
+            const submitBtn = document.querySelector('#recordPaymentModal button[onclick="submitPayment()"]');
+            const submitText = document.getElementById('submitBtnText');
+            const submitLoader = document.getElementById('submitBtnLoader');
+
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+
+            // Clean up numbers
+            payload.amount = parseFloat(payload.amount);
+
+            try {
+                // UI Loading
+                submitBtn.disabled = true;
+                submitText.textContent = 'Recording...';
+                submitLoader.classList.remove('hidden');
+
+                await AdminAPI.createPayment(payload);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Recorded',
+                    text: 'The transaction has been logged successfully.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                closeModal('recordPaymentModal');
+                loadPayments();
+
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Failed to record payment', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Record Payment';
+                submitLoader.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+
+</html>

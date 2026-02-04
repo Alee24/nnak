@@ -1,0 +1,3 @@
+First Name,Last Name,Email,Phone,Gender,License Number,Address,City,Occupation,Organization,Membership Type ID,Status,Member ID
+John,Doe,john@example.com,0712345678,Male,NNAK-12345,123 Green St,Nairobi,Nurse,Kollaboration Hospital,1,active,
+Jane,Smith,jane@example.com,0722334455,Female,,456 Blue Ave,Mombasa,Midwife,General Hospital,1,pending,

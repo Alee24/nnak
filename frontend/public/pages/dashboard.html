@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Portal - NNAK</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 font-inter text-slate-900">
+
+    <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar fixed w-64 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col z-50">
+            <!-- Brand -->
+            <div class="h-20 flex items-center px-8 border-b border-gray-100 mb-6">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-[#059669] to-[#047857] rounded-xl flex items-center justify-center text-white font-bold mr-3 shadow-md">
+                    N</div>
+                <span class="font-bold text-lg tracking-tight text-gray-900">Member Portal</span>
+            </div>
+
+            <!-- Nav -->
+            <nav class="flex-1 px-4 space-y-1">
+                <a href="dashboard.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-[#047857] bg-[#d1fae5] rounded-xl transition">
+                    <svg data-lucide="layout-grid" width="18"></svg> Dashboard
+                </a>
+                <a href="card.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="credit-card" width="18"></svg> ID Card
+                </a>
+                <a href="payment.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="zap" width="18"></svg> Payments
+                </a>
+                <a href="events.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="calendar" width="18"></svg> Events
+                </a>
+                <a href="profile.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="user" width="18"></svg> My Profile
+                </a>
+            </nav>
+
+            <!-- User Footer -->
+            <div class="p-4 border-t border-gray-100">
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition cursor-pointer group">
+                    <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs"
+                        id="sidebarAvatar">?</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-bold text-gray-900 truncate" id="sidebarName">Loading...</div>
+                        <div class="text-[10px] text-gray-500 truncate" id="sidebarEmail">...</div>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-400 group-hover:text-red-500 transition"><svg
+                            data-lucide="log-out" width="16"></svg></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-main flex-col h-screen overflow-hidden lg:ml-64 bg-slate-50 relative">
+
+            <!-- Sticky Header -->
+            <header
+                class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Logo -->
+                    <div
+                        class="lg:hidden w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold">
+                        N</div>
+
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 tracking-tight" id="welcomeHeading">Welcome</h1>
+                        <p class="text-xs text-gray-500 font-medium mt-0.5" id="currentDate">...</p>
+                    </div>
+                </div>
+
+                <button
+                    class="relative p-2 text-gray-400 hover:text-gray-600 transition bg-white border border-gray-100 rounded-full shadow-sm">
+                    <svg data-lucide="bell" width="18"></svg>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+            </header>
+
+            <!-- Scrollable Body -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10 pb-24 lg:pb-10">
+
+                <!-- Status Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div
+                        class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                        <div
+                            class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition text-green-600">
+                            <svg data-lucide="shield-check" width="60" height="60"></svg>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">My Status</p>
+                        <div class="text-2xl font-bold text-gray-900 mb-3" id="statusValue">--</div>
+                        <div id="statusPillContainer"></div>
+                    </div>
+
+                    <div
+                        class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                        <div
+                            class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition text-blue-600">
+                            <svg data-lucide="clock" width="60" height="60"></svg>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Membership Expiry</p>
+                        <div class="text-2xl font-bold text-gray-900 mb-1" id="expiryValue">--</div>
+                        <p class="text-xs text-gray-500 font-medium" id="daysRemaining">Calculated based on subscription
+                        </p>
+                    </div>
+
+                    <div
+                        class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+                        <div class="absolute right-0 top-0 p-3 opacity-10 transition"><svg data-lucide="hash" width="60"
+                                height="60"></svg></div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Member ID</p>
+                        <div class="text-3xl font-mono font-bold mb-1 tracking-wider" id="memberIdValue">....</div>
+                        <p class="text-xs text-gray-400">Official NNAK Registry</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Grid -->
+                <h2 class="text-lg font-bold text-gray-900 mb-5">Quick Actions</h2>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                    <a href="payment.html"
+                        class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl hover:border-green-500 hover:shadow-md transition text-center group">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <svg data-lucide="zap" width="24"></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-sm">Renew Membership</h3>
+                        <span class="text-[10px] text-gray-500 mt-1">Pay annual fees</span>
+                    </a>
+
+                    <a href="card.html"
+                        class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl hover:border-blue-500 hover:shadow-md transition text-center group">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <svg data-lucide="credit-card" width="24"></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-sm">Digital ID Card</h3>
+                        <span class="text-[10px] text-gray-500 mt-1">Download certificate</span>
+                    </a>
+
+                    <a href="events.html"
+                        class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl hover:border-purple-500 hover:shadow-md transition text-center group">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <svg data-lucide="calendar" width="24"></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-sm">CPD Events</h3>
+                        <span class="text-[10px] text-gray-500 mt-1">Browse upcoming</span>
+                    </a>
+
+                    <a href="profile.html"
+                        class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-2xl hover:border-orange-500 hover:shadow-md transition text-center group">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <svg data-lucide="user-cog" width="24"></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-sm">Update Profile</h3>
+                        <span class="text-[10px] text-gray-500 mt-1">Edit details</span>
+                    </a>
+                </div>
+
+                <!-- Recent Activity List -->
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900 text-sm">Recent Activity</h3>
+                        <button class="text-xs font-bold text-green-600 hover:text-green-700">View All Log</button>
+                    </div>
+                    <div class="p-0">
+                        <table class="w-full text-left">
+                            <thead
+                                class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-bold">
+                                <tr>
+                                    <th class="px-6 py-3">Type</th>
+                                    <th class="px-6 py-3">Date</th>
+                                    <th class="px-6 py-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activityTableBody" class="text-sm">
+                                <tr>
+                                    <td colspan="3" class="px-6 py-8 text-center text-gray-400">Loading records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Nav -->
+        <nav
+            class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-50 pb-safe">
+            <a href="dashboard.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-green-600">
+                <svg data-lucide="layout-grid" width="20"></svg> Home
+            </a>
+            <a href="card.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="credit-card" width="20"></svg> ID Card
+            </a>
+            <a href="events.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="calendar" width="20"></svg> Events
+            </a>
+            <a href="profile.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="user" width="20"></svg> Profile
+            </a>
+        </nav>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        lucide.createIcons();
+        if (!requireAuth()) { }
+
+        async function initDashboard() {
+            // Set Date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', options);
+
+            try {
+                const profile = await AuthService.getProfile();
+                const user = profile;
+
+                // Sidebar
+                document.getElementById('sidebarName').textContent = user.first_name + ' ' + user.last_name;
+                document.getElementById('sidebarEmail').textContent = user.email;
+                document.getElementById('sidebarAvatar').textContent = user.first_name[0];
+
+                // Header
+                document.getElementById('welcomeHeading').textContent = `Welcome back, ${user.first_name}`;
+
+                // Stats: Status
+                const statusEl = document.getElementById('statusValue');
+                const pillContainer = document.getElementById('statusPillContainer');
+
+                if (user.status === 'active') {
+                    statusEl.textContent = 'Active';
+                    statusEl.className = 'text-2xl font-bold text-green-600 mb-3';
+                    pillContainer.innerHTML = `<span class="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100">Good Standing</span>`;
+                } else {
+                    statusEl.textContent = 'Pending';
+                    statusEl.className = 'text-2xl font-bold text-yellow-600 mb-3';
+                    pillContainer.innerHTML = `<span class="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold border border-yellow-100">Action Required</span>`;
+                }
+
+                // Stats: Expiry
+                const expiryEl = document.getElementById('expiryValue');
+                const daysEl = document.getElementById('daysRemaining');
+
+                if (user.expiry_date) {
+                    const expiry = new Date(user.expiry_date);
+                    expiryEl.textContent = expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                    const diffTime = Math.abs(expiry - new Date());
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    daysEl.textContent = `${diffDays} days remaining`;
+                } else {
+                    expiryEl.textContent = '—';
+                    daysEl.textContent = 'Not Set';
+                }
+
+                // Stats: ID
+                document.getElementById('memberIdValue').textContent = user.member_id || 'PENDING';
+
+                // Activity Table (Mock)
+                const tbody = document.getElementById('activityTableBody');
+                // Simulate fetch
+                tbody.innerHTML = `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0"><svg data-lucide="log-in" width="16"></svg></div>
+                                <span class="font-bold text-gray-900 text-sm">Portal Login</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-500">${new Date().toLocaleDateString()}</td>
+                        <td class="px-6 py-4 text-right"><span class="px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-[10px] font-bold border border-green-200">Success</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition">
+                         <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0"><svg data-lucide="user-check" width="16"></svg></div>
+                                <span class="font-bold text-gray-900 text-sm">Profile Updated</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-500">${new Date(Date.now() - 86400000).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 text-right"><span class="px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-[10px] font-bold border border-green-200">Done</span></td>
+                    </tr>
+                `;
+                lucide.createIcons();
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await AuthService.logout();
+        });
+
+        initDashboard();
+    </script>
+</body>
+
+</html>

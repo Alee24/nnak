@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>NNAK Debug</title>
+</head>
+
+<body>
+    <h1>Database Connection Test</h1>
+    <button onclick="testConnection()">Test DB Connection</button>
+    <button onclick="testSession()">Check Session</button>
+    <button onclick="login()">Quick Login</button>
+    <button onclick="getMembers()">Get Members</button>
+
+    <pre id="output"></pre>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        const log = (msg) => {
+            document.getElementById('output').textContent += JSON.stringify(msg, null, 2) + '\n\n';
+        };
+
+        async function testConnection() {
+            try {
+                const res = await fetch('http://localhost:8000/index.php?request=api');
+                const data = await res.json();
+                log({ status: 'API Root', data });
+            } catch (e) {
+                log({ error: e.message });
+            }
+        }
+
+        async function testSession() {
+            try {
+                const res = await fetch('http://localhost:8000/index.php?request=api/auth/profile', {
+                    credentials: 'include'
+                });
+                const data = await res.json();
+                log({ status: 'Session Check', statusCode: res.status, data });
+            } catch (e) {
+                log({ error: e.message });
+            }
+        }
+
+        async function login() {
+            try {
+                const res = await fetch('http://localhost:8000/index.php?request=api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'mettoalex@gmail.com',
+                        password: 'admin123'
+                    })
+                });
+                const data = await res.json();
+                log({ status: 'Login', statusCode: res.status, data });
+            } catch (e) {
+                log({ error: e.message });
+            }
+        }
+
+        async function getMembers() {
+            try {
+                const res = await AdminAPI.getMembers(1, 10);
+                log({ status: 'Get Members', data: res });
+            } catch (e) {
+                log({ error: e.message });
+            }
+        }
+    </script>
+</body>
+
+</html>

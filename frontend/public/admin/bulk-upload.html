@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Member Upload - NNAK Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #f9fafb;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: #00d26a;
+            background: #f0fdf4;
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: #e5e7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+
+        .upload-zone p {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #00d26a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #00b359;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d26a, #00b359);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .stat-card.success .stat-value {
+            color: #00d26a;
+        }
+
+        .stat-card.error .stat-value {
+            color: #ef4444;
+        }
+
+        .stat-card.warning .stat-value {
+            color: #f59e0b;
+        }
+
+        .error-table {
+            width: 100%;
+            margin-top: 24px;
+            border-collapse: collapse;
+        }
+
+        .error-table th,
+        .error-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .error-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .error-table td {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .template-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #eff6ff;
+            border-radius: 12px;
+            border: 1px solid #bfdbfe;
+            margin-bottom: 24px;
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 4px;
+        }
+
+        .template-info p {
+            font-size: 0.875rem;
+            color: #3b82f6;
+        }
+
+        #results {
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #00d26a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📤 Bulk Member Upload</h1>
+            <p>Upload a CSV file to add multiple members at once</p>
+        </div>
+
+        <!-- Template Download Section -->
+        <div class="template-section">
+            <div class="template-info">
+                <h3>📋 Need a template?</h3>
+                <p>Download our CSV template with sample data to get started</p>
+            </div>
+            <button class="btn btn-secondary" onclick="downloadTemplate()">
+                ⬇️ Download Template
+            </button>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alert-success" class="alert alert-success"></div>
+        <div id="alert-error" class="alert alert-error"></div>
+
+        <!-- Upload Card -->
+        <div class="card">
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('csvFile').click()">
+                <div class="upload-icon">📄</div>
+                <h3>Drop your CSV file here</h3>
+                <p>or click to browse</p>
+                <button class="btn btn-primary">Choose File</button>
+                <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="handleFileSelect(event)">
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing CSV file...</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results">
+            <div class="card">
+                <h2 style="margin-bottom: 24px; font-size: 1.5rem;">Upload Results</h2>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRows">0</div>
+                        <div class="stat-label">Total Rows</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value" id="insertedCount">0</div>
+                        <div class="stat-label">New Members</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value" id="updatedCount">0</div>
+                        <div class="stat-label">Updated Members</div>
+                    </div>
+                    <div class="stat-card error">
+                        <div class="stat-value" id="errorCount">0</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                </div>
+
+                <!-- Error Table -->
+                <div id="errorSection" style="display: none;">
+                    <h3 style="margin: 32px 0 16px; font-size: 1.25rem; color: #dc2626;">⚠️ Errors Found</h3>
+                    <table class="error-table">
+                        <thead>
+                            <tr>
+                                <th>Row</th>
+                                <th>Email</th>
+                                <th>Field</th>
+                                <th>Error</th>
+                            </tr>
+                        </thead>
+                        <tbody id="errorTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        // Check admin access
+        if (!requireAuth() || !requireAdmin()) {
+            // Will redirect automatically
+        }
+
+        // Drag and drop handlers
+        const uploadZone = document.getElementById('uploadZone');
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        async function handleFile(file) {
+            // Validate file type
+            if (!file.name.endsWith('.csv')) {
+                showError('Please upload a CSV file');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            hideAlerts();
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('csv_file', file);
+
+            try {
+                const response = await fetch('http://localhost:8000/index.php?request=api/upload/members', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    displayResults(data.stats);
+                    showSuccess(`Successfully processed ${data.stats.inserted + data.stats.updated} members!`);
+                } else {
+                    showError(data.error || 'Failed to upload CSV');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Failed to upload file. Please try again.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('csvFile').value = '';
+            }
+        }
+
+        function displayResults(stats) {
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('totalRows').textContent = stats.total_rows;
+            document.getElementById('insertedCount').textContent = stats.inserted;
+            document.getElementById('updatedCount').textContent = stats.updated;
+            document.getElementById('errorCount').textContent = stats.error_count;
+
+            // Display errors if any
+            if (stats.errors && stats.errors.length > 0) {
+                document.getElementById('errorSection').style.display = 'block';
+                const tbody = document.getElementById('errorTableBody');
+                tbody.innerHTML = '';
+
+                stats.errors.forEach(error => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="badge badge-error">Row ${error.row}</span></td>
+                        <td>${error.email || 'N/A'}</td>
+                        <td>${error.field || 'N/A'}</td>
+                        <td>${error.error}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                document.getElementById('errorSection').style.display = 'none';
+            }
+        }
+
+        function downloadTemplate() {
+            window.location.href = 'http://localhost:8000/index.php?request=api/upload/template';
+        }
+
+        function showSuccess(message) {
+            const alert = document.getElementById('alert-success');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('alert-error');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideAlerts() {
+            document.getElementById('alert-success').style.display = 'none';
+            document.getElementById('alert-error').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

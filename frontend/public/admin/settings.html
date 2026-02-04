@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - NNAK Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .settings-container {
+            max-width: 800px;
+        }
+
+        .logo-preview-box {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logo-preview-box:hover {
+            border-color: var(--primary);
+            background: #f0fdf4;
+        }
+
+        .logo-preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ADMIN LAYOUT -->
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <!-- Sidebar content will be loaded via JS or component -->
+            <!-- Mock for now -->
+            <div class="px-6 mb-6">
+                <div class="flex items-center gap-3 font-bold text-xl text-gray-800">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-sm">N
+                    </div>
+                    NNAK Admin
+                </div>
+            </div>
+
+            <nav>
+                <div class="nav-category">Main</div>
+                <a href="admin.html" class="sidebar-link">
+                    <svg data-lucide="layout-dashboard"></svg> Dashboard
+                </a>
+                <a href="members.html" class="sidebar-link">
+                    <svg data-lucide="users"></svg> Members
+                </a>
+
+                <div class="nav-category">System</div>
+                <a href="settings.html" class="sidebar-link active">
+                    <svg data-lucide="settings"></svg> Branding & Settings
+                </a>
+                <a href="#" class="sidebar-link text-red-600 mt-8">
+                    <svg data-lucide="log-out"></svg> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <h1 class="text-2xl font-bold">System Branding</h1>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="text-sm font-bold">Admin User</div>
+                        <div class="text-xs text-muted">Super Admin</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold">A</div>
+                </div>
+            </header>
+
+            <div class="settings-container">
+                <form id="settingsForm">
+                    <!-- Branding Section -->
+                    <div class="card mb-6">
+                        <h2 class="text-lg font-bold mb-4">Organization Identity</h2>
+                        <p class="text-sm text-muted mb-6">These details will appear on Membership Cards and Email
+                            headers.</p>
+
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <!-- Logo Upload -->
+                            <div class="flex flex-col items-center">
+                                <label class="form-label mb-2">System Logo</label>
+                                <div class="logo-preview-box" id="logoUploadBox">
+                                    <img src="" id="logoPreview" class="hidden logo-preview-img">
+                                    <div id="logoPlaceholder" class="text-center p-4">
+                                        <svg data-lucide="upload-cloud" width="32"
+                                            class="mx-auto text-gray-400 mb-2"></svg>
+                                        <span class="text-xs text-muted">Click to upload</span>
+                                    </div>
+                                    <input type="file" id="logoInput" accept="image/*" class="hidden">
+                                </div>
+                                <p class="text-xs text-muted mt-2">Recommended: 300x300 PNG</p>
+                            </div>
+
+                            <!-- Text Fields -->
+                            <div class="flex-1 w-full">
+                                <div class="form-group">
+                                    <label class="form-label">Organization Name</label>
+                                    <input type="text" name="company_name" class="form-input"
+                                        placeholder="e.g. National Nurses Association of Kenya">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Tagline / Slogan</label>
+                                    <input type="text" name="company_tagline" class="form-input"
+                                        placeholder="e.g. Voice of the Nursing Profession">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="card mb-6">
+                        <h2 class="text-lg font-bold mb-4">Contact Information</h2>
+
+                        <div class="form-group">
+                            <label class="form-label">Official Email</label>
+                            <input type="email" name="company_email" class="form-input" placeholder="info@nnak.or.ke">
+                        </div>
+
+                        <div class="form-grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" name="company_phone" class="form-input" placeholder="+254...">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Postal Address</label>
+                                <input type="text" name="company_address" class="form-input" placeholder="P.O. Box...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <button type="button" class="btn btn-outline" style="width:auto">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveBtn" style="width:auto">Save
+                            Changes</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast">Settings Saved</div>
+    <style>
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translate(-50%, 100px);
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 99px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    </style>
+
+    <script src="../js/app.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Logo Upload Handling
+        const logoBox = document.getElementById('logoUploadBox');
+        const logoInput = document.getElementById('logoInput');
+        const logoPreview = document.getElementById('logoPreview');
+        const logoPlaceholder = document.getElementById('logoPlaceholder');
+
+        logoBox.addEventListener('click', () => logoInput.click());
+
+        logoInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                logoPreview.src = e.target.result;
+                logoPreview.classList.remove('hidden');
+                logoPlaceholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+
+            // Upload Immediately (or could be on submit)
+            const formData = new FormData();
+            formData.append('logo', file);
+
+            try {
+                // Mock upload for now until API implemented
+                // const res = await API.upload('settings/logo', formData);
+                console.log('Uploading logo...');
+                // Simulate success
+                showToast('Logo updated successfully');
+            } catch (err) {
+                console.error(err);
+                showToast('Logo upload failed', true);
+            }
+        });
+
+        // Load Settings
+        async function loadSettings() {
+            try {
+                // const res = await API.get('settings');
+                // const saved = res.settings;
+
+                // MOCK DATA
+                const saved = {
+                    company_name: "National Nurses Association of Kenya",
+                    company_tagline: "Voice of the Nursing Profession",
+                    company_address: "P.O. Box 49422-00100 Nairobi",
+                    company_email: "info@nnak.or.ke"
+                };
+
+                Object.keys(saved).forEach(key => {
+                    const el = document.querySelector(`input[name="${key}"]`);
+                    if (el) el.value = saved[key];
+                });
+
+                // Mock Logo
+                // if(saved.company_logo) { ... }
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                // await API.post('settings', data);
+                await new Promise(r => setTimeout(r, 800)); // Simulate delay
+                showToast('Settings saved successfully');
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to save settings', true);
+            } finally {
+                btn.innerHTML = 'Save Changes';
+                btn.disabled = false;
+            }
+        });
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = isError ? '#ef4444' : '#1f2937';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        loadSettings();
+    </script>
+</body>
+
+</html>

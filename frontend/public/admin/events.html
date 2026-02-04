@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Events - NNAK Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="px-6 mb-8">
+                <div class="flex items-center gap-3 font-bold text-xl text-gray-800">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-sm">N
+                    </div>
+                    NNAK Admin
+                </div>
+            </div>
+            <nav>
+                <div class="nav-category">Overview</div>
+                <a href="admin.html" class="sidebar-link">
+                    <svg data-lucide="layout-dashboard"></svg> Dashboard
+                </a>
+                <a href="members.html" class="sidebar-link">
+                    <svg data-lucide="users"></svg> Members
+                </a>
+                <a href="events.html" class="sidebar-link active">
+                    <svg data-lucide="calendar"></svg> Events
+                </a>
+                <a href="payments.html" class="sidebar-link">
+                    <svg data-lucide="credit-card"></svg> Payments
+                </a>
+                <div class="nav-category">System</div>
+                <a href="settings.html" class="sidebar-link">
+                    <svg data-lucide="settings"></svg> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1 class="text-2xl font-bold">Events & CPD</h1>
+                    <p class="text-sm text-muted">Manage training schedules and registrations</p>
+                </div>
+                <button class="btn btn-primary" onclick="openEventModal()">
+                    <svg data-lucide="plus" width="18"></svg> Create Event
+                </button>
+            </header>
+
+            <!-- Google Style Cards Grid for Events -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="eventsGrid">
+                <!-- JS Injected Cards -->
+                <div class="col-span-full py-12 text-center text-muted">Loading events...</div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal"
+        class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-bold">Create New Event</h2>
+                <button onclick="closeEventModal()" class="text-gray-400 hover:text-red-500"><svg
+                        data-lucide="x"></svg></button>
+            </div>
+
+            <form class="p-8">
+                <div class="form-group">
+                    <label class="form-label">Event Title</label>
+                    <input type="text" class="form-input" placeholder="e.g. Annual Nursing Conference 2025" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Location / Venue</label>
+                    <input type="text" class="form-input" placeholder="e.g. Radisson Blu, Nairobi" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-input" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CPD Points</label>
+                        <input type="number" class="form-input" placeholder="e.g. 5">
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end gap-3">
+                    <button type="button" onclick="closeEventModal()" class="btn btn-outline"
+                        style="width: auto;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="width: auto;">Publish Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function openEventModal() { document.getElementById('eventModal').classList.remove('hidden'); }
+        function closeEventModal() { document.getElementById('eventModal').classList.add('hidden'); }
+
+        <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function openEventModal() {document.getElementById('eventModal').classList.remove('hidden'); }
+        function closeEventModal() {document.getElementById('eventModal').classList.add('hidden'); }
+
+        // Fetch & Render Events
+        async function loadEvents() {
+            const grid = document.getElementById('eventsGrid');
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-muted">Loading events...</div>`;
+
+        const data = await AdminAPI.getEvents();
+
+        if (data && data.events) {
+            renderEvents(data.events);
+            } else {
+            grid.innerHTML = `<div class="col-span-full py-12 text-center text-red-500">Failed to load events</div>`;
+            }
+        }
+
+        function renderEvents(events) {
+            const grid = document.getElementById('eventsGrid');
+        if(events.length === 0) {
+            grid.innerHTML = `<div class="col-span-full py-12 text-center text-muted">No events found. Create one above!</div>`;
+        return;
+            }
+
+            grid.innerHTML = events.map(e => `
+        <div class="card p-0 overflow-hidden flex flex-col h-full hover:shadow-lg transition group">
+            <div class="h-40 bg-gray-200 relative">
+                <img src="${e.banner_image || 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=600&auto=format&fit=crop'}" class="w-full h-full object-cover">
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm ${getStatusClass(e.status)}">
+                        ${e.status || 'Draft'}
+                    </div>
+            </div>
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="text-xs text-primary font-bold uppercase mb-2">
+                    ${new Date(e.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </div>
+                <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition">${e.title}</h3>
+                <p class="text-sm text-gray-500 mb-4 line-clamp-2">${e.description || 'No description provided.'}</p>
+
+                <div class="mt-auto flex justify-between items-center border-t border-gray-100 pt-4">
+                    <div class="text-sm font-bold">${e.is_paid == 1 ? formatCurrency(e.price) : 'Free'}</div>
+                    <div class="flex gap-2">
+                        <button class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50" title="Edit"><svg data-lucide="edit-2" width="16"></svg></button>
+                        <button onclick="deleteEvent(${e.id})" class="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50" title="Delete"><svg data-lucide="trash-2" width="16"></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function getStatusClass(status) {
+            if(status === 'published') return 'text-green-700 bg-green-50';
+            if(status === 'draft') return 'text-gray-700 bg-gray-50';
+            return 'text-gray-700';
+        }
+
+        async function deleteEvent(id) {
+            if(await AdminAPI.deleteEvent(id)) {
+                loadEvents(); // Reload
+            }
+        }
+
+        // Create Event
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Basic mapping - real implementation would be more robust
+            const data = {
+                title: e.target.querySelector('input[placeholder*="Event Title"]').value,
+                start_date: e.target.querySelector('input[type="date"]').value,
+                end_date: e.target.querySelector('input[type="date"]').value, // Using same date for now if only one field
+                location: e.target.querySelector('input[placeholder*="Location"]').value,
+                price: e.target.querySelector('input[placeholder="0.00"]').value || 0,
+                is_paid: e.target.querySelector('input[placeholder="0.00"]').value > 0,
+                event_type: 'cpd',
+                status: 'published'
+            };
+
+            try {
+                const res = await AdminAPI.createEvent(data);
+                if(res.success) {
+                    closeEventModal();
+                    loadEvents();
+                    e.target.reset();
+                } else {
+                    alert('Error: ' + (res.error || 'Failed to create'));
+                }
+            } catch(err) {
+                alert('An error occurred.');
+            }
+        });
+
+        loadEvents();
+    </script>
+</body>
+
+</html>

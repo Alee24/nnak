@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Setup - NNAK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
+        <div class="flex items-center gap-3 mb-6">
+            <div
+                class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                N
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">NNAK Database Setup</h1>
+                <p class="text-sm text-gray-500">Initialize your database and run migrations</p>
+            </div>
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <!-- Status Card -->
+            <div id="statusCard" class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg data-lucide="info" width="16" class="text-gray-600"></svg>
+                    <h3 class="font-bold text-gray-900">Database Status</h3>
+                </div>
+                <div id="statusContent" class="text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin">
+                        </div>
+                        Checking status...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="createDatabase()" id="createDbBtn"
+                    class="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">
+                    <svg data-lucide="database" width="20"></svg>
+                    Create Database
+                </button>
+
+                <button onclick="runMigrations()" id="migrateBtn"
+                    class="flex items-center justify-center gap-2 px-6 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg transition">
+                    <svg data-lucide="play" width="20"></svg>
+                    Run Migrations
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Area -->
+        <div id="resultsArea" class="hidden">
+            <div class="bg-slate-900 text-green-400 rounded-xl p-4 font-mono text-sm overflow-auto max-h-96">
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+
+        <!-- Continue Button -->
+        <div id="continueSection" class="hidden mt-6 text-center">
+            <a href="pages/login.html"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition">
+                Continue to Login
+                <svg data-lucide="arrow-right" width="18"></svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Init icons
+        lucide.createIcons();
+
+        // Check status on load
+        checkStatus();
+
+        async function checkStatus() {
+            try {
+                const res = await fetch('http://localhost:8000/index.php?request=api/setup/status');
+                const data = await res.json();
+
+                if (data.database_exists) {
+                    const tableCount = Object.keys(data.tables || {}).length;
+                    document.getElementById('statusContent').innerHTML = `
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-green-600">
+                                <svg data-lucide="check-circle" width="16"></svg>
+                                <span class="font-bold">Database "${data.database_name}" exists</span>
+                            </div>
+                            <div class="text-gray-600">
+                                <span class="font-bold">${tableCount}</span> tables found:
+                                ${Object.entries(data.tables).map(([table, count]) =>
+                        `<div class="ml-6">• ${table} (${count} rows)</div>`
+                    ).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                    if (tableCount > 0) {
+                        document.getElementById('continueSection').classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('statusContent').innerHTML = `
+                        <div class="flex items-center gap-2 text-yellow-600">
+                            <svg data-lucide="alert-triangle" width="16"></svg>
+                            <span class="font-bold">Database "${data.database_name}" does not exist</span>
+                        </div>
+                        <p class="text-gray-600 mt-2 text-xs">Click "Create Database" to create it.</p>
+                    `;
+                }
+
+                lucide.createIcons();
+            } catch (error) {
+                document.getElementById('statusContent').innerHTML = `
+                    <div class="flex items-center gap-2 text-red-600">
+                        <svg data-lucide="x-circle" width="16"></svg>
+                        <span class="font-bold">Connection Error</span>
+                    </div>
+                    <p class="text-gray-600 mt-2 text-xs">${error.message}</p>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        async function createDatabase() {
+            const btn = document.getElementById('createDbBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Creating...';
+
+            showResults('Creating database...\n');
+
+            try {
+                const res = await fetch('http://localhost:8000/index.php?request=api/setup/create-database', {
+                    method: 'POST'
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    appendResults('✓ ' + data.message + '\n');
+                    appendResults(data.next_step + '\n\n');
+                    setTimeout(checkStatus, 500);
+                } else {
+                    appendResults('✗ ERROR: ' + (data.error || data.message) + '\n');
+                }
+            } catch (error) {
+                appendResults('✗ ERROR: ' + error.message + '\n');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<svg data-lucide="database" width="20"></svg> Create Database';
+                lucide.createIcons();
+            }
+        }
+
+        async function runMigrations() {
+            const btn = document.getElementById('migrateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Running...';
+
+            showResults('Running database migrations...\n\n');
+
+            try {
+                const res = await fetch('http://localhost:8000/index.php?request=api/setup/run-migrations', {
+                    method: 'POST'
+                });
+
+                // Get response as text first
+                const responseText = await res.text();
+
+                // Try to parse as JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    appendResults('✗ JSON Parse Error\n');
+                    appendResults('Raw response (first 500 chars):\n');
+                    appendResults(responseText.substring(0, 500) + '\n\n');
+                    throw new Error(`Invalid JSON response: ${parseError.message}`);
+                }
+
+                if (data.success) {
+                    data.results.forEach(result => appendResults('✓ ' + result + '\n'));
+
+                    if (data.errors && data.errors.length > 0) {
+                        appendResults('\nErrors:\n');
+                        data.errors.forEach(error => appendResults('✗ ' + error + '\n'));
+                    }
+
+                    appendResults('\n' + data.message + '\n');
+                    appendResults(`Tables created: ${data.tables_created.join(', ')}\n`);
+
+                    setTimeout(() => {
+                        checkStatus();
+                        document.getElementById('continueSection').classList.remove('hidden');
+                    }, 500);
+                } else {
+                    appendResults('✗ ERROR: ' + (data.error || data.message) + '\n');
+                    if (data.help) {
+                        appendResults('   ' + data.help + '\n');
+                    }
+                }
+            } catch (error) {
+                appendResults('✗ ERROR: ' + error.message + '\n');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<svg data-lucide="play" width="20"></svg> Run Migrations';
+                lucide.createIcons();
+            }
+        }
+
+        function showResults(text) {
+            document.getElementById('resultsArea').classList.remove('hidden');
+            document.getElementById('resultsContent').textContent = text;
+        }
+
+        function appendResults(text) {
+            document.getElementById('resultsContent').textContent += text;
+            const resultsDiv = document.getElementById('resultsContent');
+            resultsDiv.parentElement.scrollTop = resultsDiv.parentElement.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

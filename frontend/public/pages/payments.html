@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - NNAK Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar fixed w-64 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col z-50">
+        <div class="h-20 flex items-center px-8 border-b border-gray-100 mb-6">
+            <div
+                class="w-10 h-10 bg-gradient-to-br from-[#059669] to-[#047857] rounded-xl flex items-center justify-center text-white font-bold mr-3 shadow-md">
+                N</div>
+            <span class="font-bold text-lg tracking-tight text-gray-900">NNAK Admin</span>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+            <div class="nav-category text-xs font-bold text-gray-400 uppercase mb-2 px-2 mt-4">Main Menu</div>
+            <a href="admin.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                <svg data-lucide="layout-grid" width="18"></svg> Dashboard
+            </a>
+            <a href="members.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                <svg data-lucide="users" width="18"></svg> Members
+            </a>
+            <a href="reports.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                <svg data-lucide="bar-chart-2" width="18"></svg> Analytics
+            </a>
+            <a href="payments.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-[#047857] bg-[#d1fae5] rounded-xl transition">
+                <svg data-lucide="credit-card" width="18"></svg> Transactions
+            </a>
+
+            <div class="nav-category text-xs font-bold text-gray-400 uppercase mt-6 mb-2 px-2">Management</div>
+            <a href="events.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                <svg data-lucide="calendar" width="18"></svg> Events
+            </a>
+            <a href="applications.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition justify-between">
+                <div class="flex items-center gap-3"> <svg data-lucide="file-check" width="18"></svg> Applications</div>
+                <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+            </a>
+            <a href="settings.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                <svg data-lucide="settings" width="18"></svg> Settings
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100">
+            <a href="#" id="logoutBtn"
+                class="flex items-center gap-3 text-red-600 hover:bg-red-50 px-4 py-2 rounded-xl transition font-medium text-sm">
+                <svg data-lucide="log-out" width="16"></svg> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-main flex-col h-screen overflow-hidden bg-slate-50">
+
+        <!-- Header -->
+        <header class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Transactions</h1>
+                <p class="text-sm text-gray-500 mt-1">Monitor incomes and payments</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button
+                    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition">
+                    <svg data-lucide="download" width="16"></svg> Export Report
+                </button>
+                <button
+                    class="premium-button px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg gap-2 hover:scale-[1.02] transform transition">
+                    <svg data-lucide="plus" width="18" stroke-width="2.5"></svg> Record Payment
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters -->
+        <div class="px-8 py-6 flex flex-col md:flex-row gap-4 justify-between items-center flex-shrink-0">
+            <div class="relative w-full md:w-80 group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg data-lucide="search" width="16"
+                        class="text-gray-400 group-focus-within:text-green-500 transition"></svg>
+                </div>
+                <input type="text" id="searchInput" onkeyup="debounceSearch()"
+                    class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition shadow-sm"
+                    placeholder="Search invoice, member...">
+            </div>
+
+            <div class="flex gap-2">
+                <select id="statusFilter" onchange="loadPayments()"
+                    class="bg-white border border-gray-200 text-sm text-gray-700 py-2.5 px-4 rounded-xl outline-none focus:border-green-500">
+                    <option value="">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                </select>
+                <select id="typeFilter" onchange="loadPayments()"
+                    class="bg-white border border-gray-200 text-sm text-gray-700 py-2.5 px-4 rounded-xl outline-none focus:border-green-500">
+                    <option value="">All Types</option>
+                    <option value="membership">Membership</option>
+                    <option value="event">Event</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="flex-1 overflow-auto px-8 pb-8 custom-scrollbar">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden min-h-[400px]">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center py-20 text-gray-400">Loading transactions...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4 flex justify-between items-center px-2">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wide" id="paginationInfo">Showing 0
+                    results</span>
+                <div class="flex gap-2">
+                    <button onclick="changePage(-1)"
+                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm disabled:opacity-50">Previous</button>
+                    <button onclick="changePage(1)"
+                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm disabled:opacity-50">Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+        let currentPage = 1;
+
+        loadPayments();
+
+        async function loadPayments() {
+            const status = document.getElementById('statusFilter').value;
+            // const type = document.getElementById('typeFilter').value; // Pending implementation in AdminAPI
+            const tbody = document.getElementById('paymentsTableBody');
+
+            try {
+                const data = await AdminAPI.getPayments(currentPage, 20, status);
+
+                if (data && data.payments && data.payments.length > 0) {
+                    tbody.innerHTML = data.payments.map(p => `
+                        <tr class="group hover:bg-gray-50/50 transition">
+                            <td>
+                                <div class="font-bold text-gray-900 text-sm">${p.invoice_number || 'N/A'}</div>
+                                <div class="text-[11px] text-gray-400 font-medium mt-0.5 uppercase tracking-wide">${p.payment_method}</div>
+                            </td>
+                            <td>
+                                <div class="font-bold text-gray-900 text-sm">${p.first_name} ${p.last_name}</div>
+                                <div class="text-[11px] text-gray-400 mt-0.5">${p.email}</div>
+                            </td>
+                            <td>
+                                <div class="font-bold text-gray-900 text-sm">${formatCurrency(p.amount)}</div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-wide font-bold mt-0.5">${p.payment_type}</div>
+                            </td>
+                            <td class="text-sm font-medium text-gray-600">
+                                ${new Date(p.created_at).toLocaleDateString()}
+                                <div class="text-[10px] text-gray-400">${new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            </td>
+                            <td>
+                                ${getStatusPill(p.payment_status)}
+                            </td>
+                            <td class="text-right">
+                                <button class="p-2 text-gray-400 hover:text-gray-900 transition"><svg data-lucide="eye" width="16"></svg></button>
+                            </td>
+                        </tr>
+                     `).join('');
+                    updatePagination(data.pagination);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-24 text-gray-500 font-medium">No transactions found</td></tr>`;
+                }
+                lucide.createIcons();
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">Error loading data</td></tr>`;
+            }
+        }
+
+        function getStatusPill(status) {
+            const map = {
+                completed: 'bg-green-50 text-green-700 border-green-200',
+                pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                failed: 'bg-red-50 text-red-700 border-red-200'
+            };
+            const s = (status || '').toLowerCase();
+            const cls = map[s] || 'bg-gray-100 text-gray-600';
+            return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${cls} uppercase tracking-wide">${s}</span>`;
+        }
+
+        function changePage(d) {
+            currentPage += d;
+            loadPayments();
+        }
+
+        function updatePagination(meta) {
+            if (meta) document.getElementById('paginationInfo').innerText = `Page ${meta.page} of ${meta.pages}`;
+        }
+
+        // Utils logic shared or mocked
+    </script>
+</body>
+
+</html>

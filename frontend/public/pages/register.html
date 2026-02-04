@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - NNAK Membership</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'DM Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Split Layout */
+        .brand-section {
+            width: 40%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-premium) 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .brand-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.1;
+        }
+
+        .form-section {
+            flex: 1;
+            background: white;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Typography & Components */
+        .h1-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.75rem;
+            color: #111827;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #111827;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .premium-input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            items-center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Progress Steps */
+        .progress-header {
+            padding: 24px 40px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #111827;
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 4px;
+            border-radius: 2px;
+            background: #e5e7eb;
+        }
+
+        .step-dot.active {
+            background: var(--primary);
+        }
+
+        /* Mobile adjustment */
+        @media (max-width: 1024px) {
+            .brand-section {
+                display: none;
+            }
+
+            .form-section {
+                border-left: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Left Brand Panel -->
+    <div class="brand-section">
+        <div class="brand-pattern"></div>
+        <div style="z-index: 10;">
+            <div
+                class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-white font-bold text-xl mb-6">
+                N</div>
+            <h2 class="text-3xl font-bold mb-4 font-inter leading-snug">Join the Community of<br>Professional Nurses.
+            </h2>
+            <ul class="space-y-4 text-green-50 mt-8 font-medium">
+                <li class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div> Access CPD
+                    Training
+                </li>
+                <li class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div> Networking
+                    Events
+                </li>
+                <li class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div> Legal
+                    Protection
+                </li>
+            </ul>
+        </div>
+
+        <p class="text-sm text-green-100/60">Already have an account? <a href="login.html"
+                class="text-white font-bold hover:underline">Log in here</a></p>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="form-section">
+        <div class="progress-header">
+            <a href="login.html" class="back-link"><svg data-lucide="arrow-left" width="18"></svg> Back</a>
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar px-10 py-8 flex flex-col items-center">
+            <div class="w-full max-w-lg">
+                <h1 class="h1-title">Create Account</h1>
+                <p class="subtitle">Enter your personal details to begin registration.</p>
+
+                <form id="registerForm">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group">
+                            <label class="input-label">First Name</label>
+                            <input type="text" name="first_name" class="premium-input" placeholder="Jane" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Last Name</label>
+                            <input type="text" name="last_name" class="premium-input" placeholder="Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Email Address</label>
+                        <input type="email" name="email" class="premium-input" placeholder="nurse@example.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Phone Number</label>
+                        <input type="tel" name="phone" class="premium-input" placeholder="0700 123 456" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Password</label>
+                        <input type="password" name="password" class="premium-input"
+                            placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 flex gap-3">
+                        <svg data-lucide="info" class="text-blue-600 flex-shrink-0" width="20"></svg>
+                        <p class="text-xs text-blue-800 leading-relaxed">
+                            By clicking continue, you agree to our <a href="#" class="font-bold underline">Terms of
+                                Service</a> and Privacy Policy. You'll need your Nursing License Number for the next
+                            step.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        Continue Registration <svg data-lucide="arrow-right" width="18"></svg>
+                    </button>
+
+                    <div class="mt-6 text-center lg:hidden">
+                        <p class="text-sm text-gray-500">Already have an account? <a href="login.html"
+                                class="font-bold text-gray-900">Log in</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        lucide.createIcons();
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalHTML = btn.innerHTML;
+
+            const data = Object.fromEntries(new FormData(e.target));
+            // Simulate name combination if API requires single name field, or keep split if API updated
+            // Assuming API expects first_name/last_name from my previous updates
+
+            try {
+                btn.innerHTML = 'Creating Account...';
+                btn.disabled = true;
+                btn.style.opacity = '0.8';
+
+                await API.post('auth/register', data);
+
+                alert('Account created! Please login.');
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                alert(error.message);
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+
+</html>

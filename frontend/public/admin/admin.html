@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - NNAK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 1024px) {
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="px-6 mb-8">
+                <div class="flex items-center gap-3 font-bold text-xl text-gray-800">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-sm">N
+                    </div>
+                    NNAK Admin
+                </div>
+            </div>
+
+            <nav>
+                <div class="nav-category">Overview</div>
+                <a href="admin.html" class="sidebar-link active">
+                    <svg data-lucide="layout-dashboard"></svg> Dashboard
+                </a>
+                <a href="members.html" class="sidebar-link">
+                    <svg data-lucide="users"></svg> Members
+                </a>
+                <a href="events.html" class="sidebar-link">
+                    <svg data-lucide="calendar"></svg> Events
+                </a>
+                <a href="payments.html" class="sidebar-link">
+                    <svg data-lucide="credit-card"></svg> Payments
+                </a>
+
+                <div class="nav-category">System</div>
+                <a href="settings.html" class="sidebar-link">
+                    <svg data-lucide="settings"></svg> Settings
+                </a>
+                <a href="#" class="sidebar-link text-red-600 mt-8">
+                    <svg data-lucide="log-out"></svg> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1 class="text-2xl font-bold">Dashboard</h1>
+                    <p class="text-sm text-muted">Overview of association performance</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="search-bar">
+                        <svg data-lucide="search" width="18" class="text-muted"></svg>
+                        <input type="text" placeholder="Search...">
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold">A</div>
+                </div>
+            </header>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="stat-widget">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="text-sm text-muted font-bold uppercase tracking-wider">Total Members</div>
+                            <div class="text-2xl font-bold mt-1" id="totalMembers">2,543</div>
+                        </div>
+                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                            <svg data-lucide="users" width="20"></svg>
+                        </div>
+                    </div>
+                    <div class="trend-badge trend-up">
+                        <svg data-lucide="trending-up" width="14" class="mr-1"></svg> +12% this month
+                    </div>
+                </div>
+
+                <div class="stat-widget">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="text-sm text-muted font-bold uppercase tracking-wider">Active Status</div>
+                            <div class="text-2xl font-bold mt-1" id="activeMembers">1,850</div>
+                        </div>
+                        <div class="p-2 bg-green-50 text-green-600 rounded-lg">
+                            <svg data-lucide="check-circle" width="20"></svg>
+                        </div>
+                    </div>
+                    <div class="text-xs text-muted mt-2">72% Compliance Rate</div>
+                </div>
+
+                <div class="stat-widget">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="text-sm text-muted font-bold uppercase tracking-wider">Revenue (YTD)</div>
+                            <div class="text-2xl font-bold mt-1">KES 4.2M</div>
+                        </div>
+                        <div class="p-2 bg-yellow-50 text-yellow-600 rounded-lg">
+                            <svg data-lucide="dollar-sign" width="20"></svg>
+                        </div>
+                    </div>
+                    <div class="trend-badge trend-up">
+                        <svg data-lucide="trending-up" width="14" class="mr-1"></svg> +8% vs last year
+                    </div>
+                </div>
+
+                <div class="stat-widget">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="text-sm text-muted font-bold uppercase tracking-wider">Pending Cards</div>
+                            <div class="text-2xl font-bold mt-1">125</div>
+                        </div>
+                        <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                            <svg data-lucide="credit-card" width="20"></svg>
+                        </div>
+                    </div>
+                    <div class="text-xs text-muted mt-2">Requires printing</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="chart-row">
+                <div class="chart-container-card">
+                    <h3 class="text-lg font-bold mb-4">Membership Trends</h3>
+                    <canvas id="membershipChart" height="120"></canvas>
+                </div>
+
+                <div class="chart-container-card">
+                    <h3 class="text-lg font-bold mb-4">Member Distribution</h3>
+                    <canvas id="distributionChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Registrations Table -->
+            <div class="card">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">Recent Registrations</h3>
+                    <a href="members.html" class="btn btn-text text-sm">View All</a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Date Joined</th>
+                                <th>Status</th>
+                                <th>Work Station</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentMembersTable">
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-muted">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Chart.js Mock Data
+        const ctx = document.getElementById('membershipChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'New Members',
+                    data: [65, 59, 80, 81, 56, 120],
+                    borderColor: '#00d26a',
+                    tension: 0.3,
+                    fill: true,
+                    backgroundColor: 'rgba(0, 210, 106, 0.05)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
+            }
+        });
+
+        const ctx2 = document.getElementById('distributionChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nairobi', 'Mombasa', 'Kisumu', 'Other'],
+                datasets: [{
+                    data: [300, 50, 100, 80],
+                    backgroundColor: ['#00d26a', '#1f2937', '#e5e7eb', '#9ca3af']
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '70%',
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // Mock Fetch Data
+        setTimeout(() => {
+            const tbody = document.getElementById('recentMembersTable');
+            tbody.innerHTML = `
+            <tr>
+                <td>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs">JA</div>
+                        <div>
+                            <div class="font-bold">Joel Abwanzo</div>
+                            <div class="text-xs text-muted">NNAK-3274</div>
+                        </div>
+                    </div>
+                </td>
+                <td>Oct 24, 2024</td>
+                <td><span class="px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold">Active</span></td>
+                <td>Kenyatta National Hospital</td>
+                <td><button class="text-gray-400 hover:text-primary"><svg data-lucide="more-horizontal" width="18"></svg></button></td>
+            </tr>
+             <tr>
+                <td>
+                     <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">SM</div>
+                        <div>
+                            <div class="font-bold">Sarah Mueni</div>
+                            <div class="text-xs text-muted">NNAK-3275</div>
+                        </div>
+                    </div>
+                </td>
+                <td>Oct 23, 2024</td>
+                <td><span class="px-2 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold">Pending</span></td>
+                <td>Aga Khan Hospital</td>
+                <td><button class="text-gray-400 hover:text-primary"><svg data-lucide="more-horizontal" width="18"></svg></button></td>
+            </tr>
+        `;
+            lucide.createIcons();
+        }, 500);
+    </script>
+</body>
+
+</html>

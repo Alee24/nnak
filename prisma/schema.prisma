@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model cpd_points {
+  id            Int      @id @default(autoincrement())
+  member_id     Int
+  points        Int
+  activity_type String?  @db.VarChar(100)
+  description   String?  @db.Text
+  awarded_by    Int?
+  awarded_date  DateTime @db.Date
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+  members       members  @relation(fields: [member_id], references: [id], onDelete: Cascade, map: "fk_cpd_points_member")
+
+  @@index([awarded_date], map: "idx_awarded_date")
+  @@index([member_id], map: "idx_member_id")
+}
+
+model event_registrations {
+  id                Int                                    @id @default(autoincrement())
+  event_id          Int
+  member_id         Int
+  registration_date DateTime                               @default(now()) @db.Timestamp(0)
+  payment_status    event_registrations_payment_status?    @default(pending)
+  attendance_status event_registrations_attendance_status? @default(registered)
+  created_at        DateTime                               @default(now()) @db.Timestamp(0)
+  updated_at        DateTime                               @default(now()) @db.Timestamp(0)
+  events            events                                 @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_event_registrations_event")
+  members           members                                @relation(fields: [member_id], references: [id], onDelete: Cascade, map: "fk_event_registrations_member")
+
+  @@unique([event_id, member_id], map: "unique_event_member")
+  @@index([event_id], map: "idx_event_id")
+  @@index([member_id], map: "idx_member_id")
+}
+
+model events {
+  id                    Int                   @id @default(autoincrement())
+  title                 String                @db.VarChar(255)
+  description           String?               @db.Text
+  event_date            DateTime              @db.Date
+  event_time            DateTime?             @db.Time(0)
+  location              String?               @db.VarChar(255)
+  capacity              Int?
+  registration_deadline DateTime?             @db.Date
+  fee                   Decimal?              @default(0.00) @db.Decimal(10, 2)
+  status                events_status?        @default(upcoming)
+  cpd_points            Int?                  @default(0)
+  created_at            DateTime              @default(now()) @db.Timestamp(0)
+  updated_at            DateTime              @default(now()) @db.Timestamp(0)
+  event_registrations   event_registrations[]
+
+  @@index([event_date], map: "idx_event_date")
+  @@index([status], map: "idx_status")
+}
+
+model members {
+  id                  Int                     @id @default(autoincrement())
+  member_id           String?                 @unique(map: "member_id") @db.VarChar(50)
+  membership_number   String                  @unique(map: "membership_number") @db.VarChar(50)
+  first_name          String                  @db.VarChar(100)
+  last_name           String                  @db.VarChar(100)
+  email               String                  @unique(map: "email") @db.VarChar(255)
+  password_hash       String?                 @db.VarChar(255)
+  phone               String?                 @db.VarChar(20)
+  license_number      String?                 @db.VarChar(50)
+  license_expiry_date DateTime?               @db.Date
+  license_status      members_license_status? @default(not_set)
+  total_cpd_points    Int?                    @default(0)
+  membership_type_id  Int?
+  status              members_status?         @default(pending)
+  role                members_role?           @default(member)
+  registration_date   DateTime?               @db.Date
+  expiry_date         DateTime?               @db.Date
+  address             String?                 @db.Text
+  city                String?                 @db.VarChar(100)
+  postal_code         String?                 @db.VarChar(20)
+  profile_photo       String?                 @db.VarChar(255)
+  created_at          DateTime                @default(now()) @db.Timestamp(0)
+  updated_at          DateTime                @default(now()) @db.Timestamp(0)
+  deleted_at          DateTime?               @db.Timestamp(0)
+  gender              String?                 @db.VarChar(20)
+  occupation          String?                 @db.VarChar(100)
+  organization        String?                 @db.VarChar(100)
+  address_line1       String?                 @db.VarChar(255)
+  cpd_points          cpd_points[]
+  event_registrations event_registrations[]
+  membership_types    membership_types?       @relation(fields: [membership_type_id], references: [id], map: "fk_members_membership_type")
+  payments            payments[]
+
+  @@index([membership_type_id], map: "fk_members_membership_type")
+  @@index([email], map: "idx_email")
+  @@index([membership_number], map: "idx_membership_number")
+  @@index([status], map: "idx_status")
+}
+
+model membership_types {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  description     String?   @db.Text
+  price           Decimal   @default(0.00) @db.Decimal(10, 2)
+  duration_months Int       @default(12)
+  is_active       Boolean?  @default(true)
+  created_at      DateTime  @default(now()) @db.Timestamp(0)
+  updated_at      DateTime  @default(now()) @db.Timestamp(0)
+  members         members[]
+}
+
+model payments {
+  id                    Int                     @id @default(autoincrement())
+  member_id             Int
+  amount                Decimal                 @db.Decimal(10, 2)
+  payment_method        payments_payment_method
+  transaction_reference String?                 @db.VarChar(100)
+  payment_date          DateTime                @db.Date
+  status                payments_status?        @default(pending)
+  notes                 String?                 @db.Text
+  created_at            DateTime                @default(now()) @db.Timestamp(0)
+  updated_at            DateTime                @default(now()) @db.Timestamp(0)
+  members               members                 @relation(fields: [member_id], references: [id], onDelete: Cascade, map: "fk_payments_member")
+
+  @@index([member_id], map: "idx_member_id")
+  @@index([payment_date], map: "idx_payment_date")
+  @@index([status], map: "idx_status")
+}
+
+model settings {
+  id            Int      @id @default(autoincrement())
+  setting_key   String   @unique(map: "setting_key") @db.VarChar(100)
+  setting_value String?  @db.Text
+  description   String?  @db.Text
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+}
+
+enum payments_payment_method {
+  cash
+  mpesa
+  bank_transfer
+  card
+}
+
+enum event_registrations_payment_status {
+  pending
+  paid
+  waived
+}
+
+enum event_registrations_attendance_status {
+  registered
+  attended
+  absent
+}
+
+enum payments_status {
+  pending
+  completed
+  failed
+  refunded
+}
+
+enum events_status {
+  upcoming
+  ongoing
+  completed
+  cancelled
+}
+
+enum members_license_status {
+  active
+  expired
+  suspended
+  not_set
+}
+
+enum members_status {
+  pending
+  active
+  inactive
+  suspended
+}
+
+enum members_role {
+  admin
+  staff
+  member
+}

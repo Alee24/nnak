@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Card - NNAK</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <!-- Scripts for PDF & QR -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* ID CARD SPECIFIC STYLES - Kept isolated for PDF Generation reliability */
+        .id-card-wrapper {
+            width: 600px;
+            height: 380px;
+            background: white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            /* Standard font for ID consistency */
+            border-radius: 16px;
+        }
+
+        .id-header {
+            background: #ce1126;
+            /* Official Red */
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 30px;
+            color: white;
+        }
+
+        .header-slant {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 140px;
+            background: white;
+            transform: skewX(-20deg) translateX(-60px);
+            border-right: 4px solid #111827;
+            z-index: 10;
+        }
+
+        .nnak-logo-container {
+            position: absolute;
+            top: 15px;
+            left: 25px;
+            z-index: 20;
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border: 2px solid #f3f4f6;
+        }
+
+        .nnak-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+        }
+
+        .header-text {
+            text-align: right;
+            z-index: 5;
+        }
+
+        .org-name {
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .org-sub {
+            font-size: 11px;
+            font-weight: 400;
+            font-style: italic;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 800;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+
+        .card-body {
+            padding: 25px 35px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .details-col {
+            padding-top: 10px;
+            flex: 1;
+        }
+
+        .field-row {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .field-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            width: 80px;
+        }
+
+        .field-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            flex: 1;
+        }
+
+        .photo-container {
+            width: 110px;
+            height: 130px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .member-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .footer-row {
+            position: absolute;
+            bottom: 25px;
+            left: 35px;
+            right: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .qr-box {
+            width: 60px;
+            height: 60px;
+            padding: 2px;
+            background: white;
+        }
+
+        .signature-box {
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 120px;
+            border-top: 1px solid #111827;
+            margin-top: 4px;
+        }
+
+        .sig-text {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 font-inter text-slate-900">
+
+    <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar fixed w-64 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col z-50">
+            <!-- Brand -->
+            <div class="h-20 flex items-center px-8 border-b border-gray-100 mb-6">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-[#059669] to-[#047857] rounded-xl flex items-center justify-center text-white font-bold mr-3 shadow-md">
+                    N</div>
+                <span class="font-bold text-lg tracking-tight text-gray-900">Member Portal</span>
+            </div>
+
+            <!-- Nav -->
+            <nav class="flex-1 px-4 space-y-1">
+                <a href="dashboard.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="layout-grid" width="18"></svg> Dashboard
+                </a>
+                <a href="card.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-[#047857] bg-[#d1fae5] rounded-xl transition">
+                    <svg data-lucide="credit-card" width="18"></svg> ID Card
+                </a>
+                <a href="payment.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="zap" width="18"></svg> Payments
+                </a>
+                <a href="events.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="calendar" width="18"></svg> Events
+                </a>
+                <a href="profile.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="user" width="18"></svg> My Profile
+                </a>
+            </nav>
+
+            <!-- User Footer -->
+            <div class="p-4 border-t border-gray-100">
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition cursor-pointer group">
+                    <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs"
+                        id="sidebarAvatar">?</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-bold text-gray-900 truncate" id="sidebarName">Loading...</div>
+                        <div class="text-xs text-gray-500 truncate" id="sidebarEmail">...</div>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-400 group-hover:text-red-500 transition"><svg
+                            data-lucide="log-out" width="16"></svg></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-main flex-col h-screen overflow-hidden lg:ml-64 bg-slate-50 relative">
+
+            <!-- Sticky Header -->
+            <header
+                class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Logo -->
+                    <div
+                        class="lg:hidden w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold">
+                        N</div>
+                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">Membership ID</h1>
+                </div>
+
+                <button
+                    class="btn-primary flex items-center gap-2 px-5 py-2.5 rounded-full text-sm shadow-lg shadow-green-200/50"
+                    onclick="downloadPDF()">
+                    <svg data-lucide="download" width="18"></svg> Download PDF
+                </button>
+            </header>
+
+            <!-- Scrollable Body -->
+            <div
+                class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10 flex flex-col items-center justify-start pt-12">
+
+                <div class="w-full max-w-4xl text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Digital Membership Certificate</h2>
+                    <p class="text-gray-500">This is your official proof of membership. You can download and print this
+                        card.</p>
+                </div>
+
+                <!-- THE ID CARD PREVIEW (CENTERED) -->
+                <div class="scale-90 sm:scale-100 transition-transform origin-top">
+                    <div class="id-card-wrapper" id="printableCard">
+                        <div class="header-slant"></div>
+                        <div class="nnak-logo-container">
+                            <img src="https://nnak.or.ke/wp-content/uploads/2021/04/NNAK-Logo-300x300.png"
+                                onerror="this.src='https://via.placeholder.com/150?text=Logo'" class="nnak-logo"
+                                alt="NNAK Logo">
+                        </div>
+
+                        <div class="id-header">
+                            <div class="header-text">
+                                <div class="org-name">NATIONAL NURSES<br>ASSOCIATION OF KENYA</div>
+                                <div class="card-title">OFFICIAL MEMBER</div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="details-col">
+                                <div class="field-row">
+                                    <span class="field-label">Name</span>
+                                    <span class="field-value uppercase" id="cardName">...</span>
+                                </div>
+                                <div class="field-row">
+                                    <span class="field-label">Member ID</span>
+                                    <span class="field-value font-mono" id="cardMemberNo">...</span>
+                                </div>
+                                <div class="field-row">
+                                    <span class="field-label">ID Number</span>
+                                    <span class="field-value" id="cardIdNo">...</span>
+                                </div>
+                                <div class="field-row">
+                                    <span class="field-label">Valid Until</span>
+                                    <span class="field-value text-green-700" id="cardExpiry">...</span>
+                                </div>
+                            </div>
+
+                            <div class="photo-container">
+                                <img id="cardPhoto" src="https://via.placeholder.com/200" class="member-photo"
+                                    alt="Member Photo">
+                            </div>
+                        </div>
+
+                        <div class="footer-row">
+                            <div class="qr-box" id="qrcode"></div>
+                            <div class="signature-box">
+                                <img src="../assets/signature.png" onerror="this.style.display='none'"
+                                    style="height: 30px; display: block; margin: 0 auto;">
+                                <div class="signature-line"></div>
+                                <div class="sig-text">Authorised Signature</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-sm text-gray-400 mt-8 max-w-lg text-center">
+                    If found, please return to P.O. Box 49422-00100 Nairobi.<br>
+                    Property of National Nurses Association of Kenya.
+                </p>
+
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Nav -->
+        <nav
+            class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-50 pb-safe">
+            <a href="dashboard.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="layout-grid" width="20"></svg> Home
+            </a>
+            <a href="card.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-green-600">
+                <svg data-lucide="credit-card" width="20"></svg> ID Card
+            </a>
+            <a href="events.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="calendar" width="20"></svg> Events
+            </a>
+            <a href="profile.html"
+                class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900">
+                <svg data-lucide="user" width="20"></svg> Profile
+            </a>
+        </nav>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        lucide.createIcons();
+        if (!requireAuth()) { }
+
+        async function initCard() {
+            try {
+                const user = await AuthService.getProfile();
+
+                // Bind Sidebar
+                document.getElementById('sidebarName').textContent = user.first_name + ' ' + user.last_name;
+                document.getElementById('sidebarEmail').textContent = user.email;
+                document.getElementById('sidebarAvatar').textContent = user.first_name[0];
+
+                // Bind Card Data
+                document.getElementById('cardName').textContent = `${user.first_name} ${user.last_name}`;
+                document.getElementById('cardMemberNo').textContent = user.member_id || 'PENDING';
+                document.getElementById('cardIdNo').textContent = user.id_number || '24792877';
+
+                // Expiry
+                const expiry = user.expiry_date ? new Date(user.expiry_date) : new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('cardExpiry').textContent = expiry.toLocaleDateString('en-GB', options);
+
+                // Photo
+                if (user.profile_photo) {
+                    document.getElementById('cardPhoto').src = user.profile_photo;
+                } else {
+                    document.getElementById('cardPhoto').src = `https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=random&size=200`;
+                }
+
+                // QR Code
+                const verifyUrl = window.location.href;
+                document.getElementById("qrcode").innerHTML = ""; // Clear
+                new QRCode(document.getElementById("qrcode"), {
+                    text: verifyUrl,
+                    width: 56,
+                    height: 56,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        window.downloadPDF = function () {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('printableCard');
+            const btn = document.querySelector('button[onclick="downloadPDF()"]');
+            const originalText = btn.innerHTML;
+
+            btn.innerHTML = 'Generating PDF...';
+            btn.disabled = true;
+
+            html2canvas(element, { scale: 3, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('l', 'mm', [160, 100]);
+                pdf.addImage(imgData, 'PNG', 0, 0, 160, 100);
+                pdf.save('NNAK_Membership_Card.pdf');
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await AuthService.logout();
+        });
+
+        initCard();
+    </script>
+</body>
+
+</html>

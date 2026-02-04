@@ -1,0 +1,6 @@
+email,first_name,last_name,phone,date_of_birth,gender,address_line1,city,country,membership_type_id,occupation,organization
+jane.smith@example.com,Jane,Smith,+254722334455,1985-03-20,female,456 Oak Avenue,Nairobi,Kenya,1,Senior Nurse,Kenyatta National Hospital
+peter.mwangi@example.com,Peter,Mwangi,+254733445566,1990-07-15,male,789 Moi Road,Mombasa,Kenya,1,Registered Nurse,Mombasa Hospital
+mary.wanjiru@example.com,Mary,Wanjiru,+254744556677,1988-11-30,female,321 Uhuru Street,Kisumu,Kenya,1,Nurse Practitioner,Kisumu General Hospital
+david.kamau@example.com,David,Kamau,+254755667788,1992-05-10,male,654 Kenyatta Avenue,Nakuru,Kenya,1,Clinical Nurse,Nakuru Level 5 Hospital
+sarah.akinyi@example.com,Sarah,Akinyi,+254766778899,1987-09-25,female,987 Jomo Kenyatta Road,Eldoret,Kenya,1,Nurse Manager,Moi Teaching Hospital
