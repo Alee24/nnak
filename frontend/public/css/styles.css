@@ -5,9 +5,11 @@
     --primary: #059669; /* Emerald 600 - More professional green */
     --primary-dark: #047857;
     --primary-light: #d1fae5;
+    --primary-strong: #065f46;
     
     --primary-premium: #064e3b; /* Deep Forest Green for Landing */
     --accent-premium: #0f172a; /* Slate 900 for dark sections */
+    --accent-soft: #e2e8f0;
     
     --bg-body: #f9fafb;
     --bg-card: #ffffff;
@@ -40,6 +42,7 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 12px 30px rgba(5, 150, 105, 0.25);
 }
 
 * {
@@ -54,6 +57,10 @@ body {
     color: var(--text-main);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+}
+
+.landing-page {
+    background: radial-gradient(circle at top, #ffffff 0%, #f3f7f5 35%, #f9fafb 100%);
 }
 
 /* --- Typography --- */
@@ -235,15 +242,17 @@ a {
     cursor: pointer;
     border: none;
     transition: 0.2s;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .btn-primary {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
 }
 
 .btn-outline {
@@ -255,6 +264,17 @@ a {
 .btn-outline:hover {
     background: #f9fafb;
     border-color: #d1d5db;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-main);
+    box-shadow: none;
+}
+
+.btn-ghost:hover {
+    background: var(--bg-surface);
 }
 
 /* 7. Forms */
@@ -1202,12 +1222,20 @@ button {
 }
 
 .hero-section {
-    padding: 100px 5% 0px;
+    padding: 110px 5% 40px;
     text-align: center;
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
+}
+
+.hero-section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(5, 150, 105, 0.15), transparent 55%);
+    z-index: -1;
 }
 
 .hero-subtitle {
@@ -1217,6 +1245,85 @@ button {
     margin-bottom: 40px;
     font-weight: 400;
     line-height: 1.6;
+}
+
+.hero-metrics {
+    margin-top: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+.metric-pill {
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: white;
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.metric-pill strong {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.quick-actions {
+    padding: 60px 5% 0;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.action-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.action-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.action-card h4 {
+    font-size: 1.1rem;
+}
+
+.action-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.action-link {
+    margin-top: auto;
+    font-weight: 600;
+    color: var(--primary-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-link:hover {
+    color: var(--primary);
 }
 
 .feature-grid {
@@ -1298,6 +1405,36 @@ button {
     background: white;
     padding: 60px 5%;
     border-top: 1px solid var(--border-color);
+}
+
+.cta-section {
+    padding: 80px 5%;
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(15, 23, 42, 0.08));
+}
+
+.cta-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px;
+    border-radius: var(--radius-xl);
+    background: white;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+    box-shadow: var(--shadow-lg);
+}
+
+.cta-card p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+.cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .footer-content {
