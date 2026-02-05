@@ -72,6 +72,20 @@ class MemberController {
                 } else {
                     $this->methodNotAllowed();
                 }
+            } elseif ($subAction === 'generate-id') {
+                // Generate ID for individual member
+                if ($method === 'POST') {
+                    $this->generateIndividualId($memberId);
+                } else {
+                    $this->methodNotAllowed();
+                }
+            } elseif ($subAction === 'profile') {
+                // Get full premium profile data
+                if ($method === 'GET') {
+                    $this->getProfile($memberId);
+                } else {
+                    $this->methodNotAllowed();
+                }
             } else {
                 switch ($method) {
                     case 'GET':
@@ -86,6 +100,8 @@ class MemberController {
                     case 'POST':
                          if ($memberId === 'import') {
                              $this->importMembers();
+                         } elseif ($memberId === 'generate-ids') {
+                             $this->generateAllIds();
                          } else {
                              $this->methodNotAllowed();
                          }
@@ -122,6 +138,7 @@ class MemberController {
             $memberId = $this->generateMemberId();
             $memberData = [
                 'member_id' => $memberId,
+                'membership_number' => $memberId,
                 'first_name' => trim($data['first_name']),
                 'last_name' => trim($data['last_name']),
                 'email' => $email,
@@ -132,9 +149,14 @@ class MemberController {
                 'organization' => $data['organization'] ?? null,
                 'membership_type_id' => intval($data['membership_type_id'] ?? 1),
                 'status' => 'pending',
-                'role' => 'member',
-                'role' => 'member',
-                'registration_date' => date('Y-m-d')
+                'role' => 'member', // Default role
+                'registration_date' => date('Y-m-d'),
+                'qualifications' => $data['qualifications'] ?? null,
+                'personal_number' => $data['personal_number'] ?? null,
+                'registration_number' => $data['registration_number'] ?? null,
+                'chapter' => $data['chapter'] ?? null,
+                'county' => $data['county'] ?? null,
+                'id_number' => $data['id_number'] ?? null
             ];
 
             $this->create($memberData);
@@ -193,7 +215,8 @@ class MemberController {
             $stmt = $this->db->prepare("
                 SELECT m.id, m.member_id, m.email, m.first_name, m.last_name, 
                        m.phone, m.status, m.registration_date, m.expiry_date, m.role,
-                       'Member' as membership_type_name
+                       m.created_at,
+                       m.registration_number, 'Member' as membership_type_name
                 FROM members m
                 WHERE $whereClause
                 ORDER BY m.created_at DESC
@@ -270,7 +293,9 @@ class MemberController {
             $allowedFields = [
                 'first_name', 'last_name', 'phone', 'date_of_birth', 'gender',
                 'address_line1', 'address_line2', 'city', 'state', 'postal_code',
-                'occupation', 'organization', 'profile_photo'
+                'occupation', 'organization', 'profile_photo',
+                'qualifications', 'personal_number', 'registration_number', 
+                'chapter', 'county', 'id_number'
             ];
             
             // Admins can also update these fields
@@ -499,6 +524,107 @@ class MemberController {
         return $prefix . str_pad($num, 4, '0', STR_PAD_LEFT);
     }
     
+    private function generateAllIds() {
+        if (!$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+
+        try {
+            // Get active members without membership number
+            $sql = "SELECT id FROM members WHERE status = 'active' AND (membership_number IS NULL OR membership_number = '')";
+            $stmt = $this->db->query($sql);
+            $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            if (empty($members)) {
+                 $this->sendResponse(200, ['success' => true, 'message' => 'No active members need IDs', 'count' => 0]);
+            }
+
+            $year = date('Y');
+            $prefix = "NNAK-$year-";
+            
+            // Find last ID for current year
+            $stmt = $this->db->prepare("SELECT member_id FROM members WHERE member_id LIKE ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$prefix . '%']);
+            $lastId = $stmt->fetchColumn();
+            $currentNum = $lastId ? intval(substr($lastId, strrpos($lastId, '-') + 1)) : 0;
+            
+            $updated = 0;
+            $updateStmt = $this->db->prepare("UPDATE members SET member_id = ? WHERE id = ?");
+            
+            foreach ($members as $m) {
+                $currentNum++;
+                $newId = $prefix . str_pad($currentNum, 4, '0', STR_PAD_LEFT);
+                $updateStmt->execute([$newId, $m['id']]);
+                $updated++;
+            }
+            
+            $this->sendResponse(200, [
+                'success' => true,
+                'message' => "Successfully generated IDs for $updated members",
+                'count' => $updated
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Generate IDs error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to generate IDs']);
+        }
+    }
+
+    private function generateIndividualId($id) {
+        if (!$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+
+        try {
+            // Check if member exists and is active
+            $stmt = $this->db->prepare("SELECT id, status, member_id FROM members WHERE id = ? AND deleted_at IS NULL");
+            $stmt->execute([$id]);
+            $member = $stmt->fetch();
+
+            if (!$member) {
+                $this->sendResponse(404, ['error' => 'Member not found']);
+            }
+
+            if ($member['status'] !== 'active') {
+                $this->sendResponse(400, ['error' => 'Member must be active to generate an ID']);
+            }
+
+            if (!empty($member['member_id'])) {
+                $this->sendResponse(400, ['error' => 'Member already has an ID']);
+            }
+
+            $year = date('Y');
+            $prefix = "NNAK-$year-";
+
+            // Find last ID for current year
+            $stmt = $this->db->prepare("SELECT member_id FROM members WHERE member_id LIKE ? ORDER BY member_id DESC LIMIT 1");
+            $stmt->execute([$prefix . '%']);
+            $lastId = $stmt->fetchColumn();
+            
+            // Extract the numeric part reliably
+            $currentNum = 1;
+            if ($lastId) {
+                $parts = explode('-', $lastId);
+                $currentNum = intval(end($parts)) + 1;
+            }
+
+            $newId = $prefix . str_pad($currentNum, 4, '0', STR_PAD_LEFT);
+            
+            $updateStmt = $this->db->prepare("UPDATE members SET member_id = ? WHERE id = ?");
+            $updateStmt->execute([$newId, $id]);
+
+            $this->sendResponse(200, [
+                'success' => true,
+                'message' => "Successfully generated ID: $newId",
+                'member_id' => $newId
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Generate individual ID error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to generate ID: ' . $e->getMessage()]);
+        }
+    }
+    
     /**
      * Update Member Status (Activate/Suspend)
      */
@@ -525,6 +651,8 @@ class MemberController {
             if ($stmt->rowCount() === 0) {
                 $this->sendResponse(404, ['error' => 'Member not found']);
             }
+
+            $this->addInteraction($memberId, 'STATUS_CHANGE', "Status updated to " . strtoupper($data['status']));
 
             $this->sendResponse(200, [
                 'success' => true,
@@ -595,6 +723,8 @@ class MemberController {
             $member = $stmt->fetch();
 
             $this->db->commit();
+
+            $this->addInteraction($memberId, 'CPD_AWARD', "Awarded $points points: " . ($data['description'] ?? 'Manual Award'));
 
             $this->sendResponse(200, [
                 'success' => true,
@@ -699,6 +829,80 @@ class MemberController {
         } catch (PDOException $e) {
             error_log("Update license error: " . $e->getMessage());
             $this->sendResponse(500, ['error' => 'Failed to update license information']);
+        }
+    }
+    
+    /**
+     * Get Full Premium Profile Data
+     */
+    private function getProfile($id) {
+        if (!$this->isAdmin() && $_SESSION['user_id'] != $id) {
+            $this->sendResponse(403, ['error' => 'Access denied']);
+        }
+        
+        try {
+            // Get Member & Membership Type
+            $stmt = $this->db->prepare("
+                SELECT m.*, mt.name as rank_name, mt.price as rank_price
+                FROM members m
+                LEFT JOIN membership_types mt ON m.membership_type_id = mt.id
+                WHERE m.id = ? AND m.deleted_at IS NULL
+            ");
+            $stmt->execute([$id]);
+            $member = $stmt->fetch();
+            
+            if (!$member) {
+                $this->sendResponse(404, ['error' => 'Member not found']);
+            }
+            unset($member['password_hash']);
+
+            // Get Recent Interactions
+            $stmt = $this->db->prepare("
+                SELECT * FROM member_interactions 
+                WHERE member_id = ? 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            ");
+            $stmt->execute([$id]);
+            $interactions = $stmt->fetchAll();
+
+            // Get CPD Summary (Total points and last award)
+            $stmt = $this->db->prepare("
+                SELECT SUM(points) as total, MAX(awarded_date) as last_award
+                FROM cpd_points 
+                WHERE member_id = ?
+            ");
+            $stmt->execute([$id]);
+            $cpd = $stmt->fetch();
+
+            $this->sendResponse(200, [
+                'success' => true,
+                'member' => $member,
+                'interactions' => $interactions,
+                'cpd_summary' => [
+                    'total' => $cpd['total'] ?? 0,
+                    'last_award' => $cpd['last_award']
+                ]
+            ]);
+            
+        } catch (PDOException $e) {
+            error_log("Get profile error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to retrieve profile data']);
+        }
+    }
+
+    /**
+     * Add Interaction Log
+     */
+    private function addInteraction($memberId, $type, $desc) {
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO member_interactions (member_id, action_type, description, performed_by)
+                VALUES (?, ?, ?, ?)
+            ");
+            $stmt->execute([$memberId, $type, $desc, $_SESSION['user_id'] ?? null]);
+        } catch (Exception $e) {
+            error_log("Failed to log interaction: " . $e->getMessage());
         }
     }
     

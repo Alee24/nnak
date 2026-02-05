@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPD Management - NNAK Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-dm-sans {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+        }
+
+        .modal-hidden {
+            display: none !important;
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-slate-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+    <script src="../js/sidebar.js"></script>
+
+    <!-- CONTENT -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50/50 relative">
+        <header
+            class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm lg:shadow-none">
+            <button class="lg:hidden text-gray-500 hover:text-gray-700 mr-2">
+                <svg data-lucide="menu" width="24"></svg>
+            </button>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-dm-sans">CPD Management</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Track and award Continuous Professional Development points</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 pl-6 border-l border-gray-100 h-8">
+                    <div
+                        class="w-9 h-9 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 flex items-center justify-center font-bold text-xs ring-2 ring-white shadow-sm">
+                        AU</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <div class="flex-1 overflow-auto custom-scrollbar p-8">
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Total Points -->
+                <div
+                    class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Points Awarded
+                        </p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="statTotalPoints">--</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                        <svg data-lucide="award" width="24"></svg>
+                    </div>
+                </div>
+
+                <!-- Total Awards -->
+                <div
+                    class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Awards Issued</p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="statTotalAwards">--</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                        <svg data-lucide="check-circle" width="24"></svg>
+                    </div>
+                </div>
+
+                <!-- Top Member -->
+                <div
+                    class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Top Earner</p>
+                        <h3 class="text-lg font-bold text-gray-900 truncate max-w-[150px]" id="statTopMember">--</h3>
+                        <p class="text-xs text-green-600 font-medium" id="statTopPoints">-- Points</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                        <svg data-lucide="crown" width="24"></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                <div class="relative w-full sm:w-80">
+                    <svg data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        width="18"></svg>
+                    <input type="text" placeholder="Search members or activities..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition shadow-sm">
+                </div>
+                <button onclick="openAwardModal()"
+                    class="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-5 py-2.5 rounded-xl font-medium transition shadow-lg shadow-green-900/10 active:scale-95">
+                    <svg data-lucide="plus" width="18"></svg> Award Points
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr
+                                class="bg-gray-50/50 border-b border-gray-100 text-xs uppercase text-gray-400 font-bold tracking-wider">
+                                <th class="px-6 py-4">Date</th>
+                                <th class="px-6 py-4">Member</th>
+                                <th class="px-6 py-4">Membership #</th>
+                                <th class="px-6 py-4">Activity</th>
+                                <th class="px-6 py-4">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cpdTableBody" class="divide-y divide-gray-50 text-sm text-gray-600">
+                            <!-- Rows will be injected here -->
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-400">Loading records...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Award Points -->
+    <div id="awardModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm modal-hidden transition-opacity duration-300">
+        <div
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden transform transition-all scale-100">
+            <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 class="text-lg font-bold text-gray-900">Award CPD Points</h3>
+                <button onclick="closeAwardModal()"
+                    class="text-gray-400 hover:text-gray-600 bg-white p-1.5 rounded-full border border-gray-200 hover:border-gray-300 transition">
+                    <svg data-lucide="x" width="18"></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="awardForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Member ID / Number</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="memberSearchInput" placeholder="Enter Registration Number"
+                                class="flex-1 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition">
+                            <button type="button" onclick="verifyMember()"
+                                class="px-4 py-2.5 bg-gray-100 text-gray-600 font-medium rounded-xl hover:bg-gray-200 transition text-sm">Verify</button>
+                        </div>
+                        <input type="hidden" id="verifiedMemberId" name="member_id">
+                        <p id="memberVerifyStatus" class="text-xs mt-1 h-4"></p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Points</label>
+                        <input type="number" name="points"
+                            class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition"
+                            placeholder="e.g. 5">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Activity Type</label>
+                        <select name="activity_type"
+                            class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition">
+                            <option value="Conference">Conference</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Webinar">Webinar</option>
+                            <option value="Publication">Publication</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Description</label>
+                        <textarea name="description" rows="3"
+                            class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition"
+                            placeholder="Event details..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button onclick="closeAwardModal()"
+                    class="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition">Cancel</button>
+                <button type="button" onclick="submitAward()"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-[#059669] hover:bg-[#047857] rounded-xl shadow-lg shadow-green-900/10 transition">Confirm
+                    Award</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        async function initCpdPage() {
+            // Fetch Stats
+            const stats = await AdminAPI.fetchJson('cpd/stats');
+            if (stats) {
+                document.getElementById('statTotalPoints').innerText = stats.total_points || 0;
+                document.getElementById('statTotalAwards').innerText = stats.total_awards || 0;
+                if (stats.top_member) {
+                    document.getElementById('statTopMember').innerText = `${stats.top_member.first_name} ${stats.top_member.last_name}`;
+                    document.getElementById('statTopPoints').innerText = `${stats.top_member.total_cpd_points} Points`;
+                }
+            }
+
+            // Fetch Recent
+            const recent = await AdminAPI.fetchJson('cpd/recent');
+            const tbody = document.getElementById('cpdTableBody');
+
+            if (recent && recent.length > 0) {
+                tbody.innerHTML = recent.map(r => `
+                    <tr class="hover:bg-gray-50/50 transition">
+                        <td class="px-6 py-4 font-medium text-gray-900">${new Date(r.created_at).toLocaleDateString()}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                                    ${r.first_name.charAt(0)}${r.last_name.charAt(0)}
+                                </div>
+                                <span class="font-medium text-gray-900">${r.first_name} ${r.last_name}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 font-mono text-gray-500 text-xs">${r.membership_number}</td>
+                        <td class="px-6 py-4"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-bold border border-blue-100">${r.activity_type || 'General'}</span></td>
+                        <td class="px-6 py-4 font-bold text-green-600">+${r.points}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">No CPD records found.</td></tr>`;
+            }
+        }
+
+        function openAwardModal() {
+            document.getElementById('awardModal').classList.remove('modal-hidden');
+        }
+
+        function closeAwardModal() {
+            document.getElementById('awardModal').classList.add('modal-hidden');
+        }
+
+        async function verifyMember() {
+            const input = document.getElementById('memberSearchInput').value;
+            const status = document.getElementById('memberVerifyStatus');
+            const hiddenId = document.getElementById('verifiedMemberId');
+
+            if (!input) return;
+            status.innerText = "Checking...";
+            status.className = "text-xs mt-1 h-4 text-gray-500";
+
+            // Mock verify or use API if available (we can search members)
+            // For now, let's implement a quick search in AdminAPI if needed, or assume we can search by number
+            // Actually, AdminAPI.getMembers has search.
+            // We'll implement a helper in admin.js to simple search.
+            const res = await AdminAPI.fetchJson(`members/search?q=${encodeURIComponent(input)}`);
+
+            if (res && res.members && res.members.length > 0) {
+                const m = res.members[0];
+                hiddenId.value = m.id;
+                status.innerText = `Found: ${m.first_name} ${m.last_name}`;
+                status.className = "text-xs mt-1 h-4 text-green-600 font-bold";
+            } else {
+                hiddenId.value = "";
+                status.innerText = "Member not found.";
+                status.className = "text-xs mt-1 h-4 text-red-600 font-bold";
+            }
+        }
+
+        async function submitAward() {
+            const form = document.getElementById('awardForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            if (!data.member_id) {
+                Swal.fire("Error", "Please verify a member first.", "error");
+                return;
+            }
+
+            try {
+                await AdminAPI.fetch('cpd/award', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                Swal.fire("Success", "Points awarded successfully!", "success");
+                closeAwardModal();
+                form.reset();
+                document.getElementById('memberVerifyStatus').innerText = "";
+                initCpdPage(); // Refresh
+            } catch (e) {
+                Swal.fire("Error", "Failed to award points.", "error");
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initCpdPage);
+    </script>
+</body>
+
+</html>

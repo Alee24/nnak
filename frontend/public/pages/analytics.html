@@ -295,34 +295,48 @@
 
         async function initAnalytics() {
             try {
-                // Fetch Data
-                const stats = await AdminAPI.getStats();
-                // Mocking charts data for visual demo (API might not give time-series for all yet)
+                let stats = null;
+                try {
+                    stats = await AdminAPI.getStats();
+                } catch (apiError) {
+                    console.warn("API Stats failed, using mock data", apiError);
+                }
 
-                // Update KPI Cards
-                if (stats) {
-                    document.getElementById('kpiRevenue').innerText = formatKES(stats.year_revenue || 1250000); // Fallback mock
-                    document.getElementById('kpiGrowth').innerText = "+" + (stats.recent_registrations || 45);
-                    document.getElementById('kpiTotalMembers').innerText = (stats.total_members || 1200).toLocaleString();
-                    document.getElementById('kpiEventRevenue').innerText = formatKES(450000); // Mock
+                // MOCK DATA OVERRIDE FOR DEMO
+                // Regardless of API result, mix in random numbers for the demo
+                const mockStats = {
+                    year_revenue: Math.floor(Math.random() * (2500000 - 1200000) + 1200000),
+                    revenue_growth: (Math.random() * (25 - 5) + 5).toFixed(1),
+                    recent_registrations: Math.floor(Math.random() * (120 - 30) + 30),
+                    member_growth: (Math.random() * (15 - 2) + 2).toFixed(1),
+                    total_members: Math.floor(Math.random() * (5000 - 1000) + 1000),
+                    event_revenue: Math.floor(Math.random() * (500000 - 100000) + 100000),
+                    active_members: 0,
+                    pending_payments: { count: 0 }
+                };
 
-                    // Growth Badges
-                    renderGrowthBadge('badgeRevenueGrowth', stats.revenue_growth);
-                    renderGrowthBadge('badgeMemberGrowth', stats.member_growth);
+                mockStats.active_members = Math.floor(mockStats.total_members * 0.75);
+                mockStats.pending_payments.count = Math.floor(mockStats.total_members * 0.20);
+                const suspended = mockStats.total_members - mockStats.active_members - mockStats.pending_payments.count;
+
+                // Merge real stats if they exist, but prefer mock for missing or zero values in this demo
+                // For this specific request, we force mock display
+                const displayStats = mockStats;
+
+                if (displayStats) {
+                    document.getElementById('kpiRevenue').innerText = formatKES(displayStats.year_revenue);
+                    document.getElementById('kpiGrowth').innerText = "+" + displayStats.recent_registrations;
+                    document.getElementById('kpiTotalMembers').innerText = displayStats.total_members.toLocaleString();
+                    document.getElementById('kpiEventRevenue').innerText = formatKES(displayStats.event_revenue);
+
+                    renderGrowthBadge('badgeRevenueGrowth', displayStats.revenue_growth);
+                    renderGrowthBadge('badgeMemberGrowth', displayStats.member_growth);
 
                     renderStatusChart({
-                        active: stats.active_members || 850,
-                        pending: (stats.pending_payments ? stats.pending_payments.count : 150),
-                        suspended: 24
+                        active: displayStats.active_members,
+                        pending: displayStats.pending_payments.count,
+                        suspended: suspended
                     });
-                } else {
-                    // Fallback mocks if API fails or returns null
-                    document.getElementById('kpiRevenue').innerText = "KES 1.2M";
-                    document.getElementById('kpiGrowth').innerText = "+65";
-                    document.getElementById('kpiTotalMembers').innerText = "1,240";
-                    document.getElementById('kpiEventRevenue').innerText = "KES 450k";
-
-                    renderStatusChart({ active: 850, pending: 150, suspended: 24 });
                 }
 
                 renderGrowthChart();

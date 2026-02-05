@@ -1,5 +1,8 @@
-// API Base URL
-const API_URL = 'http://localhost:8000/index.php?request=api';
+const getApiUrl = () => {
+    return '/api';
+};
+
+const API_URL = getApiUrl();
 
 // API Client
 class API {
@@ -24,7 +27,9 @@ class API {
 
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("Server returned non-JSON response. Possibly a PHP error.");
+                const text = await response.text();
+                console.error("Raw response:", text);
+                throw new Error("Server returned non-JSON response. Possibly a PHP error. Check console for details.");
             }
 
             const data = await response.json();
@@ -86,7 +91,7 @@ class AuthService {
     static async logout() {
         await API.post('auth/logout');
         localStorage.removeItem('user');
-        window.location.href = 'http://localhost:6856/pages/login.html';
+        window.location.href = 'login.html';
     }
 
     static async getProfile() {
@@ -288,7 +293,7 @@ function formatCurrency(amount, currency = 'KES') {
 // Check Auth on Protected Pages
 function requireAuth() {
     if (!AuthService.isAuthenticated()) {
-        window.location.href = 'http://localhost:6856/pages/login.html';
+        window.location.href = 'login.html';
         return false;
     }
     return true;
@@ -298,7 +303,7 @@ function requireAuth() {
 function requireAdmin() {
     if (!AuthService.isAdmin()) {
         Notification.error('Admin access required');
-        window.location.href = 'http://localhost:6856/pages/dashboard.html';
+        window.location.href = 'dashboard.html';
         return false;
     }
     return true;

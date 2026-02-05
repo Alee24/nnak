@@ -89,6 +89,10 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <button onclick="generateMemberIds()"
+                    class="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+                    <svg data-lucide="wand-2" width="16"></svg> Generate IDs
+                </button>
                 <button onclick="showImportModal()"
                     class="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
                     <svg data-lucide="upload" width="16"></svg> Import CSV
@@ -192,6 +196,8 @@
                                     </th>
                                     <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Member Details</th>
+                                    <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Register No</th>
                                     <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Contact</th>
                                     <th class="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -564,6 +570,9 @@
                         </div>
                     </td>
                     <td class="py-4 px-6">
+                        <span class="text-sm font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 font-mono">${m.registration_number || 'N/A'}</span>
+                    </td>
+                    <td class="py-4 px-6">
                         <div class="text-sm font-medium text-gray-700">${m.email}</div>
                         <div class="text-xs text-gray-400 mt-0.5">${m.phone || '-'}</div>
                     </td>
@@ -774,18 +783,9 @@
                     pText.textContent = 'Uploading data...';
 
                     try {
-                        const response = await fetch('http://localhost:8000/index.php?request=api/member/import', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ members: members })
-                        });
+                        const res = await AdminAPI.post('/member/import', { members: members });
 
-                        pBar.style.width = '100%';
-                        pText.textContent = 'Done!';
-
-                        const res = await response.json();
-
-                        if (response.ok) {
+                        if (res.success || res.imported_count >= 0) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Import Complete',
@@ -809,27 +809,118 @@
             });
         }
 
-        // Placeholder functions for action buttons (prevent errors)
-        function viewMemberProfile(memberId) {
-            Swal.fire('Coming Soon', 'Member profile view will be available shortly', 'info');
-        }
+    </script>
 
-        function editMember(memberId) {
-            Swal.fire('Coming Soon', 'Edit member feature will be available shortly', 'info');
-        }
+    <!-- View Member Modal -->
+    <div id="viewMemberModal" class="modal-overlay hidden">
+        <div class="modal-box max-w-2xl">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-900" id="profileMemberName">Member Profile</h3>
+                <button onclick="closeModal('viewMemberModal')" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg data-lucide="x" width="20"></svg>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto custom-scrollbar" id="memberProfileContent">
+                <!-- Content loaded via JS -->
+                <div class="flex items-center justify-center py-12">
+                    <div class="animate-spin w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function toggleMemberStatus(memberId, currentStatus) {
-            Swal.fire('Coming Soon', 'Status toggle feature will be available shortly', 'info');
-        }
+    <!-- Award CPD Modal -->
+    <div id="awardCPDModal" class="modal-overlay hidden">
+        <div class="modal-box max-w-md">
+            <div
+                class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 text-purple-700">
+                <h3 class="font-bold flex items-center gap-2"><svg data-lucide="award" width="20"></svg> Award CPD
+                    Points</h3>
+                <button onclick="closeModal('awardCPDModal')" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg data-lucide="x" width="20"></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-xs text-gray-500 mb-6 font-medium uppercase tracking-wider">Member: <span
+                        id="cpdMemberName" class="text-gray-900 font-bold"></span></p>
+                <form id="cpdForm" class="space-y-4">
+                    <input type="hidden" id="cpdMemberId">
+                    <div class="form-group">
+                        <label class="form-label">Points to Award</label>
+                        <input type="number" id="cpdPoints" required class="form-input" placeholder="e.g. 5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Activity Type</label>
+                        <select id="cpdActivityType" class="form-input">
+                            <option value="Conference">Annual Conference</option>
+                            <option value="Webinar">Educational Webinar</option>
+                            <option value="Workshop">Skills Workshop</option>
+                            <option value="Manual Award">Other Activity</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea id="cpdDescription" rows="2" class="form-input"
+                            placeholder="Brief details..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Award Date</label>
+                        <input type="date" id="cpdDate" required class="form-input">
+                    </div>
+                    <button type="button" onclick="submitAwardCPD()"
+                        class="w-full bg-[#7c3aed] text-white py-3 rounded-xl font-bold hover:bg-[#6d28d9] transition shadow-lg shadow-purple-600/20 mt-4">
+                        Confirm Award
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        function openAwardCPDModal(memberId, memberName) {
-            Swal.fire('Coming Soon', 'Award CPD points feature will be available shortly', 'info');
-        }
+    <!-- Update License Modal -->
+    <div id="updateLicenseModal" class="modal-overlay hidden">
+        <div class="modal-box max-w-md">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 text-teal-700">
+                <h3 class="font-bold flex items-center gap-2"><svg data-lucide="id-card" width="20"></svg> Update
+                    License Info</h3>
+                <button onclick="closeModal('updateLicenseModal')" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg data-lucide="x" width="20"></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-xs text-gray-500 mb-6 font-medium uppercase tracking-wider">Member: <span
+                        id="licenseMemberName" class="text-gray-900 font-bold"></span></p>
+                <form id="licenseForm" class="space-y-4">
+                    <input type="hidden" id="licenseMemberId">
+                    <div class="form-group">
+                        <label class="form-label">License Number</label>
+                        <input type="text" id="licenseNumber" required class="form-input"
+                            placeholder="e.g. NURS-2024-XXXX">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="date" id="licenseExpiryDate" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">License Status</label>
+                        <select id="licenseStatus" class="form-input">
+                            <option value="active">Active</option>
+                            <option value="expired">Expired</option>
+                            <option value="pending_renewal">Pending Renewal</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="submitUpdateLicense()"
+                        class="w-full bg-[#0d9488] text-white py-3 rounded-xl font-bold hover:bg-[#0f766e] transition shadow-lg shadow-teal-600/20 mt-4">
+                        Update Information
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        function openUpdateLicenseModal(memberId, memberName) {
-            Swal.fire('Coming Soon', 'Update license feature will be available shortly', 'info');
-        }
-
+    <script src="../js/admin.js"></script>
+    <script src="members_actions.js"></script>
+    <script>
+        lucide.createIcons();
     </script>
 </body>
 

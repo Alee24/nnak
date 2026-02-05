@@ -16,6 +16,12 @@ class EventController {
         
         // Publicly accessible for now, or check auth if needed
         // For admin events, we probably want auth.
+        if ($parts[0] === 'image') {
+            // Public access for images
+            $this->serveImage();
+            return;
+        }
+
          if (!$this->isAuthenticated()) {
             $this->sendResponse(401, ['error' => 'Authentication required']);
         }
@@ -46,18 +52,15 @@ class EventController {
             
             $sql = "SELECT * FROM events WHERE deleted_at IS NULL";
             if ($status === 'upcoming') {
-                $sql .= " AND date >= CURRENT_DATE()";
+                $sql .= " AND event_date >= CURRENT_DATE()";
             } elseif ($status === 'past') {
-                $sql .= " AND date < CURRENT_DATE()";
+                $sql .= " AND event_date < CURRENT_DATE()";
             }
             
-            $sql .= " ORDER BY date ASC";
+            $sql .= " ORDER BY event_date ASC";
             
             $stmt = $this->db->query($sql);
             $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Format for frontend if needed, but raw is usually fine
-            // Maybe add calculated fields like is_upcoming
             
             $this->sendResponse(200, ['events' => $events]);
             
@@ -72,25 +75,55 @@ class EventController {
             $this->sendResponse(403, ['error' => 'Admin access required']);
         }
 
-        $data = $this->getJsonInput();
-        
+        // Use $_POST for Multipart/Form-Data
+        $title = $_POST['title'] ?? '';
+        $date = $_POST['date'] ?? '';
+        $time = $_POST['time'] ?? null;
+        $location = $_POST['location'] ?? '';
+        $description = $_POST['description'] ?? '';
+        $fee = $_POST['fee'] ?? 0;
+        $cpd_points = $_POST['cpd_points'] ?? 0;
+
         // Validation
-        if (empty($data['title']) || empty($data['date'])) {
+        if (empty($title) || empty($date)) {
             $this->sendResponse(400, ['error' => 'Title and Date are required']);
         }
 
+        // Handle Image Upload
+        $imageUrl = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../frontend/public/uploads/events/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            
+            $fileExt = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            
+            if (in_array($fileExt, $allowed)) {
+                $fileName = uniqid('event_') . '.' . $fileExt;
+                $targetFile = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+                    // Relative path for frontend
+                    $imageUrl = 'uploads/events/' . $fileName;
+                }
+            }
+        }
+
         try {
-            $sql = "INSERT INTO events (title, description, date, time, location, type, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO events (title, description, event_date, event_time, location, fee, cpd_points, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $this->db->prepare($sql);
             
             $stmt->execute([
-                $data['title'],
-                $data['description'] ?? '',
-                $data['date'],
-                $data['time'] ?? null,
-                $data['location'] ?? '',
-                $data['type'] ?? 'General',
-                $_SESSION['user_id'] ?? 1 // Fallback or strict
+                $title,
+                $description,
+                $date,
+                $time,
+                $location,
+                $fee,
+                $cpd_points,
+                $imageUrl
             ]);
             
             $id = $this->db->lastInsertId();
@@ -98,12 +131,13 @@ class EventController {
             $this->sendResponse(201, [
                 'success' => true,
                 'message' => 'Event created successfully',
-                'id' => $id
+                'id' => $id,
+                'image_url' => $imageUrl
             ]);
             
         } catch (PDOException $e) {
             error_log("Create event error: " . $e->getMessage());
-            $this->sendResponse(500, ['error' => 'Failed to create event']);
+            $this->sendResponse(500, ['error' => 'Failed to create event: ' . $e->getMessage()]);
         }
     }
 
@@ -128,6 +162,28 @@ class EventController {
         }
     }
 
+    private function serveImage() {
+        $path = $_GET['path'] ?? '';
+        
+        // Security check: only allow images from uploads/events
+        if (empty($path) || strpos($path, 'uploads/events/') === false || strpos($path, '..') !== false) {
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }
+        
+        $fullPath = __DIR__ . '/../../frontend/public/' . $path;
+        
+        if (file_exists($fullPath)) {
+            $mime = mime_content_type($fullPath);
+            header('Content-Type: ' . $mime);
+            readfile($fullPath);
+            exit;
+        }
+        
+        header("HTTP/1.0 404 Not Found");
+        exit;
+    }
+
     // Helpers (Could be in a BaseController)
     private function isAuthenticated() {
         return isset($_SESSION['user_id']); // Assuming session auth from MemberController logic
@@ -136,10 +192,6 @@ class EventController {
     private function isAdmin() {
         // Assuming session role check
         return isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'super_admin']);
-    }
-
-    private function getJsonInput() {
-        return json_decode(file_get_contents('php://input'), true) ?? [];
     }
 
     private function sendResponse($code, $data) {

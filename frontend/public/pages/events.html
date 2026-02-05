@@ -262,6 +262,11 @@
                             placeholder="e.g. Annual General Meeting">
                     </div>
 
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label">Event Image</label>
+                        <input type="file" name="image" accept="image/*" class="form-input" style="padding: 8px;">
+                    </div>
+
                     <div class="flex gap-4">
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">Date</label>
@@ -380,9 +385,10 @@
                 card.className = 'event-card';
                 card.innerHTML = `
                     <div class="event-image">
-                       <div style="width:100%; height:100%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                            <svg data-lucide="image" width="32"></svg>
-                       </div>
+                       ${e.image_url
+                        ? `<img src="../../backend/index.php?request=api/event/image&path=${encodeURIComponent(e.image_url)}" alt="${e.title}" onerror="this.onerror=null;this.parentElement.innerHTML='<div style=\'width:100%; height:100%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8;\'><svg data-lucide=\'image\' width=\'32\'></svg></div>'">`
+                        : `<div style="width:100%; height:100%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8;"><svg data-lucide="image" width="32"></svg></div>`
+                    }
                        <div class="event-badge" style="background: ${badgeColor}; color: ${badgeText};">${status}</div>
                     </div>
                     <div class="event-content">
@@ -444,15 +450,9 @@
         async function handleCreate(e) {
             e.preventDefault();
             const form = e.target;
-            const data = {
-                title: form.title.value,
-                date: form.date.value,
-                time: form.time.value,
-                location: form.location.value,
-                type: form.type.value,
-                description: form.description.value,
-                // image: ... handle upload later
-            };
+            const formData = new FormData(form);
+            // Validations done by required attributes
+            // Image is in formData automatically
 
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
@@ -460,7 +460,7 @@
             btn.disabled = true;
 
             try {
-                await AdminAPI.createEvent(data);
+                await AdminAPI.createEvent(formData);
                 Swal.fire({
                     icon: 'success',
                     title: 'Published!',

@@ -21,18 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Admin API Handler
 const AdminAPI = {
-    baseUrl: '/api',
+    getBaseUrl: () => {
+        return '/api';
+    },
 
     // Helper to make authenticated requests
     fetch: async (url, options = {}) => {
         const config = {
             credentials: 'include', // CRITICAL: Send session cookies
             headers: {
-                'Content-Type': 'application/json',
                 ...options.headers
             },
             ...options
         };
+
+        // Auto-set JSON content type if not FormData and not already set
+        if (!(options.body instanceof FormData) && !config.headers['Content-Type']) {
+            config.headers['Content-Type'] = 'application/json';
+        }
 
         const response = await fetch(url, config);
 
@@ -58,122 +64,84 @@ const AdminAPI = {
         return response;
     },
 
+    // Unified request handler to fix URL joining and path issues
+    request: async (method, endpoint, body = null) => {
+        const baseUrl = AdminAPI.getBaseUrl();
+        // If endpoint starts with /, and baseUrl ends with api, we get api/endpoint
+        // If endpoint has ?, we need to turn it into & because baseUrl already has ?request=api
+        const url = `${baseUrl}${endpoint}`;
+        const options = { method };
+        if (body) options.body = JSON.stringify(body);
+
+        const response = await AdminAPI.fetch(url, options);
+        return await response.json();
+    },
+
+    get: async (endpoint) => {
+        return await AdminAPI.request('GET', endpoint);
+    },
+
+    post: async (endpoint, body) => {
+        return await AdminAPI.request('POST', endpoint, body);
+    },
+
+    put: async (endpoint, body) => {
+        return await AdminAPI.request('PUT', endpoint, body);
+    },
+
     // --- Members ---
     getMembers: async (page = 1, limit = 20, status = '', search = '') => {
-        let url = `http://localhost:8000/index.php?request=api/member&page=${page}&limit=${limit}`;
-        if (status) url += `&status=${status}`;
-        if (search) url = `http://localhost:8000/index.php?request=api/member/search&q=${encodeURIComponent(search)}`;
+        let endpoint = `/member?page=${page}&limit=${limit}`;
+        if (status) endpoint += `&status=${status}`;
+        if (search) endpoint = `/member/search?q=${encodeURIComponent(search)}`;
 
-        try {
-            const response = await AdminAPI.fetch(url);
+        return await AdminAPI.get(endpoint);
+    },
 
-            // Handle JSON parsing errors specifically for debugging
-            const text = await response.text();
-            let data;
-
-            try {
-                data = JSON.parse(text);
-            } catch (e) {
-                // If it fails to parse, it's likely HTML error from PHP
-                console.error('Members API Error (Invalid JSON):', text);
-
-                // Try to render it in the debug container if available
-                const debugContainer = document.getElementById('debug-error-display');
-                if (debugContainer) {
-                    debugContainer.classList.remove('hidden');
-                    debugContainer.innerHTML = `
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4 relative shadow-md rounded-r-lg">
-                             <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-red-400 hover:text-red-700">
-                                <svg data-lucide="x" width="16"></svg>
-                            </button>
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="ml-3 w-full">
-                                    <h3 class="text-sm font-medium text-red-800">Backend Error (HTML Response)</h3>
-                                    <div class="mt-2 text-xs text-red-700 overflow-auto max-h-60 p-3 bg-white rounded border border-red-200 font-mono whitespace-pre-wrap">
-                                        ${text.replace(/</g, '&lt;')}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    if (window.lucide) lucide.createIcons();
-                }
-
-                throw new Error('Server returned invalid JSON. Check debug output below.');
-            }
-
-            if (!response.ok) throw new Error(data.error || 'Failed to fetch members');
-            return data;
-        } catch (error) {
-            console.error('Error fetching members:', error);
-            throw error;
-        }
+    getMember: async (id) => {
+        return await AdminAPI.get(`/member/${id}`);
     },
 
     createMember: async (data) => {
-        try {
-            const response = await AdminAPI.fetch('http://localhost:8000/index.php?request=api/member', {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-            const resData = await response.json();
-            if (!response.ok) throw new Error(resData.error || 'Failed to create member');
-            return resData;
-        } catch (error) {
-            console.error('Error creating member:', error);
-            throw error;
-        }
+        return await AdminAPI.post('/member', data);
     },
 
     updateMember: async (id, data) => {
-        try {
-            const response = await AdminAPI.fetch(`http://localhost:8000/index.php?request=api/member/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify(data)
-            });
-            const resData = await response.json();
-            if (!response.ok) throw new Error(resData.error || 'Failed to update member');
-            return resData;
-        } catch (error) {
-            console.error('Error updating member:', error);
-            throw error;
-        }
+        return await AdminAPI.put(`/member/${id}`, data);
     },
 
     deleteMember: async (id) => {
         if (!confirm('Are you sure you want to deactivate this member?')) return;
-        try {
-            const response = await AdminAPI.fetch(`http://localhost:8000/index.php?request=api/member/${id}`, { method: 'DELETE' });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Failed to delete member');
-            return data;
-        } catch (error) {
-            console.error('Error deleting member:', error);
-            throw error;
-        }
+        return await AdminAPI.request('DELETE', `/member/${id}`);
+    },
+
+    updateMemberStatus: async (id, status) => {
+        return await AdminAPI.put(`/member/${id}/status`, { status });
+    },
+
+    getCPDPoints: async (id) => {
+        return await AdminAPI.get(`/member/${id}/cpd-points`);
+    },
+
+    awardCPDPoints: async (id, data) => {
+        return await AdminAPI.post(`/member/${id}/cpd-points`, data);
+    },
+
+    updateLicense: async (id, data) => {
+        return await AdminAPI.put(`/member/${id}/license`, data);
     },
 
     // --- Events ---
     getEvents: async (status = 'all') => {
-        try {
-            const response = await AdminAPI.fetch(`http://localhost:8000/index.php?request=api/event&status=${status}`);
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching events:', error);
-            return null;
-        }
+        return await AdminAPI.get(`/event?status=${status}`);
     },
 
     createEvent: async (data) => {
         try {
-            const response = await AdminAPI.fetch('http://localhost:8000/index.php?request=api/event', {
+            const body = data instanceof FormData ? data : JSON.stringify(data);
+            const response = await AdminAPI.fetch(`${AdminAPI.getBaseUrl()}/event`, {
                 method: 'POST',
-                body: JSON.stringify(data)
+                body: body
             });
             return await response.json();
         } catch (error) {
@@ -184,32 +152,19 @@ const AdminAPI = {
 
     deleteEvent: async (id) => {
         if (!confirm('Are you sure you want to delete this event?')) return;
-        try {
-            await AdminAPI.fetch(`http://localhost:8000/index.php?request=api/event/${id}`, { method: 'DELETE' });
-            return true;
-        } catch (error) {
-            console.error('Error deleting event:', error);
-            return false;
-        }
+        return await AdminAPI.request('DELETE', `/event/${id}`);
     },
 
     // --- Payments ---
     getPayments: async (page = 1, limit = 20, status = '') => {
-        let url = `http://localhost:8000/index.php?request=api/payment&all=true&page=${page}&limit=${limit}`;
-        if (status) url += `&status=${status}`;
-
-        try {
-            const response = await AdminAPI.fetch(url);
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching payments:', error);
-            return null;
-        }
+        let endpoint = `/payment?all=true&page=${page}&limit=${limit}`;
+        if (status) endpoint += `&status=${status}`;
+        return await AdminAPI.get(endpoint);
     },
 
     createPayment: async (data) => {
         try {
-            const response = await AdminAPI.fetch('http://localhost:8000/index.php?request=api/payment', {
+            const response = await AdminAPI.fetch(`${AdminAPI.getBaseUrl()}/payment`, {
                 method: 'POST',
                 body: JSON.stringify(data)
             });
@@ -222,31 +177,29 @@ const AdminAPI = {
         }
     },
 
-    // --- Reports ---
-    getStats: async () => {
+    fetchJson: async (endpoint, options = {}) => {
         try {
-            const response = await AdminAPI.fetch('http://localhost:8000/index.php?request=api/report/dashboard');
+            const response = await AdminAPI.fetch(`${AdminAPI.getBaseUrl()}/${endpoint}`, options);
             return await response.json();
         } catch (error) {
-            console.error('Error fetching stats:', error);
+            console.error(`Error fetching ${endpoint}:`, error);
             return null;
         }
     },
 
+    // --- Members ---
+    getStats: async () => {
+        return await AdminAPI.get('/report/dashboard');
+    },
+
     getAnalytics: async (type) => {
-        try {
-            const response = await AdminAPI.fetch(`http://localhost:8000/index.php?request=api/report/${type}`);
-            return await response.json();
-        } catch (error) {
-            console.error(`Error fetching ${type} report:`, error);
-            return null;
-        }
+        return await AdminAPI.get(`/report/${type}`);
     },
 
     // --- Auth ---
     logout: async () => {
         try {
-            await AdminAPI.fetch('http://localhost:8000/index.php?request=api/auth/logout', { method: 'POST' });
+            await AdminAPI.fetch(`${AdminAPI.getBaseUrl()}/auth/logout`, { method: 'POST' });
         } catch (e) {
             console.error('Logout failed but proceeding', e);
         }
@@ -276,3 +229,71 @@ function formatDate(dateString) {
 function formatCurrency(amount) {
     return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
 }
+
+// Global Actions
+async function generateMemberIds(event) {
+    if (event) event.preventDefault();
+    if (!confirm('Are you sure you want to generate IDs for all active members who do not have one?')) return;
+
+    // Show global loading if possible, or use alert
+    // If called from button, show spinner
+    let btn = null;
+    let originalContent = '';
+
+    if (event && event.target) {
+        btn = event.target.closest('button') || event.target.closest('a');
+    }
+
+    if (btn) {
+        originalContent = btn.innerHTML;
+        btn.innerHTML = `<div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin inline-block"></div> Generating...`;
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.7';
+    } else {
+        // Fallback for sidebar link if no button context
+        document.body.style.cursor = 'wait';
+    }
+
+    try {
+        const result = await AdminAPI.post('/member/generate-ids', {});
+        if (result.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: result.message || `Successfully generated IDs for ${result.count} members.`,
+                confirmButtonColor: '#3b82f6'
+            }).then(() => {
+                if (typeof loadMembers === 'function') {
+                    loadMembers();
+                } else if (typeof loadActiveMembers === 'function') {
+                    loadActiveMembers();
+                    if (typeof updateCounts === 'function') updateCounts();
+                } else {
+                    window.location.reload();
+                }
+            });
+        } else {
+            throw new Error(result.error || result.message || 'Failed to generate IDs');
+        }
+    } catch (error) {
+        console.error('Generate IDs error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Operation Failed',
+            html: `<div class="text-left font-mono text-xs bg-gray-50 p-3 rounded border border-gray-200 mt-2">
+                    <div class="font-bold text-red-600 mb-1 italic">DEBUG ERROR:</div>
+                    ${error.message}
+                   </div>`,
+            confirmButtonColor: '#3b82f6'
+        });
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalContent;
+            btn.style.pointerEvents = '';
+            btn.style.opacity = '';
+        } else {
+            document.body.style.cursor = 'default';
+        }
+    }
+}
+window.generateMemberIds = generateMemberIds;

@@ -138,8 +138,9 @@ class AuthController {
                 INSERT INTO members (
                     member_id, email, password_hash, first_name, last_name, phone,
                     date_of_birth, gender, address_line1, city, state, postal_code,
-                    membership_type_id, status, join_date, occupation, organization
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURDATE(), ?, ?)
+                    membership_type_id, status, join_date, occupation, organization,
+                    qualifications, personal_number, registration_number, chapter, county, id_number
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
@@ -157,7 +158,13 @@ class AuthController {
                 $data['postal_code'] ?? null,
                 $data['membership_type_id'] ?? null,
                 $data['occupation'] ?? null,
-                $data['organization'] ?? null
+                $data['organization'] ?? null,
+                $data['qualifications'] ?? null,
+                $data['personal_number'] ?? null,
+                $data['registration_number'] ?? null,
+                $data['chapter'] ?? null,
+                $data['county'] ?? null,
+                $data['id_number'] ?? null
             ]);
             
             $userId = $this->db->lastInsertId();

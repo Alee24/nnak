@@ -2,23 +2,28 @@
 
 :root {
     /* --- Premium Color Palette --- */
-    --primary: #059669; /* Emerald 600 - More professional green */
+    --primary: #059669;
+    /* Emerald 600 - More professional green */
     --primary-dark: #047857;
     --primary-light: #d1fae5;
-    
-    --primary-premium: #064e3b; /* Deep Forest Green for Landing */
-    --accent-premium: #0f172a; /* Slate 900 for dark sections */
-    
+
+    --primary-premium: #064e3b;
+    /* Deep Forest Green for Landing */
+    --accent-premium: #0f172a;
+    /* Slate 900 for dark sections */
+
     --bg-body: #f9fafb;
     --bg-card: #ffffff;
     --bg-surface: #f3f4f6;
 
-    --text-main: #111827; /* Gray 900 */
-    --text-muted: #4b5563; /* Gray 600 */
+    --text-main: #111827;
+    /* Gray 900 */
+    --text-muted: #4b5563;
+    /* Gray 600 */
     --text-light: #9ca3af;
 
     --border-color: #e5e7eb;
-    
+
     /* Functional */
     --success-bg: #dcfce7;
     --success-text: #166534;
@@ -26,15 +31,16 @@
     --warning-text: #854d0e;
     --error-bg: #fee2e2;
     --error-text: #991b1b;
-    
+
     /* Sizing */
     --sidebar-width: 260px;
-    --header-height: 72px; /* Slightly taller for landing feel */
+    --header-height: 72px;
+    /* Slightly taller for landing feel */
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-xl: 24px;
-    
+
     /* Effects */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -779,6 +785,10 @@ button {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .md\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .md\:block {
         display: block;
     }
@@ -1283,13 +1293,15 @@ button {
 }
 
 .stat-item h3 {
-    color: white; /* Important override */
+    color: white;
+    /* Important override */
     font-size: 3rem;
     margin-bottom: 8px;
 }
 
 .stat-item p {
-    color: #94a3b8; /* Slate 400 */
+    color: #94a3b8;
+    /* Slate 400 */
     font-size: 1.1rem;
     font-weight: 500;
 }
@@ -1358,8 +1370,16 @@ button {
 }
 
 /* Utility Overrides for Landing layout */
-.hidden-mobile { display: none; }
+.hidden-mobile {
+    display: none;
+}
+
 @media (min-width: 768px) {
-    .hidden-mobile { display: block; }
-    .hidden-desktop { display: none; }
+    .hidden-mobile {
+        display: block;
+    }
+
+    .hidden-desktop {
+        display: none;
+    }
 }

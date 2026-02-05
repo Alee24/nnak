@@ -1,4 +1,5 @@
 <?php
+ob_start();
 /**
  * API Router and Request Handler
  * Main entry point for all API requests
@@ -16,6 +17,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
+
+// Force JSON errors
+set_exception_handler(function($e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Internal Server Error',
+        'message' => $e->getMessage(),
+        'trace' => APP_ENV === 'development' ? $e->getTraceAsString() : null
+    ]);
+    exit();
+});
+
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    if (!(error_reporting() & $errno)) return false;
+    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+});
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== NULL && ($error['type'] === E_ERROR || $error['type'] === E_PARSE || $error['type'] === E_CORE_ERROR || $error['type'] === E_COMPILE_ERROR)) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'error' => 'Fatal Error',
+            'message' => $error['message'],
+            'file' => $error['file'],
+            'line' => $error['line']
+        ]);
+    }
+});
 
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/Database.php';
@@ -94,3 +125,4 @@ try {
         sendResponse(500, ['error' => 'Internal server error']);
     }
 }
+ob_end_flush();

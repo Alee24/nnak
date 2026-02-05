@@ -427,7 +427,7 @@
 
             try {
                 // Post to UploadController
-                const response = await fetch('http://localhost:8000/index.php?request=api/upload/image', {
+                const response = await fetch('../../backend/index.php?request=api/upload/image', {
                     method: 'POST',
                     body: formData
                 });

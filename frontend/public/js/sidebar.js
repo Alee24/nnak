@@ -47,6 +47,10 @@ class SidebarComponent {
                 <a href="events.html" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
                     <svg data-lucide="calendar" width="18"></svg> Events
                 </a>
+
+                <a href="cpd.html" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="award" width="18"></svg> CPD Points
+                </a>
                 
                 <a href="applications.html" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition justify-between">
                     <div class="flex items-center gap-3"> 
@@ -55,6 +59,10 @@ class SidebarComponent {
                     <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
                 </a>
                 
+                <a href="generate_ids.html" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
+                    <svg data-lucide="wand-2" width="18"></svg> Generate IDs
+                </a>
+
                 <a href="settings.html" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition">
                     <svg data-lucide="settings" width="18"></svg> Settings
                 </a>

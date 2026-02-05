@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate IDs - NNAK Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+    <script src="../js/sidebar.js"></script>
+
+    <!-- CONTENT -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50/50 relative">
+
+        <!-- Header -->
+        <header
+            class="h-20 flex justify-between items-center px-8 flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm lg:shadow-none">
+            <button class="lg:hidden text-gray-500 hover:text-gray-700 mr-2">
+                <svg data-lucide="menu" width="24"></svg>
+            </button>
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-dm-sans">ID Management</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Generate, manage, and print member identification</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div
+                    class="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-100">
+                    <span class="relative flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    System Active
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto custom-scrollbar p-8">
+            <div class="max-w-6xl mx-auto space-y-8">
+
+                <!-- Database ID Generation Section -->
+                <section class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                    <svg data-lucide="database" width="24" class="text-blue-600"></svg>
+                                    Member ID Assignment
+                                </h2>
+                                <p class="text-gray-500 max-w-2xl text-sm leading-relaxed">
+                                    Automatically assign unique Membership Numbers (e.g., <span
+                                        class="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-700">NNAK-2025-XXXX</span>)
+                                    to all active members who currently lack one. This process is safe and only affects
+                                    members without IDs.
+                                </p>
+                            </div>
+                            <div class="hidden md:block">
+                                <span
+                                    class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Database
+                                    Action</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <div class="bg-blue-50/50 rounded-2xl p-6 border border-blue-100 mb-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-sm font-bold text-gray-500 uppercase tracking-wide">Pending
+                                        Assignment</span>
+                                    <span
+                                        class="h-8 w-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                                        <svg data-lucide="user-plus" width="18"></svg>
+                                    </span>
+                                </div>
+                                <div class="text-4xl font-bold text-gray-900 mb-1" id="pendingIdCount">--</div>
+                                <div class="text-sm text-gray-500">Active members waiting for ID generation</div>
+                            </div>
+
+                            <ul class="space-y-3 text-sm text-gray-500">
+                                <li class="flex items-center gap-2">
+                                    <svg data-lucide="check" width="16" class="text-green-500"></svg> Generates
+                                    sequential IDs based on year
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg data-lucide="check" width="16" class="text-green-500"></svg> Updates both
+                                    Member ID and Membership No.
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg data-lucide="check" width="16" class="text-green-500"></svg> Skips members who
+                                    already have IDs
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div
+                            class="flex flex-col items-center justify-center text-center p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                            <div class="mb-4 bg-white p-4 rounded-full shadow-sm">
+                                <svg data-lucide="wand-2" width="32" class="text-blue-600"></svg>
+                            </div>
+                            <h3 class="font-bold text-gray-900 mb-2">Ready to Generate?</h3>
+                            <p class="text-sm text-gray-500 mb-6 max-w-xs mx-auto">Click below to start the bulk
+                                generation process. This may take a few seconds.</p>
+                            <button onclick="window.generateMemberIds(event)"
+                                class="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 transition transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                                <svg data-lucide="play" width="18"></svg>
+                                Generate Missing IDs
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PDF ID Card Section -->
+                <section class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                    <svg data-lucide="id-card" width="24" class="text-purple-600"></svg>
+                                    Physical ID Cards
+                                </h2>
+                                <p class="text-gray-500 max-w-2xl text-sm leading-relaxed">
+                                    Generate printable PDF ID cards for members. Supports bulk export and individual
+                                    card printing.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button id="downloadBtn" onclick="downloadAllPDFs()"
+                                class="p-6 border border-purple-200 rounded-3xl bg-purple-50 flex flex-col items-center text-center hover:bg-purple-100 transition group relative overflow-hidden">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition">
+                                </div>
+                                <svg data-lucide="file-down" width="32"
+                                    class="text-purple-600 mb-3 group-hover:scale-110 transition relative z-10"></svg>
+                                <span class="font-bold text-gray-900 relative z-10">Download All PDFs</span>
+                                <span class="text-xs text-gray-500 mt-1 relative z-10">Generate cards for active
+                                    members</span>
+                            </button>
+
+                            <div
+                                class="p-6 border border-gray-100 rounded-3xl bg-gray-50/50 flex flex-col items-center text-center opacity-60">
+                                <svg data-lucide="printer" width="32" class="text-gray-400 mb-3"></svg>
+                                <span class="font-bold text-gray-500">Print Batch</span>
+                                <span class="text-xs text-gray-400 mt-1">Direct printer connection</span>
+                            </div>
+
+                            <div
+                                class="p-6 border border-gray-100 rounded-3xl bg-gray-50/50 flex flex-col items-center text-center opacity-60">
+                                <svg data-lucide="mail" width="32" class="text-gray-400 mb-3"></svg>
+                                <span class="font-bold text-gray-500">Email Cards</span>
+                                <span class="text-xs text-gray-400 mt-1">Send digital copies</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Active Members List Section -->
+                <section class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900 mb-1">Active Members</h2>
+                            <p class="text-sm text-gray-500">Manage individual IDs and card downloads</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadActiveMembers()"
+                                class="p-2 text-gray-400 hover:text-blue-600 transition" title="Refresh List">
+                                <svg data-lucide="refresh-cw" width="20"></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50/50 border-b border-gray-100">
+                                <tr>
+                                    <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Member Details</th>
+                                    <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Contact</th>
+                                    <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Member ID</th>
+                                    <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberListBody" class="divide-y divide-gray-50">
+                                <!-- Loading state -->
+                                <tr>
+                                    <td colspan="4" class="px-8 py-12 text-center text-gray-400">
+                                        <div class="flex flex-col items-center gap-2">
+                                            <div
+                                                class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin">
+                                            </div>
+                                            <span>Loading active members...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Hidden Template for ID Card -->
+                <div id="idCardTemplate" class="fixed -left-[9999px] top-0 opacity-0 pointer-events-none">
+                    <div id="card-container"
+                        style="width: 400px; height: 250px; background: white; position: relative; font-family: 'DM Sans', sans-serif; overflow: hidden; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                        <!-- Background Accents -->
+                        <div
+                            style="position: absolute; top: 0; right: 0; width: 150px; height: 100%; background: linear-gradient(135deg, #059669 0%, #10b981 100%); clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);">
+                        </div>
+
+                        <div
+                            style="padding: 24px; display: flex; flex-direction: column; height: 100%; position: relative; z-index: 10;">
+                            <!-- Header -->
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                                <div
+                                    style="width: 40px; height: 40px; background: #059669; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="3">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size: 16px; font-weight: 800; color: #111827; letter-spacing: -0.025em;">
+                                        NNAK</div>
+                                    <div
+                                        style="font-size: 10px; color: #6b7280; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        Digital Membership</div>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                                <div
+                                    style="width: 100px; height: 100px; background: #f3f4f6; border-radius: 14px; border: 4px solid white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d1d5db"
+                                        stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div id="card-name"
+                                        style="font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 4px; line-height: 1.2;">
+                                        Member Name</div>
+                                    <div id="card-id"
+                                        style="font-family: 'Courier New', monospace; font-size: 14px; font-weight: 700; color: #059669; margin-bottom: 12px;">
+                                        NNAK-2025-0000</div>
+                                    <div
+                                        style="display: inline-flex; align-items: center; padding: 4px 10px; background: white; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 700; color: #374151;">
+                                        ACTIVE MEMBER
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div
+                                style="margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end;">
+                                <div>
+                                    <div
+                                        style="font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">
+                                        Registration</div>
+                                    <div id="card-date" style="font-size: 11px; font-weight: 700; color: #111827;">
+                                        04/02/2026</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div
+                                        style="font-size: 9px; color: #e2e8f0; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">
+                                        Expires</div>
+                                    <div style="font-size: 11px; font-weight: 700; color: white;">31 DEC 2025</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            await updateCounts();
+            await loadActiveMembers();
+        });
+
+        async function updateCounts() {
+            try {
+                const result = await AdminAPI.get('/member');
+                if (result && result.members) {
+                    const withoutId = result.members.filter(m => !m.member_id || m.member_id === '').length;
+                    document.getElementById('pendingIdCount').innerText = withoutId;
+                }
+            } catch (error) {
+                console.error('Error updating counts:', error);
+                document.getElementById('pendingIdCount').innerText = '0';
+            }
+        }
+
+        let allActiveMembers = [];
+
+        async function loadActiveMembers() {
+            const tbody = document.getElementById('memberListBody');
+            try {
+                const result = await AdminAPI.get('/member?status=active&limit=100');
+                allActiveMembers = result.members || [];
+
+                if (allActiveMembers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-8 py-12 text-center text-gray-400 font-medium italic">No active members found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = allActiveMembers.map(m => `
+                    <tr class="hover:bg-gray-50/50 transition cursor-default">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold uppercase">
+                                    ${m.first_name[0]}${m.last_name[0]}
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-900">${m.first_name} ${m.last_name}</div>
+                                    <div class="text-xs text-gray-400 capitalize">${m.role} Member</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <div class="text-sm font-medium text-gray-900">${m.email}</div>
+                            <div class="text-xs text-gray-400">${m.phone || 'No phone'}</div>
+                        </td>
+                        <td class="px-8 py-5">
+                            ${m.member_id ? `
+                                <span class="font-mono bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-bold border border-green-100">
+                                    ${m.member_id}
+                                </span>
+                            ` : `
+                                <span class="bg-gray-100 text-gray-400 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
+                                    PENDING ID
+                                </span>
+                            `}
+                        </td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-2">
+                                ${!m.member_id ? `
+                                    <button onclick="generateIndividualId(${m.id}, event)" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition" title="Generate ID">
+                                        <svg data-lucide="wand-2" width="18"></svg>
+                                    </button>
+                                ` : `
+                                    <button onclick="downloadSinglePDF(${m.id})" class="p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white transition" title="Download PDF Card">
+                                        <svg data-lucide="file-down" width="18"></svg>
+                                    </button>
+                                `}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error loading members:', error);
+                tbody.innerHTML = `<tr><td colspan="4" class="px-8 py-12 text-center text-red-500">
+                    <div class="font-bold mb-1">Failed to load active members</div>
+                    <div class="text-xs bg-red-50 p-2 rounded border border-red-100 font-mono inline-block max-w-sm">
+                        DEBUG ERROR: ${error.message}
+                    </div>
+                </td></tr>`;
+            }
+        }
+
+        async function generateIndividualId(id, event) {
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>`;
+            btn.disabled = true;
+
+            try {
+                const result = await AdminAPI.post(`/member/${id}/generate-id`, {});
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ID Generated',
+                        text: result.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    await updateCounts();
+                    await loadActiveMembers();
+                } else {
+                    throw new Error(result.message || 'Failed to generate ID');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Generation Failed',
+                    html: `<div class="text-left font-mono text-xs bg-gray-50 p-3 rounded border border-gray-200 mt-2">
+                            <div class="font-bold text-red-600 mb-1 italic">DEBUG ERROR:</div>
+                            ${error.message}
+                           </div>`,
+                    confirmButtonColor: '#3b82f6'
+                });
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        async function downloadSinglePDF(id) {
+            const member = allActiveMembers.find(m => m.id == id);
+            if (!member) return;
+
+            const { jsPDF } = window.jspdf;
+
+            Swal.fire({
+                title: 'Generating PDF Card...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const cardWidthPDF = 90;
+                const cardHeightPDF = 55;
+                const margin = 10;
+
+                const cardEl = document.getElementById('card-container');
+
+                // Update template content
+                document.getElementById('card-name').innerText = `${member.first_name} ${member.last_name}`;
+                document.getElementById('card-id').innerText = member.member_id;
+                document.getElementById('card-date').innerText = new Date(member.registration_date).toLocaleDateString();
+
+                const canvas = await html2canvas(cardEl, {
+                    scale: 3,
+                    useCORS: true,
+                    backgroundColor: null,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', margin, margin, cardWidthPDF, cardHeightPDF);
+
+                doc.save(`ID_Card_${member.first_name}_${member.last_name}.pdf`);
+                Swal.close();
+            } catch (error) {
+                console.error('PDF Export Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Export Failed',
+                    html: `<div class="text-left font-mono text-xs bg-gray-50 p-3 rounded border border-gray-200 mt-2">
+                            <div class="font-bold text-red-600 mb-1 italic">DEBUG ERROR:</div>
+                            ${error.message}
+                           </div>`,
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        }
+
+        async function downloadAllPDFs() {
+            const { jsPDF } = window.jspdf;
+
+            Swal.fire({
+                title: 'Preparing Member Cards',
+                text: 'Fetching active members and generating IDs...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                const result = await AdminAPI.get('/member?status=active&limit=100');
+                const members = result.members || [];
+
+                if (members.length === 0) {
+                    Swal.fire('Notice', 'No active members found to generate cards for.', 'info');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Generating PDF',
+                    text: `Processing ${members.length} members...`,
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const cardWidthPDF = 90;
+                const cardHeightPDF = 55;
+                const margin = 10;
+                let x = margin;
+                let y = margin;
+                const cardsPerRow = 2;
+                const cardsPerPage = 8;
+                let cardsCreated = 0;
+
+                const cardEl = document.getElementById('card-container');
+
+                for (let i = 0; i < members.length; i++) {
+                    const m = members[i];
+
+                    if (!m.member_id) continue; // Skip if no ID generated
+
+                    document.getElementById('card-name').innerText = `${m.first_name} ${m.last_name}`;
+                    document.getElementById('card-id').innerText = m.member_id;
+                    document.getElementById('card-date').innerText = new Date(m.registration_date).toLocaleDateString();
+
+                    const canvas = await html2canvas(cardEl, {
+                        scale: 3,
+                        useCORS: true,
+                        backgroundColor: null,
+                        logging: false
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+
+                    if (cardsCreated > 0 && cardsCreated % cardsPerPage === 0) {
+                        doc.addPage();
+                        x = margin;
+                        y = margin;
+                    }
+
+                    doc.addImage(imgData, 'PNG', x, y, cardWidthPDF, cardHeightPDF);
+
+                    cardsCreated++;
+
+                    if (cardsCreated % cardsPerRow === 0) {
+                        x = margin;
+                        y += cardHeightPDF + 10;
+                    } else {
+                        x += cardWidthPDF + 10;
+                    }
+
+                    if (i % 5 === 0) {
+                        Swal.getHtmlContainer().innerText = `Generating cards: ${i + 1} of ${members.length}...`;
+                    }
+                }
+
+                if (cardsCreated === 0) {
+                    Swal.fire('Notice', 'No members with generated IDs found. Please generate IDs first.', 'warning');
+                    return;
+                }
+
+                doc.save(`NNAK_Member_Cards_${new Date().toISOString().split('T')[0]}.pdf`);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Export Complete',
+                    text: `Successfully generated ${cardsCreated} member cards.`,
+                    confirmButtonColor: '#059669'
+                });
+
+            } catch (error) {
+                console.error('PDF Export Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Bulk Export Failed',
+                    html: `<div class="text-left font-mono text-xs bg-gray-50 p-3 rounded border border-gray-200 mt-2">
+                            <div class="font-bold text-red-600 mb-1 italic">DEBUG ERROR:</div>
+                            ${error.message}
+                           </div>`,
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
