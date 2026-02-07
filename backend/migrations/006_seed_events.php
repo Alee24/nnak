@@ -2,8 +2,12 @@
 /**
  * Seeder: Add Test Events
  */
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/config/Database.php';
+if (!defined('DB_HOST')) {
+    require_once __DIR__ . '/../config/config.php';
+}
+if (!class_exists('Database')) {
+    require_once __DIR__ . '/../config/Database.php';
+}
 
 $db = Database::getInstance()->getConnection();
 
@@ -38,7 +42,7 @@ try {
         ]
     ];
 
-    $sql = "INSERT INTO events (title, description, date, time, location, type, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO events (title, description, event_date, event_time, location, type, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $db->prepare($sql);
 
     foreach ($events as $event) {

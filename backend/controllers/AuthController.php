@@ -139,8 +139,10 @@ class AuthController {
                     member_id, email, password_hash, first_name, last_name, phone,
                     date_of_birth, gender, address_line1, city, state, postal_code,
                     membership_type_id, status, join_date, occupation, organization,
-                    qualifications, personal_number, registration_number, chapter, county, id_number
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?)
+                    qualifications, personal_number, registration_number, chapter, county, 
+                    sub_county, id_number, designation, work_station, cadre, employment_status,
+                    is_signed, signature_date, profile_picture
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
@@ -164,7 +166,15 @@ class AuthController {
                 $data['registration_number'] ?? null,
                 $data['chapter'] ?? null,
                 $data['county'] ?? null,
-                $data['id_number'] ?? null
+                $data['sub_county'] ?? null,
+                $data['id_number'] ?? null,
+                $data['designation'] ?? null,
+                $data['work_station'] ?? null,
+                $data['cadre'] ?? null,
+                $data['employment_status'] ?? null,
+                isset($data['is_signed']) ? (int)$data['is_signed'] : 0,
+                $data['signature_date'] ?? null,
+                $data['profile_picture'] ?? null
             ]);
             
             $userId = $this->db->lastInsertId();

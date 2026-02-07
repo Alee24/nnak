@@ -28,8 +28,8 @@ class MemberController {
             return;
         }
         
-        if (empty($action)) {
-            // /api/members - list all members or create new
+        if (empty($action) || $action === 'list') {
+            // /api/members or /api/members/list - list all members or create new
             if ($method === 'GET') {
                 $this->listMembers();
             } elseif ($method === 'POST') {
@@ -65,6 +65,12 @@ class MemberController {
                 } else {
                     $this->methodNotAllowed();
                 }
+            } elseif ($action === 'cpd-ledger') {
+                if ($method === 'GET') {
+                    $this->getCPDLedger();
+                } else {
+                    $this->methodNotAllowed();
+                }
             } elseif ($subAction === 'license') {
                 // Update license information
                 if ($method === 'PUT') {
@@ -83,6 +89,24 @@ class MemberController {
                 // Get full premium profile data
                 if ($method === 'GET') {
                     $this->getProfile($memberId);
+                } else {
+                    $this->methodNotAllowed();
+                }
+            } elseif ($action === 'pending-count') {
+                if ($method === 'GET') {
+                    $this->getPendingCount();
+                } else {
+                    $this->methodNotAllowed();
+                }
+            } elseif ($action === 'dashboard-stats') {
+                if ($method === 'GET') {
+                    $this->getDashboardStats();
+                } else {
+                    $this->methodNotAllowed();
+                }
+            } elseif ($action === 'applications') {
+                if ($method === 'GET') {
+                    $this->getPendingApplications();
                 } else {
                     $this->methodNotAllowed();
                 }
@@ -150,13 +174,20 @@ class MemberController {
                 'membership_type_id' => intval($data['membership_type_id'] ?? 1),
                 'status' => 'pending',
                 'role' => 'member', // Default role
-                'registration_date' => date('Y-m-d'),
+                'join_date' => date('Y-m-d'),
                 'qualifications' => $data['qualifications'] ?? null,
                 'personal_number' => $data['personal_number'] ?? null,
                 'registration_number' => $data['registration_number'] ?? null,
                 'chapter' => $data['chapter'] ?? null,
                 'county' => $data['county'] ?? null,
-                'id_number' => $data['id_number'] ?? null
+                'sub_county' => $data['sub_county'] ?? null,
+                'id_number' => $data['id_number'] ?? null,
+                'designation' => $data['designation'] ?? null,
+                'work_station' => $data['work_station'] ?? null,
+                'cadre' => $data['cadre'] ?? null,
+                'employment_status' => $data['employment_status'] ?? null,
+                'is_signed' => isset($data['is_signed']) ? (int)$data['is_signed'] : 0,
+                'signature_date' => $data['signature_date'] ?? ($data['is_signed'] ? date('Y-m-d') : null)
             ];
 
             $this->create($memberData);
@@ -175,6 +206,9 @@ class MemberController {
     }
     
     private function listMembers() {
+        // Log entry
+        file_put_contents(__DIR__ . '/../../debug_log.txt', "Entered listMembers at " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+
         // Only admins can list all members
         if (!$this->isAdmin()) {
             $this->sendResponse(403, ['error' => 'Admin access required']);
@@ -188,6 +222,9 @@ class MemberController {
             $limit = min(100, max(10, intval($_GET['limit'] ?? 20)));
             $offset = ($page - 1) * $limit;
             
+            // Get search query
+            $search = $_GET['search'] ?? $_GET['q'] ?? '';
+
             // Build query
             $where = ["m.deleted_at IS NULL"];
             $params = [];
@@ -195,6 +232,16 @@ class MemberController {
             if ($status) {
                 $where[] = "m.status = ?";
                 $params[] = $status;
+            }
+
+            if (!empty($search)) {
+                $where[] = "(m.first_name LIKE ? OR m.last_name LIKE ? OR m.email LIKE ? OR m.member_id LIKE ? OR m.phone LIKE ?)";
+                $term = "%$search%";
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
             }
             
             if ($membershipType) {
@@ -214,7 +261,7 @@ class MemberController {
             // Get members (removed LEFT JOIN temporarily due to missing membership_types table)
             $stmt = $this->db->prepare("
                 SELECT m.id, m.member_id, m.email, m.first_name, m.last_name, 
-                       m.phone, m.status, m.registration_date, m.expiry_date, m.role,
+                       m.phone, m.status, m.role,
                        m.created_at,
                        m.registration_number, 'Member' as membership_type_name
                 FROM members m
@@ -223,7 +270,7 @@ class MemberController {
                 LIMIT $limit OFFSET $offset
             ");
             $stmt->execute($params);
-            $members = $stmt->fetchAll();
+            $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             $this->sendResponse(200, [
                 'members' => $members,
@@ -235,18 +282,17 @@ class MemberController {
                 ]
             ]);
             
-        } catch (PDOException $e) {
-            error_log("List members error: " . $e->getMessage());
+        } catch (Throwable $e) {
+            $errorMsg = "List members CRITICAL error: " . $e->getMessage() . "\nFile: " . $e->getFile() . ":" . $e->getLine() . "\nTrace: " . $e->getTraceAsString();
+            error_log($errorMsg);
+            file_put_contents(__DIR__ . '/../../debug_log.txt', $errorMsg . "\n", FILE_APPEND);
             
-            // Provide detailed error in development, generic in production
-            $errorResponse = ['error' => 'Failed to retrieve members'];
-            
-            if (APP_ENV === 'development') {
-                $errorResponse['details'] = $e->getMessage();
-                $errorResponse['code'] = $e->getCode();
-            }
-            
-            $this->sendResponse(500, $errorResponse);
+            $this->sendResponse(500, [
+                'error' => 'Failed to retrieve members',
+                'details' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
         }
     }
     
@@ -264,7 +310,7 @@ class MemberController {
                 WHERE m.id = ? AND m.deleted_at IS NULL
             ");
             $stmt->execute([$id]);
-            $member = $stmt->fetch();
+            $member = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if (!$member) {
                 $this->sendResponse(404, ['error' => 'Member not found']);
@@ -295,7 +341,9 @@ class MemberController {
                 'address_line1', 'address_line2', 'city', 'state', 'postal_code',
                 'occupation', 'organization', 'profile_photo',
                 'qualifications', 'personal_number', 'registration_number', 
-                'chapter', 'county', 'id_number'
+                'chapter', 'county', 'sub_county', 'id_number',
+                'designation', 'work_station', 'cadre', 'employment_status',
+                'is_signed', 'signature_date'
             ];
             
             // Admins can also update these fields
@@ -399,7 +447,7 @@ class MemberController {
                 LIMIT 50
             ");
             $stmt->execute([$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
-            $members = $stmt->fetchAll();
+            $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             $this->sendResponse(200, ['members' => $members]);
             
@@ -424,8 +472,8 @@ class MemberController {
                 ORDER BY p.created_at DESC
             ");
             $stmt->execute([$memberId]);
-            $payments = $stmt->fetchAll();
-            
+            $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
             $this->sendResponse(200, ['payments' => $payments]);
             
         } catch (PDOException $e) {
@@ -434,8 +482,6 @@ class MemberController {
         }
     }
     
-
-
     private function importMembers() {
         if (!$this->isAdmin()) {
             $this->sendResponse(403, ['error' => 'Admin access required']);
@@ -686,17 +732,29 @@ class MemberController {
         }
 
         try {
+            // If internal ID is actually a membership number, resolve it
+            if (!empty($data['is_membership_number'])) {
+                $stmt = $this->db->prepare("SELECT id FROM members WHERE member_id = ?");
+                $stmt->execute([$memberId]);
+                $foundId = $stmt->fetchColumn();
+                if (!$foundId) {
+                    $this->sendResponse(404, ['error' => 'Member with this membership number not found']);
+                }
+                $memberId = $foundId;
+            }
+
             // Start transaction
             $this->db->beginTransaction();
 
             // Insert CPD points record
             $stmt = $this->db->prepare("
-                INSERT INTO cpd_points (member_id, points, activity_type, description, awarded_by, awarded_date)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO cpd_points (member_id, event_id, points, activity_type, description, awarded_by, awarded_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
                 $memberId,
+                $data['event_id'] ?? null,
                 $points,
                 $data['activity_type'] ?? 'Manual Award',
                 $data['description'] ?? '',
@@ -747,9 +805,11 @@ class MemberController {
             $stmt = $this->db->prepare("
                 SELECT cp.*, 
                        m.first_name as awarded_by_name,
-                       m.last_name as awarded_by_last_name
+                       m.last_name as awarded_by_last_name,
+                       e.title as event_name
                 FROM cpd_points cp
                 LEFT JOIN members m ON cp.awarded_by = m.id
+                LEFT JOIN events e ON cp.event_id = e.id
                 WHERE cp.member_id = ?
                 ORDER BY cp.awarded_date DESC, cp.created_at DESC
             ");
@@ -770,6 +830,40 @@ class MemberController {
         } catch (PDOException $e) {
             error_log("Get CPD points history error: " . $e->getMessage());
             $this->sendResponse(500, ['error' => 'Failed to retrieve CPD points history']);
+        }
+    }
+
+    /**
+     * Get CPD Ledger for all members (Admin only)
+     */
+    private function getCPDLedger() {
+        if (!$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+
+        try {
+            $stmt = $this->db->query("
+                SELECT cp.*, 
+                       m.first_name, m.last_name, m.member_id as membership_number,
+                       e.title as event_title,
+                       admin.first_name as admin_name, admin.last_name as admin_last_name
+                FROM cpd_points cp
+                LEFT JOIN members m ON cp.member_id = m.id
+                LEFT JOIN events e ON cp.event_id = e.id
+                LEFT JOIN members admin ON cp.awarded_by = admin.id
+                ORDER BY cp.created_at DESC
+                LIMIT 500
+            ");
+            $ledger = $stmt->fetchAll();
+
+            $this->sendResponse(200, [
+                'success' => true,
+                'ledger' => $ledger
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Get CPD ledger error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to retrieve CPD ledger']);
         }
     }
 
@@ -905,9 +999,142 @@ class MemberController {
             error_log("Failed to log interaction: " . $e->getMessage());
         }
     }
-    
-    // Helper methods
-    
+
+    /**
+     * Get count of pending applications
+     */
+    private function getPendingCount() {
+        if (!$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+
+        try {
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM members WHERE status = 'pending' AND deleted_at IS NULL");
+            $stmt->execute();
+            $count = (int)$stmt->fetchColumn();
+
+            $this->sendResponse(200, ['count' => $count]);
+        } catch (PDOException $e) {
+            error_log("Get pending count error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to get pending count']);
+        }
+    }
+
+    /**
+     * Get statistics for the admin dashboard
+     */
+    private function getDashboardStats() {
+        if (!$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+
+        try {
+            // 1. Basic Stats
+            $stmt = $this->db->query("
+                SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = 'suspended' THEN 1 ELSE 0 END) as suspended
+                FROM members 
+                WHERE deleted_at IS NULL
+            ");
+            $summary = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // 2. CPD Stats
+            $stmt = $this->db->query("SELECT COALESCE(SUM(points), 0) FROM cpd_points");
+            $totalCPD = (int)$stmt->fetchColumn();
+
+            // 3. Last 7 Days Analytics (Registration Count)
+            $analytics = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $date = date('Y-m-d', strtotime("-$i days"));
+                $stmt = $this->db->prepare("SELECT COUNT(*) FROM members WHERE DATE(created_at) = ? AND deleted_at IS NULL");
+                $stmt->execute([$date]);
+                $analytics[] = [
+                    'date' => $date,
+                    'count' => (int)$stmt->fetchColumn(),
+                    'label' => date('D', strtotime($date))
+                ];
+            }
+
+            // 4. Recent Applications
+            $stmt = $this->db->query("
+                SELECT id, member_id, first_name, last_name, email, created_at, status
+                FROM members 
+                WHERE status = 'pending' AND deleted_at IS NULL
+                ORDER BY created_at DESC
+                LIMIT 5
+            ");
+            $recentApplications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 5. Recent Activity (Latest Updated Members)
+            $stmt = $this->db->query("
+                SELECT m.id, m.member_id, m.first_name, m.last_name, m.status, m.updated_at, m.role, m.profile_image
+                FROM members m
+                WHERE m.deleted_at IS NULL
+                ORDER BY m.updated_at DESC
+                LIMIT 5
+            ");
+            $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->sendResponse(200, [
+                'summary' => $summary,
+                'total_cpd' => $totalCPD,
+                'analytics' => $analytics,
+                'recent_applications' => $recentApplications,
+                'recent_activity' => $recentActivity
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Dashboard stats error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to retrieve dashboard statistics']);
+        }
+    }
+
+    /**
+     * Get list of pending applications
+     */
+    private function getPendingApplications() {
+        if (!$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+
+        try {
+            $page = max(1, intval($_GET['page'] ?? 1));
+            $limit = min(100, max(10, intval($_GET['limit'] ?? 20)));
+            $offset = ($page - 1) * $limit;
+
+            $countStmt = $this->db->prepare("SELECT COUNT(*) FROM members WHERE status = 'pending' AND deleted_at IS NULL");
+            $countStmt->execute();
+            $total = $countStmt->fetchColumn();
+
+            $stmt = $this->db->prepare("
+                SELECT m.id, m.member_id, m.email, m.first_name, m.last_name, 
+                       m.phone, m.status, m.created_at, m.registration_number
+                FROM members m
+                WHERE m.status = 'pending' AND m.deleted_at IS NULL
+                ORDER BY m.created_at DESC
+                LIMIT $limit OFFSET $offset
+            ");
+            $stmt->execute();
+            $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->sendResponse(200, [
+                'applications' => $applications,
+                'pagination' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'total' => $total,
+                    'pages' => ceil($total / $limit)
+                ]
+            ]);
+        } catch (PDOException $e) {
+            error_log("Get pending applications error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to retrieve applications']);
+        }
+    }
+
     private function isAuthenticated() {
         return isset($_SESSION['user_id']);
     }

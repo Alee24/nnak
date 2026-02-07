@@ -1,0 +1,143 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  --background: 210 20% 98%;
+  /* F4F6F8 approx */
+  --foreground: 222.2 84% 4.9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+
+  --primary: 161 94% 24%;
+  /* Emerald Green #047857 HSL */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 142 76% 24%;
+
+  --radius: 1rem;
+
+  font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+  /* DM Sans Primary */
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+}
+
+/* DONEZO CARD STYLE - REPLACES GLASS */
+.donezo-card {
+  @apply bg-white rounded-[2rem] border border-transparent transition-all duration-300;
+  box-shadow: 0 8px 30px rgb(0, 0, 0, 0.04);
+}
+
+.donezo-card:hover {
+  @apply -translate-y-1;
+  box-shadow: 0 8px 30px rgb(0, 0, 0, 0.08);
+}
+
+/* Legacy Glass Support (Optional, mostly deprecated for this look) */
+.glass-panel {
+  @apply bg-white rounded-[2rem] shadow-sm border-none;
+}
+
+.glass-panel-hover {
+  @apply hover:shadow-md transition-all duration-300;
+}
+
+.glass-card {
+  @apply bg-white rounded-2xl shadow-sm border-none;
+}
+
+/* --- ULTRA-PREMIUM BENTO UTILITIES --- */
+
+/* 1. Noise Texture */
+.bg-noise {
+  position: relative;
+  isolation: isolate;
+}
+
+.bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* 2. Aurora Gradients */
+.aurora-bg {
+  background:
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+}
+
+.aurora-blob {
+  @apply absolute blur-3xl opacity-30 animate-pulse-slow mix-blend-multiply;
+  background-image: linear-gradient(to right, theme('colors.primary.200'), theme('colors.blue.200'));
+}
+
+/* 3. Bento Card */
+.bento-card {
+  @apply relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-2xl border border-white/40 shadow-premium transition-all duration-500 ease-out;
+}
+
+.bento-card:hover {
+  @apply shadow-float -translate-y-1 bg-white/80 border-white/60;
+}
+
+.bento-card::after {
+  @apply content-[''] absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 transition-opacity duration-500;
+}
+
+.bento-card:hover::after {
+  @apply opacity-100;
+}
+
+/* 4. Text Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.tracking-tight-premium {
+  letter-spacing: -0.02em;
+}
+
+/* 5. Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-200/50 rounded-full hover:bg-gray-300/80 transition-colors;
+}

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Profile - NNAK Admin</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        brand: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857', 900: '#064e3b' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .profile-banner {
+            background: linear-gradient(90deg, #064e3b 0%, #059669 100%);
+        }
+
+        .avatar-overlap {
+            margin-top: -3.5rem;
+        }
+
+        .tab-active {
+            background-color: #047857 !important;
+            /* Brand 700 */
+            color: white !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Certificate Watermark Pattern */
+        .watermark-bg {
+            background-image: radial-gradient(#047857 0.5px, transparent 0.5px);
+            background-size: 10px 10px;
+            opacity: 0.03;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+    <aside class="bg-white border-r border-slate-200 w-64 flex-shrink-0 hidden lg:flex flex-col z-50">
+        <div class="h-20 flex items-center px-8 border-b border-slate-100">
+            <div class="flex items-center gap-2 font-bold text-xl text-brand-700">
+                <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center">
+                    <svg data-lucide="activity" width="20"></svg>
+                </div>
+                NNAK Admin
+            </div>
+        </div>
+        <nav class="p-4 space-y-1">
+            <a href="index.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">
+                <svg data-lucide="layout-grid" width="18"></svg> Dashboard
+            </a>
+            <a href="members.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium bg-brand-50 text-brand-700 rounded-xl transition-colors">
+                <svg data-lucide="users" width="18"></svg> Members
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50/50 relative">
+
+        <header
+            class="h-16 flex justify-between items-center px-8 bg-white border-b border-slate-200 z-10 flex-shrink-0">
+            <a href="members.html"
+                class="flex items-center gap-2 text-sm text-slate-500 hover:text-brand-700 transition font-medium group">
+                <div class="p-1 rounded-full group-hover:bg-brand-50 transition">
+                    <svg data-lucide="arrow-left" width="18"></svg>
+                </div>
+                Back to Directory
+            </a>
+
+            <div class="flex items-center gap-3">
+                <button onclick="switchTab('id-card')"
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold shadow-lg shadow-slate-900/10 hover:bg-slate-700 transition">
+                    <svg data-lucide="printer" width="14"></svg> Issue ID
+                </button>
+                <button
+                    class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-50 transition">
+                    <svg data-lucide="edit-3" width="14"></svg> Edit
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto custom-scrollbar p-6 lg:p-8">
+            <div class="max-w-5xl mx-auto">
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+                    <div class="h-32 profile-banner relative overflow-hidden">
+                        <div
+                            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+                        </div>
+                    </div>
+
+                    <div class="px-8 pb-8 relative">
+                        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div class="flex flex-col md:flex-row md:items-end gap-6 avatar-overlap">
+                                <div
+                                    class="w-28 h-28 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white">
+                                    <img id="profilePhoto"
+                                        src="https://ui-avatars.com/api/?name=Sarah+Mwangi&background=047857&color=fff&size=200"
+                                        alt="Profile" class="w-full h-full object-cover">
+                                </div>
+                                <div class="pb-1">
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <h2 id="memberName" class="text-2xl font-bold tracking-tight text-slate-900">
+                                            SARAH MWANGI</h2>
+                                        <span
+                                            class="px-2 py-0.5 bg-brand-100 text-brand-700 text-[10px] font-bold rounded uppercase tracking-wider">REG
+                                            NURSE</span>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-4 text-slate-500 text-xs font-medium">
+                                        <div class="flex items-center gap-1.5">
+                                            <svg data-lucide="mail" width="14"></svg> sarah.m@gmail.com
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <svg data-lucide="phone" width="14"></svg> +254 712 345 678
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-8 pb-2">
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CPD
+                                        Score</p>
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <span class="text-lg font-bold text-slate-900">35</span>
+                                        <span class="text-xs font-bold text-slate-400">/ 40</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                        Status</p>
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-sm font-bold text-slate-900">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                    <div class="lg:col-span-3 space-y-2">
+                        <button onclick="switchTab('overview')" id="btn-overview"
+                            class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition tab-active">
+                            <svg data-lucide="user-circle" width="18"></svg> Overview
+                        </button>
+                        <button onclick="switchTab('id-card')" id="btn-id-card"
+                            class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-white hover:shadow-sm transition">
+                            <svg data-lucide="id-card" width="18"></svg> ID Card
+                        </button>
+                        <button onclick="switchTab('certificate')" id="btn-certificate"
+                            class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-white hover:shadow-sm transition">
+                            <svg data-lucide="award" width="18"></svg> Certificate
+                        </button>
+                    </div>
+
+                    <div class="lg:col-span-9 bg-white rounded-2xl shadow-sm border border-slate-200 p-8 min-h-[500px]">
+
+                        <div id="tab-overview" class="tab-content block">
+                            <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                <svg data-lucide="info" width="20" class="text-brand-600"></svg> Member Details
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Full
+                                        Legal Name</p>
+                                    <p class="text-base font-semibold text-slate-800">Sarah Wanjiku Mwangi</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                        Location</p>
+                                    <p class="text-base font-semibold text-slate-800">Nairobi, Westlands</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                        National ID</p>
+                                    <p class="text-base font-semibold text-slate-800">32981023</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                        Membership No.</p>
+                                    <p class="text-base font-semibold text-slate-800">NNAK/2023/891</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-10 pt-6 border-t border-slate-100 flex gap-8">
+                                <div class="text-xs text-slate-500 flex items-center gap-2">
+                                    <svg data-lucide="calendar" width="14"></svg> Joined: <span
+                                        class="font-bold text-slate-700">Oct 24, 2023</span>
+                                </div>
+                                <div class="text-xs text-slate-500 flex items-center gap-2">
+                                    <svg data-lucide="credit-card" width="14"></svg> Subscription: <span
+                                        class="font-bold text-green-600">Paid (2025)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-id-card" class="tab-content hidden">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="text-lg font-bold text-slate-900">Digital ID Card</h3>
+                                <button onclick="downloadIdCard()"
+                                    class="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-800">
+                                    <svg data-lucide="download" width="14"></svg> Download PDF
+                                </button>
+                            </div>
+
+                            <div class="flex justify-center bg-slate-100 p-8 rounded-2xl border border-slate-200">
+                                <div id="card-container"
+                                    class="relative bg-white shadow-xl overflow-hidden group cursor-pointer"
+                                    style="width: 500px; height: 300px; border-radius: 16px;">
+
+                                    <div class="h-24 bg-[#be123c] relative flex items-center px-6"
+                                        style="clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);">
+                                        <div class="w-full">
+                                            <h1
+                                                class="text-white font-black text-lg uppercase tracking-tight leading-none">
+                                                National Nurses<br>Association of Kenya</h1>
+                                            <p class="text-white/80 text-[10px] italic mt-1 font-serif">"Voice of the
+                                                Nursing Profession"</p>
+                                        </div>
+                                        <div
+                                            class="absolute top-4 right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-[#be123c] shadow-sm">
+                                            <div class="text-center leading-none">
+                                                <div class="text-[#be123c] font-black text-[10px]">NNAK</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-6 py-4 flex gap-5">
+                                        <div
+                                            class="w-28 h-32 bg-slate-200 rounded-lg overflow-hidden border border-slate-300 flex-shrink-0">
+                                            <img src="https://ui-avatars.com/api/?name=Sarah+Mwangi&background=047857&color=fff&size=200"
+                                                class="w-full h-full object-cover">
+                                        </div>
+
+                                        <div class="flex-1 space-y-2 pt-1">
+                                            <div>
+                                                <p class="text-[9px] text-slate-400 uppercase font-bold">Name</p>
+                                                <p class="text-sm font-bold text-slate-900 uppercase leading-tight">
+                                                    Sarah Wanjiku Mwangi</p>
+                                            </div>
+                                            <div class="flex gap-4">
+                                                <div>
+                                                    <p class="text-[9px] text-slate-400 uppercase font-bold">ID No</p>
+                                                    <p class="text-xs font-bold text-slate-800">32981023</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-[9px] text-slate-400 uppercase font-bold">Member No
+                                                    </p>
+                                                    <p class="text-xs font-bold text-slate-800">NNAK/891</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-[9px] text-slate-400 uppercase font-bold">Valid Until</p>
+                                                <p class="text-xs font-bold text-[#be123c]">31 DEC 2025</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="absolute bottom-3 left-6 right-6 border-t border-slate-100 pt-2 flex justify-between items-end">
+                                        <div>
+                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAjSURBVHgB7cwxAQAAAMKg9U9tDB8gAAAAAAAAAAAAAADAOwatZQAB8/y4PAAAAABJRU5ErkJggg=="
+                                                class="w-8 h-8 opacity-20" alt="QR">
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-serif italic text-slate-800 text-sm">Authorized</div>
+                                            <p class="text-[8px] text-slate-400 uppercase">Signature</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-certificate" class="tab-content hidden">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="text-lg font-bold text-slate-900">Official Certificate</h3>
+                                <button onclick="downloadCertificate()"
+                                    class="text-xs font-bold bg-brand-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-brand-800">
+                                    <svg data-lucide="download" width="14"></svg> Download PDF
+                                </button>
+                            </div>
+
+                            <div
+                                class="flex justify-center bg-slate-50 p-6 rounded-2xl border border-slate-200 overflow-auto">
+                                <div id="certificate-container" class="bg-white relative shadow-2xl"
+                                    style="width: 595px; height: 842px; padding: 40px; color: #1e293b;">
+
+                                    <div
+                                        class="h-full w-full border-[12px] border-brand-700 relative p-8 flex flex-col items-center text-center">
+                                        <div class="absolute inset-0 watermark-bg pointer-events-none"></div>
+
+                                        <div class="mb-8">
+                                            <div
+                                                class="w-20 h-20 mx-auto bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg">
+                                                NNAK
+                                            </div>
+                                            <h1
+                                                class="text-3xl font-bold uppercase text-brand-900 tracking-wide font-serif">
+                                                National Nurses Association<br>of Kenya</h1>
+                                            <p class="text-red-600 font-serif italic mt-2">"Voice of the Nursing
+                                                Profession"</p>
+                                        </div>
+
+                                        <div class="w-32 h-1 bg-brand-100 mb-10"></div>
+
+                                        <h2 class="text-4xl font-serif text-slate-800 mb-2 italic">Certificate of</h2>
+                                        <h2
+                                            class="text-5xl font-serif font-bold text-brand-700 mb-12 uppercase tracking-wider">
+                                            Membership</h2>
+
+                                        <p class="text-slate-500 uppercase text-xs tracking-[0.2em] mb-6">This is to
+                                            certify that</p>
+
+                                        <div class="border-b-2 border-slate-800 w-3/4 mb-8">
+                                            <p class="text-3xl font-serif font-bold text-slate-900 pb-2">Sarah Wanjiku
+                                                Mwangi</p>
+                                        </div>
+
+                                        <p class="text-slate-600 leading-relaxed max-w-md mx-auto mb-16 font-serif">
+                                            Has been duly registered as a member of the National Nurses Association of
+                                            Kenya, complying with all professional standards and requirements.
+                                        </p>
+
+                                        <div class="mt-auto w-full flex justify-between items-end px-10 pb-10">
+                                            <div class="text-center">
+                                                <div class="text-xl font-serif text-brand-800 mb-2"
+                                                    style="font-family: cursive;">Signed</div>
+                                                <div class="w-32 h-px bg-slate-400 mx-auto mb-2"></div>
+                                                <p class="text-[10px] font-bold uppercase text-slate-400">General
+                                                    Secretary</p>
+                                            </div>
+
+                                            <div class="text-center">
+                                                <div class="border border-brand-200 p-2 rounded mb-2">
+                                                    <div class="text-xs font-bold text-brand-700">Valid 2025</div>
+                                                </div>
+                                                <p class="text-[10px] font-bold uppercase text-slate-400">Date Issued:
+                                                    Oct 2023</p>
+                                            </div>
+
+                                            <div class="text-center">
+                                                <div class="text-xl font-serif text-brand-800 mb-2"
+                                                    style="font-family: cursive;">Signed</div>
+                                                <div class="w-32 h-px bg-slate-400 mx-auto mb-2"></div>
+                                                <p class="text-[10px] font-bold uppercase text-slate-400">National
+                                                    Chairperson</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. Icons ---
+        lucide.createIcons();
+
+        // --- 2. Tab Logic ---
+        function switchTab(tabName) {
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-white', 'bg-brand-700'); // Clean active styles
+                btn.classList.add('text-slate-500', 'hover:bg-white'); // Add inactive styles
+            });
+
+            const activeBtn = document.getElementById(`btn-${tabName}`);
+            activeBtn.classList.remove('text-slate-500', 'hover:bg-white');
+            activeBtn.classList.add('tab-active');
+
+            // Update Content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('block');
+        }
+
+        // --- 3. PDF Downloads ---
+
+        async function downloadIdCard() {
+            const element = document.getElementById('card-container');
+
+            // Visual feedback
+            const originalTransform = element.style.transform;
+            element.style.transform = "scale(1)"; // Ensure no CSS scaling affects capture
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 3, // High resolution
+                    useCORS: true, // Allow fetching avatar images
+                    backgroundColor: null
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('l', 'mm', [85.6, 54]); // Standard ID Card Size (Credit Card)
+
+                pdf.addImage(imgData, 'PNG', 0, 0, 85.6, 54);
+                pdf.save('NNAK-ID-Card.pdf');
+
+            } catch (err) {
+                console.error("ID Generation failed", err);
+                alert("Could not generate ID Card. Check console.");
+            }
+        }
+
+        async function downloadCertificate() {
+            const element = document.getElementById('certificate-container');
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: -window.scrollY // Fix potential scroll clipping
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4'); // A4 Portrait
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('NNAK-Certificate.pdf');
+
+            } catch (err) {
+                console.error("Certificate Generation failed", err);
+                alert("Could not generate Certificate.");
+            }
+        }
+    </script>
+</body>
+
+</html>

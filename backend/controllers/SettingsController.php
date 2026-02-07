@@ -1,71 +1,98 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
+/**
+ * Settings Controller
+ * Handles system settings and branding assets
+ */
 
 class SettingsController {
     private $db;
-
+    
     public function __construct() {
-        $this->db = (new Database())->connect();
+        $this->db = Database::getInstance()->getConnection();
+    }
+    
+    public function handleRequest($method, $parts) {
+        // Check authentication for all settings operations
+        if (!$this->isAuthenticated()) {
+            $this->sendResponse(401, ['error' => 'Authentication required']);
+        }
+
+        // Only admins can modify settings
+        if ($method === 'POST' && !$this->isAdmin()) {
+            $this->sendResponse(403, ['error' => 'Admin access required']);
+        }
+        
+        if ($method === 'GET') {
+            $this->getSettings();
+        } elseif ($method === 'POST') {
+            $this->updateSettings();
+        } else {
+            $this->methodNotAllowed();
+        }
     }
 
-    public function getSettings() {
-        $query = "SELECT setting_key, setting_value FROM settings";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute();
-        $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // Returns ['key' => 'value']
-
-        echo json_encode(['success' => true, 'settings' => $settings]);
+    private function getSettings() {
+        try {
+            $stmt = $this->db->query("SELECT setting_key, setting_value FROM settings");
+            $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+            
+            $this->sendResponse(200, [
+                'success' => true,
+                'settings' => $settings
+            ]);
+        } catch (PDOException $e) {
+            $this->sendResponse(500, ['error' => 'Failed to fetch settings']);
+        }
     }
 
-    public function updateSettings() {
-        // Only admin should access this (middleware check assumed or added here)
-        $data = json_decode(file_get_contents("php://input"), true);
+    private function updateSettings() {
+        $data = $this->getJsonInput();
+        
+        if (empty($data)) {
+            $this->sendResponse(400, ['error' => 'No settings provided']);
+        }
 
-        if (!empty($data)) {
+        try {
+            $this->db->beginTransaction();
+            
+            $stmt = $this->db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?");
+            
             foreach ($data as $key => $value) {
-                // simple sanitize
-                $key = htmlspecialchars(strip_tags($key));
-                $value = htmlspecialchars(strip_tags($value));
-
-                $query = "INSERT INTO settings (setting_key, setting_value) VALUES (:key, :value) 
-                          ON DUPLICATE KEY UPDATE setting_value = :value";
-                $stmt = $this->db->prepare($query);
-                $stmt->bindParam(':key', $key);
-                $stmt->bindParam(':value', $value);
-                $stmt->execute();
+                $stmt->execute([$key, $value, $value]);
             }
-            echo json_encode(['success' => true, 'message' => 'Settings updated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'No data provided']);
+            
+            $this->db->commit();
+            
+            $this->sendResponse(200, [
+                'success' => true,
+                'message' => 'Settings updated successfully'
+            ]);
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            $this->sendResponse(500, ['error' => 'Failed to update settings: ' . $e->getMessage()]);
         }
     }
 
-    public function uploadLogo() {
-        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../frontend/public/uploads/logos/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
-            $filename = 'logo_' . time() . '_' . basename($_FILES['logo']['name']);
-            $targetPath = $uploadDir . $filename;
-            $publicPath = '/uploads/logos/' . $filename;
-
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $targetPath)) {
-                // Update DB
-                $query = "INSERT INTO settings (setting_key, setting_value) VALUES ('company_logo', :logo) 
-                          ON DUPLICATE KEY UPDATE setting_value = :logo";
-                $stmt = $this->db->prepare($query);
-                $stmt->bindParam(':logo', $publicPath);
-                $stmt->execute();
-
-                echo json_encode(['success' => true, 'logo_url' => $publicPath]);
-            } else {
-                http_response_code(500);
-                echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file']);
-            }
-        } else {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
-        }
+    private function isAuthenticated() {
+        return isset($_SESSION['user_id']);
+    }
+    
+    private function isAdmin() {
+        return isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'super_admin']);
+    }
+    
+    private function getJsonInput() {
+        return json_decode(file_get_contents('php://input'), true) ?? [];
+    }
+    
+    private function sendResponse($code, $data) {
+        http_response_code($code);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+    
+    private function methodNotAllowed() {
+        $this->sendResponse(405, ['error' => 'Method not allowed']);
     }
 }
-?>

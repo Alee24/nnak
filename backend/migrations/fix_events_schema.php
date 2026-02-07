@@ -1,6 +1,10 @@
 <?php
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/Database.php';
+if (!defined('DB_HOST')) {
+    require_once __DIR__ . '/../config/config.php';
+}
+if (!class_exists('Database')) {
+    require_once __DIR__ . '/../config/Database.php';
+}
 
 try {
     $db = Database::getInstance()->getConnection();

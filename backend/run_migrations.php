@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/Database.php';
 
 ?>
 <!DOCTYPE html>
@@ -92,7 +93,7 @@ try {
     echo "=== RUNNING SQL MIGRATIONS ===\n\n";
     
     // Get all SQL migration files
-    $migrationsPath = __DIR__ . '/database/migrations/';
+    $migrationsPath = __DIR__ . '/migrations/';
     $files = glob($migrationsPath . '*.sql');
     sort($files);
     

@@ -113,11 +113,13 @@ try {
     // Call the controller method
     $controller->handleRequest($method, $requestParts);
     
-} catch (Exception $e) {
-    if (APP_ENV === 'development') {
+} catch (Throwable $e) {
+    if (APP_DEBUG || APP_ENV === 'development') {
         sendResponse(500, [
             'error' => 'Internal server error',
             'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
             'trace' => $e->getTraceAsString()
         ]);
     } else {

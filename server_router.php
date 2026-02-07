@@ -21,6 +21,13 @@ if (strpos($uri, '/api') === 0) {
     return true;
 }
 
+// Handle Setup Scripts
+if ($uri === '/setup_admin.php' || $uri === '/run_migrations.php' || $uri === '/cleanup_db.php' || $uri === '/debug_list_members.php' || $uri === '/verify_system.php' || $uri === '/add_missing_columns.php' || $uri === '/setup_database.php') {
+    chdir(__DIR__ . '/backend');
+    require basename($uri);
+    return true;
+}
+
 // 2. Handle Static Files from frontend/public
 // If URI is "/" redirect to members page
 if ($uri === '/' || $uri === '/index.php' || $uri === '/index.html') {
