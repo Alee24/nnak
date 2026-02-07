@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
     Plus,
-    MoreHorizontal,
     ArrowUpRight,
     ArrowDownRight,
-    Calendar,
     Clock,
     CheckCircle2,
-    Circle,
-    MoreVertical,
     Search,
-    Bell,
-    Play,
     Users,
     UserCheck,
     UserX,
@@ -20,14 +14,11 @@ import {
 import AdminAPI from '../services/api';
 
 const ProjectDashboard = () => {
-    const [currentTime, setCurrentTime] = useState(new Date());
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         fetchStats();
-        return () => clearInterval(timer);
     }, []);
 
     const fetchStats = async () => {
@@ -86,105 +77,104 @@ const ProjectDashboard = () => {
 
     const totalForDistribution = distribution.reduce((acc, curr) => acc + curr.value, 0) || 1;
 
+    if (loading) return null;
+
     return (
-        <div className="space-y-4 pb-10">
-            {/* Header Area */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight">NNAK Dashboard</h1>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Professional Portal</p>
+        <div className="space-y-4 pb-4 max-w-[1400px] mx-auto">
+            {/* Action Bar (Removed redundant NNAK Dashboard title) */}
+            <div className="flex justify-between items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-2">
+                    <div className="bg-emerald-50 p-1.5 rounded-lg">
+                        <CheckCircle2 size={16} className="text-emerald-600" />
+                    </div>
+                    <div>
+                        <h2 className="text-sm font-bold text-slate-800">Quick Actions</h2>
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Manage your community</p>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
-                        <ArrowDownRight size={14} className="rotate-180" />
-                        Report
+                <div className="flex items-center gap-2">
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 text-[10px] font-bold rounded-xl hover:bg-slate-100 transition-all">
+                        <ArrowDownRight size={12} className="rotate-180" />
+                        Export
                     </button>
                     <button
                         onClick={() => window.location.href = '/dashboard/members?action=add'}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-2xl hover:bg-slate-900 transition-all shadow-lg shadow-slate-200"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-white text-[10px] font-bold rounded-xl hover:bg-slate-900 transition-all"
                     >
-                        <Plus size={16} />
-                        Member
+                        <Plus size={12} />
+                        Add Member
                     </button>
                 </div>
             </div>
 
-            {/* Overview Label */}
-            <div className="flex flex-col -mb-2">
-                <h2 className="text-lg font-black text-slate-800">Overview</h2>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Real-time Statistics</p>
-            </div>
-
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Metrics Grid - More Compact */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {metrics.map((metric, index) => (
-                    <div key={index} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className={`p-3 rounded-2xl bg-${metric.color}-50 text-${metric.color}-600`}>
-                                <metric.icon size={20} />
+                    <div key={index} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-md transition-all">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className={`p-2 rounded-xl bg-${metric.color}-50 text-${metric.color}-600`}>
+                                <metric.icon size={16} />
                             </div>
                             {metric.trend && (
-                                <div className={`flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg ${metric.isUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                                <div className={`flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-md ${metric.isUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                                     {metric.trend}
-                                    {metric.isUp ? <ArrowUpRight size={12} /> : (metric.trendIcon === 'check' ? <CheckCircle2 size={12} /> : <ArrowDownRight size={12} />)}
+                                    {metric.isUp ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
                                 </div>
                             )}
                             {metric.hasBadge && (
-                                <div className="text-[10px] font-black px-2 py-1 rounded-lg bg-orange-50 text-orange-600 uppercase tracking-tighter">
+                                <div className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-orange-50 text-orange-600">
                                     {metric.badgeText}
                                 </div>
                             )}
                         </div>
                         <div>
-                            <h3 className="text-3xl font-black text-slate-800 mb-1">{metric.value}</h3>
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{metric.label}</span>
+                            <h3 className="text-xl font-bold text-slate-800 mb-0.5">{metric.value}</h3>
+                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">{metric.label}</span>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
-                {/* Distribution Chart Card */}
-                <div className="lg:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative group">
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="text-emerald-500">
-                            <ArrowUpRight size={20} className="rotate-45" />
+            {/* Main Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+                {/* Distribution Card - Reduced size and padding */}
+                <div className="lg:col-span-8 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-50">
+                        <div className="flex items-center gap-1.5 text-emerald-600">
+                            <ArrowUpRight size={16} className="rotate-45" />
+                            <h3 className="font-bold text-slate-800 text-sm">Status Distribution</h3>
                         </div>
-                        <h3 className="font-black text-slate-800 text-lg">Distribution</h3>
-                        <div className="ml-auto flex items-center gap-2 bg-slate-50 p-1 rounded-xl">
-                            <button className="px-4 py-1.5 text-[10px] font-black bg-white shadow-sm rounded-lg text-slate-800 uppercase tracking-widest">Now</button>
-                            <button className="px-4 py-1.5 text-[10px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">History</button>
+                        <div className="flex bg-slate-50 p-0.5 rounded-lg border border-slate-100">
+                            <button className="px-3 py-1 text-[9px] font-bold bg-white shadow-sm rounded-md text-slate-800 uppercase tracking-wider">Current</button>
+                            <button className="px-3 py-1 text-[9px] font-semibold text-slate-400 hover:text-slate-600 uppercase tracking-wider">Growth</button>
                         </div>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                        {/* Donut Chart */}
-                        <div className="relative w-64 h-64 flex items-center justify-center">
+                    <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
+                        {/* Smaller Donut Chart */}
+                        <div className="relative w-40 h-40 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
                                 {distribution.map((item, i) => {
                                     const percentage = (item.value / totalForDistribution) * 100;
-                                    const strokeDasharray = 440;
+                                    const strokeDasharray = 314; // circumference for r=50
                                     const strokeDashoffset = strokeDasharray * (1 - percentage / 100);
-
-                                    // Calculate rotation based on previous items
                                     const precedingPercentage = distribution.slice(0, i).reduce((acc, curr) => acc + (curr.value / totalForDistribution) * 100, 0);
                                     const rotation = (precedingPercentage / 100) * 360;
 
                                     return (
                                         <circle
                                             key={i}
-                                            cx="128"
-                                            cy="128"
-                                            r="70"
+                                            cx="80"
+                                            cy="80"
+                                            r="50"
                                             fill="transparent"
                                             stroke={item.color}
-                                            strokeWidth="32"
+                                            strokeWidth="18"
                                             strokeDasharray={strokeDasharray}
                                             strokeDashoffset={strokeDashoffset}
                                             strokeLinecap="round"
                                             style={{
-                                                transformOrigin: 'center',
+                                                transformOrigin: '80px 80px',
                                                 transform: `rotate(${rotation}deg)`,
                                                 transition: 'all 1s ease-out'
                                             }}
@@ -193,114 +183,88 @@ const ProjectDashboard = () => {
                                 })}
                             </svg>
                             <div className="absolute flex flex-col items-center">
-                                <span className="text-4xl font-black text-slate-800 tracking-tighter">{stats?.summary?.total || '0'}</span>
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total</span>
+                                <span className="text-2xl font-bold text-slate-800 tracking-tight">{stats?.summary?.total || '0'}</span>
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Members</span>
                             </div>
                         </div>
 
-                        {/* Legend */}
-                        <div className="flex-1 grid grid-cols-2 gap-x-8 gap-y-6 w-full md:w-auto">
+                        {/* Tighter Legend */}
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                             {distribution.map((item, i) => (
-                                <div key={i} className="flex items-center gap-3">
-                                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                <div key={i} className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></div>
                                     <div className="flex flex-col">
-                                        <span className="text-xs font-black text-slate-800">{item.label}</span>
-                                        <span className="text-[10px] font-bold text-slate-400">{Math.round((item.value / totalForDistribution) * 100)}%</span>
+                                        <span className="text-[10px] font-bold text-slate-800 leading-tight">{item.label}</span>
+                                        <span className="text-[9px] font-semibold text-slate-400">{Math.round((item.value / totalForDistribution) * 100)}%</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* Bottom Stats Row */}
-                    <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-50">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Growth</span>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-black text-emerald-600">12.5%</span>
-                                <ArrowUpRight size={14} className="text-emerald-500" />
-                            </div>
+                    {/* Bottom Micro Stats */}
+                    <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-50">
+                        <div className="text-center">
+                            <p className="text-[8px] font-bold text-slate-400 uppercase">Growth Rate</p>
+                            <p className="text-xs font-bold text-emerald-600">+12.5%</p>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Retention</span>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-black text-blue-600">94%</span>
-                                <ArrowUpRight size={14} className="text-blue-500" />
-                            </div>
+                        <div className="text-center border-x border-slate-50">
+                            <p className="text-[8px] font-bold text-slate-400 uppercase">Retention</p>
+                            <p className="text-xs font-bold text-blue-600">94.2%</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-[8px] font-bold text-slate-400 uppercase">Avg Rating</p>
+                            <p className="text-xs font-bold text-amber-500">4.9/5</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Column: Recent Members & CPD Status */}
-                <div className="lg:col-span-4 flex flex-col gap-4">
-                    {/* Recent Members Panel */}
-                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex-1">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="font-black text-slate-800 tracking-tight">Recent Members</h3>
-                            <button
-                                onClick={() => window.location.href = '/dashboard/members'}
-                                className="text-[10px] font-black text-emerald-500 uppercase tracking-widest hover:text-emerald-600 transition-colors"
-                            >
-                                All
-                            </button>
+                {/* Right Panel - More dense */}
+                <div className="lg:col-span-4 flex flex-col gap-3">
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex-1">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xs font-bold text-slate-800">Recent Users</h3>
+                            <button onClick={() => window.location.href = '/dashboard/members'} className="text-[10px] font-bold text-emerald-500 hover:underline">View All</button>
                         </div>
-                        <div className="space-y-6">
+                        <div className="space-y-3">
                             {(stats?.recent_members || []).map((member, i) => (
-                                <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                                    <div className="w-11 h-11 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 font-bold text-xs uppercase group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-all">
+                                <div key={i} className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent">
+                                    <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 font-bold text-[10px] uppercase">
                                         {member.first_name[0]}{member.last_name[0]}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-black text-slate-800 truncate leading-tight mb-0.5">{member.first_name} {member.last_name}</h4>
-                                        <p className="text-[10px] text-slate-400 font-bold">{new Date(member.created_at).toLocaleDateString()} ago</p>
+                                        <h4 className="text-[10px] font-bold text-slate-800 truncate leading-none mb-1">{member.first_name} {member.last_name}</h4>
+                                        <p className="text-[8px] text-slate-400 font-semibold">{new Date(member.created_at).toLocaleDateString()}</p>
                                     </div>
-                                    <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
-                                        member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
-                                            'bg-red-50 text-red-600'
+                                    <span className={`px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
+                                            member.status === 'pending' ? 'bg-orange-50 text-orange-600' : 'bg-red-50 text-red-600'
                                         }`}>
                                         {member.status}
                                     </span>
                                 </div>
                             ))}
-                            {(!stats?.recent_members || stats.recent_members.length === 0) && (
-                                <div className="py-10 text-center text-slate-300 font-bold text-sm tracking-widest uppercase">
-                                    No New Members
-                                </div>
-                            )}
                         </div>
                     </div>
 
-                    {/* CPD Status Widget */}
-                    <div className="bg-slate-900 rounded-3xl p-6 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-6 opacity-30 text-emerald-400">
-                            <Plus size={24} className="rotate-45" />
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">CPD Status</div>
-                                    <Award size={14} className="text-emerald-400" />
-                                </div>
-                                <h3 className="text-xl font-black text-white mb-6">Compliance</h3>
+                    {/* CPD Widget - Compressed */}
+                    <div className="bg-slate-900 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <Award size={14} className="text-emerald-400" />
+                                <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">CPD Status</span>
                             </div>
-
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-end">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Health</span>
-                                    <span className="text-lg font-black text-white">{stats?.cpd?.compliance_ratio || 0}%</span>
-                                </div>
-                                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out"
-                                        style={{ width: `${stats?.cpd?.compliance_ratio || 0}%` }}
-                                    ></div>
-                                </div>
+                            <div className="flex items-end justify-between mb-1.5">
+                                <h4 className="text-sm font-bold text-white leading-none">Compliance</h4>
+                                <span className="text-sm font-bold text-emerald-400">{stats?.cpd?.compliance_ratio || 0}%</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${stats?.cpd?.compliance_ratio || 0}%` }}></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
