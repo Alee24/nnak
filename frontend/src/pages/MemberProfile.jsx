@@ -98,11 +98,38 @@ const MemberProfile = () => {
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: null,
-                logging: true,
-                width: idCardRef.current.offsetWidth,
-                height: idCardRef.current.offsetHeight,
                 scrollX: 0,
-                scrollY: -window.scrollY
+                scrollY: -window.scrollY,
+                onclone: (clonedDoc) => {
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        :root {
+                            --color-emerald-50: #ecfdf5 !important;
+                            --color-emerald-100: #d1fae5 !important;
+                            --color-emerald-500: #10b981 !important;
+                            --color-emerald-600: #059669 !important;
+                            --color-emerald-700: #047857 !important;
+                            --color-slate-900: #0f172a !important;
+                            --color-slate-800: #1e293b !important;
+                            --color-slate-400: #94a3b8 !important;
+                            --color-gray-50: #f9fafb !important;
+                            --color-gray-100: #f3f4f6 !important;
+                            --color-gray-400: #9ca3af !important;
+                        }
+                        * {
+                            oklch: none !important; /* Attempt to kill oklch parsing */
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+
+                    // Force computed styles for all elements to avoid oklch
+                    const elements = clonedDoc.getElementsByTagName('*');
+                    for (const el of elements) {
+                        const computed = window.getComputedStyle(el);
+                        if (computed.backgroundColor.includes('oklch')) el.style.backgroundColor = '#ffffff';
+                        if (computed.color.includes('oklch')) el.style.color = '#333333';
+                    }
+                }
             });
 
             const doc = new jsPDF({
@@ -144,11 +171,28 @@ const MemberProfile = () => {
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: '#ffffff',
-                logging: true,
-                width: 794,
                 height: 1123,
                 scrollX: 0,
-                scrollY: -window.scrollY
+                scrollY: -window.scrollY,
+                onclone: (clonedDoc) => {
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        :root {
+                            --color-emerald-50: #ecfdf5 !important;
+                            --color-emerald-100: #d1fae5 !important;
+                            --color-emerald-500: #10b981 !important;
+                            --color-emerald-600: #059669 !important;
+                            --color-emerald-700: #047857 !important;
+                            --color-slate-900: #0f172a !important;
+                            --color-slate-800: #1e293b !important;
+                            --color-slate-400: #94a3b8 !important;
+                            --color-gray-50: #f9fafb !important;
+                            --color-gray-100: #f3f4f6 !important;
+                            --color-gray-400: #9ca3af !important;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                }
             });
 
             const doc = new jsPDF('p', 'mm', 'a4');

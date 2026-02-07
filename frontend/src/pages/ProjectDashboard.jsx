@@ -11,7 +11,11 @@ import {
     MoreVertical,
     Search,
     Bell,
-    Play
+    Play,
+    Users,
+    UserCheck,
+    UserX,
+    Award
 } from 'lucide-react';
 import AdminAPI from '../services/api';
 
@@ -195,8 +199,8 @@ const ProjectDashboard = () => {
                                         </td>
                                         <td className="py-4">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
-                                                    member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
-                                                        'bg-red-50 text-red-600'
+                                                member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
+                                                    'bg-red-50 text-red-600'
                                                 }`}>
                                                 {member.status}
                                             </span>
@@ -243,13 +247,13 @@ const ProjectDashboard = () => {
                                 stroke="#047857"
                                 strokeWidth="12"
                                 strokeDasharray={440}
-                                strokeDashoffset={440 * (1 - (stats ? stats.summary.active / stats.summary.total : 0.5))}
+                                strokeDashoffset={440 * (1 - (stats && stats.summary.total > 0 ? stats.summary.active / stats.summary.total : 0))}
                                 strokeLinecap="round"
                                 className="transition-all duration-1000 ease-out"
                             />
                         </svg>
                         <div className="absolute flex flex-col items-center">
-                            <span className="text-4xl font-black text-gray-900">{stats ? Math.round((stats.summary.active / stats.summary.total) * 100) : '...'}%</span>
+                            <span className="text-4xl font-black text-gray-900">{stats && stats.summary.total > 0 ? Math.round((stats.summary.active / stats.summary.total) * 100) : '0'}%</span>
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active</span>
                         </div>
                     </div>

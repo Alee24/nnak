@@ -1029,23 +1029,46 @@ class MemberController {
         }
 
         try {
-            // 1. Basic Stats
+            // 1. Member Summary & Distribution
             $stmt = $this->db->query("
                 SELECT 
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
                     SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                    SUM(CASE WHEN status = 'suspended' THEN 1 ELSE 0 END) as suspended
+                    SUM(CASE WHEN status = 'suspended' THEN 1 ELSE 0 END) as suspended,
+                    SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive
                 FROM members 
                 WHERE deleted_at IS NULL
             ");
             $summary = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // 2. CPD Stats
+            // 2. System Overview
+            // Events count
+            $stmt = $this->db->query("SELECT COUNT(*) FROM events WHERE deleted_at IS NULL");
+            $totalEvents = (int)$stmt->fetchColumn();
+
+            // Transactions/Payments count
+            $stmt = $this->db->query("SELECT COUNT(*) FROM payments");
+            $totalTransactions = (int)$stmt->fetchColumn();
+
+            // IDs Generated count (members who have a member_id assigned)
+            $stmt = $this->db->query("SELECT COUNT(*) FROM members WHERE member_id IS NOT NULL AND member_id != '' AND deleted_at IS NULL");
+            $totalIdsGenerated = (int)$stmt->fetchColumn();
+
+            // 3. CPD Analytics
             $stmt = $this->db->query("SELECT COALESCE(SUM(points), 0) FROM cpd_points");
             $totalCPD = (int)$stmt->fetchColumn();
+            
+            // Compliance Ratio: Active members with CPD points / Total active members
+            $stmt = $this->db->query("
+                SELECT COUNT(DISTINCT member_id) 
+                FROM cpd_points 
+                WHERE member_id IN (SELECT id FROM members WHERE status = 'active' AND deleted_at IS NULL)
+            ");
+            $activeWithPoints = (int)$stmt->fetchColumn();
+            $complianceRatio = $summary['active'] > 0 ? round(($activeWithPoints / $summary['active']) * 100) : 0;
 
-            // 3. Last 7 Days Analytics (Registration Count)
+            // 4. Last 7 Days Analytics (Registration Count)
             $analytics = [];
             for ($i = 6; $i >= 0; $i--) {
                 $date = date('Y-m-d', strtotime("-$i days"));
@@ -1058,7 +1081,7 @@ class MemberController {
                 ];
             }
 
-            // 4. Recent Applications
+            // 5. Recent Applications (Latest Pending)
             $stmt = $this->db->query("
                 SELECT id, member_id, first_name, last_name, email, created_at, status
                 FROM members 
@@ -1068,22 +1091,30 @@ class MemberController {
             ");
             $recentApplications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // 5. Recent Activity (Latest Updated Members)
+            // 6. Recent Members (Overall Latest)
             $stmt = $this->db->query("
-                SELECT m.id, m.member_id, m.first_name, m.last_name, m.status, m.updated_at, m.role, m.profile_image
+                SELECT m.id, m.member_id, m.first_name, m.last_name, m.status, m.created_at, m.role, m.profile_image
                 FROM members m
                 WHERE m.deleted_at IS NULL
-                ORDER BY m.updated_at DESC
-                LIMIT 5
+                ORDER BY m.created_at DESC
+                LIMIT 4
             ");
-            $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $recentMembers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $this->sendResponse(200, [
                 'summary' => $summary,
-                'total_cpd' => $totalCPD,
+                'system' => [
+                    'events' => $totalEvents,
+                    'transactions' => $totalTransactions,
+                    'ids_generated' => $totalIdsGenerated
+                ],
+                'cpd' => [
+                    'total_points' => $totalCPD,
+                    'compliance_ratio' => $complianceRatio
+                ],
                 'analytics' => $analytics,
                 'recent_applications' => $recentApplications,
-                'recent_activity' => $recentActivity
+                'recent_members' => $recentMembers
             ]);
 
         } catch (PDOException $e) {

@@ -150,7 +150,27 @@ const Members = () => {
                     backgroundColor: '#ffffff',
                     logging: true,
                     scrollX: 0,
-                    scrollY: -window.scrollY
+                    scrollY: -window.scrollY,
+                    onclone: (clonedDoc) => {
+                        const style = clonedDoc.createElement('style');
+                        style.innerHTML = `
+                            :root {
+                                --color-emerald-50: #ecfdf5 !important;
+                                --color-emerald-500: #10b981 !important;
+                                --color-slate-900: #0f172a !important;
+                                --color-gray-50: #f9fafb !important;
+                                --color-gray-100: #f3f4f6 !important;
+                                --color-gray-400: #9ca3af !important;
+                            }
+                        `;
+                        clonedDoc.head.appendChild(style);
+                        const elements = clonedDoc.getElementsByTagName('*');
+                        for (const el of elements) {
+                            const comp = window.getComputedStyle(el);
+                            if (comp.backgroundColor.includes('oklch')) el.style.backgroundColor = '#ffffff';
+                            if (comp.color.includes('oklch')) el.style.color = '#333333';
+                        }
+                    }
                 });
 
                 const imgData = canvas.toDataURL('image/png');
@@ -218,7 +238,27 @@ const Members = () => {
                     backgroundColor: '#ffffff',
                     logging: true,
                     scrollX: 0,
-                    scrollY: -window.scrollY
+                    scrollY: -window.scrollY,
+                    onclone: (clonedDoc) => {
+                        const style = clonedDoc.createElement('style');
+                        style.innerHTML = `
+                            :root {
+                                --color-emerald-50: #ecfdf5 !important;
+                                --color-emerald-500: #10b981 !important;
+                                --color-slate-900: #0f172a !important;
+                                --color-slate-400: #94a3b8 !important;
+                                --color-gray-50: #f9fafb !important;
+                                --color-gray-100: #f3f4f6 !important;
+                            }
+                        `;
+                        clonedDoc.head.appendChild(style);
+                        const elements = clonedDoc.getElementsByTagName('*');
+                        for (const el of elements) {
+                            const comp = window.getComputedStyle(el);
+                            if (comp.backgroundColor.includes('oklch')) el.style.backgroundColor = '#ffffff';
+                            if (comp.color.includes('oklch')) el.style.color = '#B91C1C';
+                        }
+                    }
                 });
 
                 const imgData = canvas.toDataURL('image/png');
