@@ -511,66 +511,88 @@ const Members = () => {
                     )}
 
                     {bulkItem && (
-                        <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-dm-sans border-[15px] border-[#E11D48] text-left" style={{ backgroundColor: '#ffffff', borderColor: '#E11D48' }}>
-                            {/* Inner Border */}
-                            <div className="absolute inset-2 border border-slate-100" style={{ borderColor: '#f1f5f9' }}></div>
+                        <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-dm-sans border-[12px] border-[#059669]" style={{ backgroundColor: '#ffffff', borderColor: '#059669' }}>
+                            {/* Inner Decorative Border */}
+                            <div className="absolute inset-4 border-[3px] border-[#059669]" style={{ borderColor: '#059669' }}></div>
 
-                            {/* Header */}
-                            <div className="relative z-10 flex flex-col items-center text-center mt-4">
-                                {branding.system_logo && (
-                                    <img src={branding.system_logo} alt="L" className="w-20 h-20 object-contain mb-4" crossOrigin="anonymous" />
-                                )}
-                                <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-tight" style={{ color: '#0f172a' }}>
+                            <div className="relative z-10 flex flex-col items-center flex-1">
+                                {/* Logo from Settings */}
+                                <div className="mt-8 mb-6 h-24 flex items-center justify-center">
+                                    {branding.system_logo ? (
+                                        <img src={branding.system_logo} alt="NNAK Logo" className="h-full object-contain" crossOrigin="anonymous" />
+                                    ) : (
+                                        <div className="w-24 h-24 border-2 border-emerald-600 rounded-full flex items-center justify-center text-emerald-600 font-bold text-center p-2 text-[10px]">NNAK Logo</div>
+                                    )}
+                                </div>
+
+                                {/* Association Name */}
+                                <h1 className="text-[28px] font-black text-[#059669] uppercase tracking-tight text-center max-w-[550px] leading-tight mb-1" style={{ color: '#059669' }}>
                                     {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
                                 </h1>
-                                <p className="text-sm font-bold text-[#E11D48] uppercase tracking-[0.2em]" style={{ color: '#E11D48' }}>
-                                    {branding.association_tagline || 'Promoting Professional Excellence'}
-                                </p>
-                            </div>
 
-                            {/* Main Content */}
-                            <div className="relative z-10 flex-1 flex flex-col items-center text-center px-10 pt-10">
-                                <div className="w-full h-[1px] bg-slate-100 mb-10" style={{ backgroundColor: '#f1f5f9' }}></div>
-
-                                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em] mb-2" style={{ color: '#94a3b8' }}>Membership Certificate</h2>
-                                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8" style={{ color: '#0f172a' }}>PRACTISING CERTIFICATE</h3>
-
-                                <p className="text-base text-slate-500 mb-4 italic" style={{ color: '#64748b' }}>This is to certify that</p>
-                                <h4 className="text-4xl font-black text-[#E11D48] uppercase tracking-tighter mb-6" style={{ color: '#E11D48' }}>
-                                    {bulkItem.first_name} {bulkItem.last_name}
-                                </h4>
-
-                                <p className="text-base text-slate-600 max-w-lg leading-relaxed mb-10" style={{ color: '#475569' }}>
-                                    Is a duly registered member of the association,
-                                    holding registration number <span className="font-black text-slate-900" style={{ color: '#0f172a' }}>{bulkItem.registration_number}</span>
-                                    and is authorized to practice as a <span className="font-black text-slate-900" style={{ color: '#0f172a' }}>{bulkItem.occupation || 'Professional Nurse'}</span>.
+                                {/* Tagline */}
+                                <p className="text-lg font-bold text-[#E11D48] italic tracking-tight mb-16" style={{ color: '#E11D48' }}>
+                                    "{branding.association_tagline || 'Voice of the Nursing Profession'}"
                                 </p>
 
-                                <div className="grid grid-cols-2 gap-10 w-full mt-auto mb-10 text-left px-8">
-                                    <div className="space-y-2">
-                                        <div>
-                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none" style={{ color: '#9ca3af' }}>Member ID</p>
-                                            <p className="text-sm font-mono font-black text-slate-900 leading-none" style={{ color: '#0f172a' }}>{bulkItem.member_id}</p>
+                                {/* Certificate Title */}
+                                <h2 className="text-[62px] font-black text-[#1e3a8a] italic mb-8" style={{ color: '#1e3a8a' }}>
+                                    Certificate of
+                                </h2>
+                                <h2 className="text-[62px] font-black text-[#1e3a8a] -mt-8 mb-12" style={{ color: '#1e3a8a' }}>
+                                    Membership
+                                </h2>
+
+                                {/* Certification Statement */}
+                                <p className="text-base font-bold text-gray-400 uppercase tracking-[0.3em] mb-8" style={{ color: '#9ca3af' }}>
+                                    THIS IS TO CERTIFY THAT
+                                </p>
+
+                                {/* Member Name */}
+                                <div className="mb-12 border-b-[3px] border-[#059669] px-10 pb-1">
+                                    <h3 className="text-4xl font-black text-[#059669] uppercase tracking-tight" style={{ color: '#059669' }}>
+                                        {bulkItem.first_name} {bulkItem.last_name}
+                                    </h3>
+                                </div>
+
+                                {/* Body Text */}
+                                <div className="max-w-[550px] text-center mb-16">
+                                    <p className="text-base text-slate-500 leading-relaxed" style={{ color: '#64748b' }}>
+                                        Has been duly registered as a member of the National Nurses Association of Kenya, having complied with the association's requirements and committed to the excellence of the nursing profession.
+                                    </p>
+                                </div>
+
+                                {/* Details Grid */}
+                                <div className="w-full grid grid-cols-2 gap-10 px-8 mt-auto mb-10">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Member ID:</div>
+                                            <div className="text-base font-mono font-black text-slate-900" style={{ color: '#0f172a' }}>{bulkItem.member_id || 'PENDING'}</div>
                                         </div>
-                                        <div>
-                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none" style={{ color: '#9ca3af' }}>Date Issued</p>
-                                            <p className="text-sm font-mono font-black text-slate-900 leading-none" style={{ color: '#0f172a' }}>{new Date().toLocaleDateString()}</p>
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Reg Number:</div>
+                                            <div className="text-base font-mono font-black text-slate-900" style={{ color: '#0f172a' }}>{bulkItem.registration_number || 'PENDING'}</div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date Issued:</div>
+                                            <div className="text-base font-mono font-black text-slate-900" style={{ color: '#0f172a' }}>{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
                                         </div>
                                     </div>
+
                                     <div className="flex flex-col items-center justify-end">
                                         {branding.authorised_signature && (
                                             <img src={branding.authorised_signature} alt="S" className="w-32 h-12 object-contain filter grayscale mb-1" crossOrigin="anonymous" />
-                                        )}
-                                        <div className="w-full h-px bg-slate-900" style={{ backgroundColor: '#0f172a' }}></div>
-                                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1" style={{ color: '#9ca3af' }}>Authorized Signature</p>
+                                        ) || <div className="h-12"></div>}
+                                        <div className="w-full h-px bg-slate-400" style={{ backgroundColor: '#94a3b8' }}></div>
+                                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mt-1" style={{ color: '#9ca3af' }}>Authorized Signature</p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Footer Warning */}
-                            <div className="relative z-10 border-t border-slate-50 pt-4 text-center" style={{ borderTopColor: '#f8fafc' }}>
-                                <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>
-                                    This document is valid until 31st December 2026. Verify at members.nnak.or.ke
+                            {/* Footer Info */}
+                            <div className="relative z-10 border-t border-slate-100 pt-6 text-center" style={{ borderTopColor: '#f1f5f9' }}>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>
+                                    Valid until 31st December 2026 • Verify authenticity at members.nnak.or.ke
                                 </p>
                             </div>
                         </div>

@@ -87,7 +87,7 @@ const ProjectDashboard = () => {
     const totalForDistribution = distribution.reduce((acc, curr) => acc + curr.value, 0) || 1;
 
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-4 pb-10">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -118,7 +118,7 @@ const ProjectDashboard = () => {
             {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {metrics.map((metric, index) => (
-                    <div key={index} className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                    <div key={index} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
                         <div className="flex justify-between items-start mb-6">
                             <div className={`p-3 rounded-2xl bg-${metric.color}-50 text-${metric.color}-600`}>
                                 <metric.icon size={20} />
@@ -144,10 +144,10 @@ const ProjectDashboard = () => {
             </div>
 
             {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
                 {/* Distribution Chart Card */}
-                <div className="lg:col-span-8 bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 relative group">
-                    <div className="flex items-center gap-2 mb-10">
+                <div className="lg:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative group">
+                    <div className="flex items-center gap-2 mb-6">
                         <div className="text-emerald-500">
                             <ArrowUpRight size={20} className="rotate-45" />
                         </div>
@@ -158,7 +158,7 @@ const ProjectDashboard = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-12">
+                    <div className="flex flex-col md:flex-row items-center gap-8">
                         {/* Donut Chart */}
                         <div className="relative w-64 h-64 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
@@ -213,7 +213,7 @@ const ProjectDashboard = () => {
                     </div>
 
                     {/* Bottom Stats Row */}
-                    <div className="grid grid-cols-2 gap-6 mt-12 pt-10 border-t border-slate-50">
+                    <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-50">
                         <div className="flex items-center justify-between">
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Growth</span>
                             <div className="flex items-center gap-2">
@@ -232,9 +232,9 @@ const ProjectDashboard = () => {
                 </div>
 
                 {/* Right Column: Recent Members & CPD Status */}
-                <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="lg:col-span-4 flex flex-col gap-4">
                     {/* Recent Members Panel */}
-                    <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex-1">
+                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex-1">
                         <div className="flex justify-between items-center mb-8">
                             <h3 className="font-black text-slate-800 tracking-tight">Recent Members</h3>
                             <button
@@ -255,8 +255,8 @@ const ProjectDashboard = () => {
                                         <p className="text-[10px] text-slate-400 font-bold">{new Date(member.created_at).toLocaleDateString()} ago</p>
                                     </div>
                                     <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
-                                            member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
-                                                'bg-red-50 text-red-600'
+                                        member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
+                                            'bg-red-50 text-red-600'
                                         }`}>
                                         {member.status}
                                     </span>
@@ -271,7 +271,7 @@ const ProjectDashboard = () => {
                     </div>
 
                     {/* CPD Status Widget */}
-                    <div className="bg-slate-900 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+                    <div className="bg-slate-900 rounded-3xl p-6 shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-6 opacity-30 text-emerald-400">
                             <Plus size={24} className="rotate-45" />
                         </div>
@@ -300,7 +300,7 @@ const ProjectDashboard = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

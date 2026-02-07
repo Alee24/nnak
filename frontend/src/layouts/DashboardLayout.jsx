@@ -97,7 +97,7 @@ const DashboardLayout = () => {
                 </header>
 
                 {/* Main Content Area - Added internal scroll */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 lg:p-6">
                     <Outlet />
                 </div>
             </main>
