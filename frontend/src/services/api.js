@@ -120,6 +120,15 @@ class AdminAPI {
     // Auth Methods
     static async login(email, password) {
         const response = await api.post('/auth/login', { email, password });
+        // Don't store user here if OTP is required
+        if (response.success && !response.otp_required) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        return response;
+    }
+
+    static async verifyOtp(otp) {
+        const response = await api.post('/auth/verify-otp', { otp });
         if (response.success) {
             localStorage.setItem('user', JSON.stringify(response.user));
         }
@@ -131,13 +140,35 @@ class AdminAPI {
         localStorage.removeItem('user');
     }
 
-    // Branding Settings
+    // Messaging and Settings
     static async getSettings() {
         return api.get('/settings');
     }
 
+    static async getPublicSettings() {
+        return api.get('/settings/public');
+    }
+
     static async updateSettings(data) {
         return api.post('/settings', data);
+    }
+
+    // Payment Methods
+    static async createPayment(data) {
+        return api.post('/payment', data);
+    }
+
+    static async capturePaypalOrder(orderId, paymentId) {
+        return api.post('/payment/paypal-capture', { order_id: orderId, payment_id: paymentId });
+    }
+
+    static async getTransactions(page = 1, limit = 20, status = '', type = '', search = '') {
+        const queryParams = new URLSearchParams({ page, limit, status, type, search }).toString();
+        return api.get(`/payment/list?${queryParams}`);
+    }
+
+    static async getTransaction(id) {
+        return api.get(`/payment/${id}`);
     }
 
     // Events Methods
@@ -206,8 +237,12 @@ class AdminAPI {
         return api.get(`/event/${eventId}/attendees`);
     }
 
-    static async updateEventAttendance(eventId, data) {
-        return api.post(`/event/${eventId}/attendance`, data);
+    static async getMemberDashboardSummary() {
+        return api.get('/member/dashboard-summary');
+    }
+
+    static async respondToEvent(eventId, response) {
+        return api.post(`/event/${eventId}/respond`, { response });
     }
 }
 

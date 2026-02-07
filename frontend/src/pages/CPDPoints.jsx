@@ -17,6 +17,7 @@ const CPDPoints = () => {
     const [filterType, setFilterType] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [user, setUser] = useState(null);
 
     // Manual Award Form
     const [formData, setFormData] = useState({
@@ -28,19 +29,33 @@ const CPDPoints = () => {
     });
 
     useEffect(() => {
-        fetchLedger();
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
     }, []);
+
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+
+    useEffect(() => {
+        if (user) {
+            fetchLedger();
+        }
+    }, [user]);
 
     const fetchLedger = async () => {
         try {
             setLoading(true);
-            const response = await AdminAPI.getCPDLedger();
+            const response = isAdmin
+                ? await AdminAPI.getCPDLedger()
+                : await AdminAPI.getMemberCPD('me');
+
             if (response.success) {
-                setLedger(response.ledger);
+                setLedger(isAdmin ? (response.ledger || []) : (response.history || []));
             }
         } catch (error) {
-            console.error("Failed to fetch CPD ledger:", error);
-            Swal.fire('Error', 'Could not load CPD ledger', 'error');
+            console.error("Failed to fetch CPD data:", error);
+            Swal.fire('Error', 'Could not load CPD records', 'error');
         } finally {
             setLoading(false);
         }
@@ -88,96 +103,88 @@ const CPDPoints = () => {
     );
 
     return (
-        <div className="p-1 md:p-6 space-y-6 animate-fade-in font-dm-sans">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-4 animate-fade-in font-inter pb-8">
+            {/* Header Section - Standardized High Density */}
+            <div className="flex justify-between items-end px-1">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">CPD Points Management</h1>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Track and allocate professional development credits</p>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">CPD Ledger</h1>
+                    <p className="text-xs text-[#059669] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                        <span className="w-4 h-px bg-[#059669]/30"></span>
+                        Professional Development Tracking
+                    </p>
                 </div>
                 <div className="flex gap-2">
                     <button
                         onClick={fetchLedger}
-                        className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-emerald-600 transition-colors shadow-sm"
+                        className="p-1.5 bg-white border border-slate-100 rounded-lg text-slate-400 hover:text-emerald-600 transition-all shadow-sm active:scale-95"
                     >
-                        <RefreshCw size={18} className={clsx(loading && "animate-spin")} />
+                        <RefreshCw size={14} className={clsx(loading && "animate-spin")} />
                     </button>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg active:scale-95"
-                    >
-                        <Plus size={16} /> Allocate Points
-                    </button>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md hover:bg-emerald-600 transition-all active:scale-95"
+                        >
+                            <Plus size={12} strokeWidth={3} /> Allocate Points
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-emerald-600 p-6 rounded-[2.5rem] text-white shadow-xl shadow-emerald-100">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-2 bg-emerald-500 rounded-xl">
-                            <ArrowUpRight size={20} />
+            {/* Stats Overview - Compact High Density */}
+            {isAdmin && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 px-1">
+                    <div className="bg-emerald-600 p-4 rounded-2xl text-white shadow-lg shadow-emerald-50 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                        <div className="relative z-10 flex flex-col gap-1">
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80">This Month Awarded</p>
+                            <h3 className="text-xl font-bold tracking-tight">
+                                {ledger.reduce((acc, item) => {
+                                    const date = new Date(item.created_at);
+                                    const now = new Date();
+                                    return (date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) ? acc + Number(item.points) : acc;
+                                }, 0)}
+                            </h3>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-80">This Month</span>
                     </div>
-                    <h3 className="text-3xl font-black tracking-tighter mb-1">
-                        {ledger.reduce((acc, item) => {
-                            const date = new Date(item.created_at);
-                            const now = new Date();
-                            return (date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) ? acc + Number(item.points) : acc;
-                        }, 0)}
-                    </h3>
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Total Points Awarded</p>
-                </div>
 
-                <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
-                            <Clock size={20} />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Transactions</span>
+                    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Transactions</p>
+                        <h3 className="text-xl font-bold text-slate-900 tracking-tight">{ledger.length}</h3>
                     </div>
-                    <h3 className="text-3xl font-black tracking-tighter text-slate-900 mb-1">{ledger.length}</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ledger Records</p>
-                </div>
 
-                <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
-                            <Calendar size={20} />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Avg Points / Award</span>
+                    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Points / Award</p>
+                        <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+                            {ledger.length > 0 ? (ledger.reduce((acc, item) => acc + Number(item.points), 0) / ledger.length).toFixed(1) : 0}
+                        </h3>
                     </div>
-                    <h3 className="text-3xl font-black tracking-tighter text-slate-900 mb-1">
-                        {ledger.length > 0 ? (ledger.reduce((acc, item) => acc + Number(item.points), 0) / ledger.length).toFixed(1) : 0}
-                    </h3>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Points Per Event</p>
                 </div>
-            </div>
+            )}
 
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm">
-                <div className="relative w-full md:w-96 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
+            {/* Filters - High Density */}
+            <div className="flex flex-col md:flex-row gap-3 items-center justify-between bg-white p-2 rounded-2xl border border-slate-100 shadow-sm mx-1">
+                <div className="relative w-full md:w-80 group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={14} />
                     <input
                         type="text"
-                        placeholder="Search by member names, ID or reason..."
+                        placeholder="Search ledger..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                        className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-emerald-500/5 transition-all outline-none"
                     />
                 </div>
 
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
                     {['all', 'Workshop', 'Conference', 'Seminar', 'Manual Award'].map((type) => (
                         <button
                             key={type}
                             onClick={() => setFilterType(type)}
                             className={clsx(
-                                "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                                "px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap",
                                 filterType === type
-                                    ? "bg-slate-900 text-white shadow-lg"
-                                    : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                                    ? "bg-slate-900 text-white shadow-sm"
+                                    : "text-slate-400 hover:text-slate-600"
                             )}
                         >
                             {type}
@@ -186,80 +193,85 @@ const CPDPoints = () => {
                 </div>
             </div>
 
-            {/* Ledger Table */}
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+            {/* Ledger Table - High Density */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mx-1">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50">
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Member Info</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Activity Details</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Points</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Timestamp</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Awarded By</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]"></th>
+                            <tr className="bg-slate-50/50">
+                                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Recipient</th>
+                                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Activity / Description</th>
+                                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Points</th>
+                                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Timeline</th>
+                                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Issuer</th>
+                                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-[0.1em]"></th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-slate-50">
                             {loading ? (
                                 [1, 2, 3, 4, 5].map(i => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan="6" className="px-6 py-8">
-                                            <div className="h-4 bg-gray-50 rounded w-full"></div>
+                                        <td colSpan="6" className="px-4 py-6">
+                                            <div className="h-3 bg-slate-50 rounded w-full"></div>
                                         </td>
                                     </tr>
                                 ))
                             ) : filteredLedger.length > 0 ? (
                                 filteredLedger.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
-                                                    <User size={18} />
+                                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+                                                    <User size={14} />
                                                 </div>
-                                                <Link to={`/dashboard/members/${item.member_id}`} className="hover:opacity-80 transition-opacity">
-                                                    <p className="text-xs font-black text-slate-900 uppercase tracking-tighter hover:text-emerald-600 transition-colors">{item.first_name} {item.last_name}</p>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.membership_number}</p>
-                                                </Link>
+                                                {isAdmin ? (
+                                                    <Link to={`/dashboard/members/${item.member_id}`} className="hover:opacity-80 transition-opacity">
+                                                        <p className="text-xs font-black text-slate-900 uppercase tracking-tight leading-none mb-1">{item.first_name} {item.last_name}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.membership_number}</p>
+                                                    </Link>
+                                                ) : (
+                                                    <div>
+                                                        <p className="text-xs font-black text-slate-900 uppercase tracking-tight leading-none mb-1">{item.first_name} {item.last_name}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.membership_number}</p>
+                                                    </div>
+                                                )}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <div className="px-2 py-0.5 inline-block bg-slate-100 text-slate-600 rounded text-[9px] font-black uppercase tracking-tighter mb-1">
-                                                {item.activity_type}
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tight">{item.activity_type}</span>
+                                                <p className="text-xs font-medium text-slate-500 line-clamp-1">{item.description}</p>
                                             </div>
-                                            <p className="text-xs font-medium text-slate-600 line-clamp-1">{item.description}</p>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
-                                                    <Award size={16} />
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-5 h-5 bg-emerald-50 text-emerald-600 rounded flex items-center justify-center">
+                                                    <Award size={10} strokeWidth={3} />
                                                 </div>
-                                                <span className="text-lg font-black text-slate-900">+{item.points}</span>
+                                                <span className="text-[13px] font-black text-slate-900">+{item.points}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <p className="text-xs font-bold text-slate-900">{new Date(item.created_at).toLocaleDateString()}</p>
-                                            <p className="text-[10px] font-medium text-gray-400">{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                        <td className="px-4 py-3 text-[10px]">
+                                            <p className="font-bold text-slate-900">{new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                            <p className="font-medium text-slate-400 mt-0.5">{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <p className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">
-                                                {item.admin_name ? `${item.admin_name} ${item.admin_last_name}` : 'SYSTEM'}
+                                        <td className="px-4 py-3 text-[10px]">
+                                            <p className="font-black text-slate-900 uppercase tracking-tight italic">
+                                                {item.admin_name ? `${item.admin_name} ${item.admin_last_name}` : 'SYSTEM AUTO'}
                                             </p>
                                         </td>
-                                        <td className="px-6 py-5 text-right">
-                                            <button className="p-2 text-gray-400 hover:text-slate-900">
-                                                <MoreVertical size={16} />
+                                        <td className="px-4 py-3 text-right">
+                                            <button className="p-1.5 text-slate-300 hover:text-slate-900 transition-colors">
+                                                <MoreVertical size={14} />
                                             </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-20 text-center">
-                                        <div className="flex flex-col items-center">
-                                            <Award size={48} className="text-gray-200 mb-4" />
-                                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No CPD records found</p>
-                                        </div>
+                                    <td colSpan="6" className="px-4 py-16 text-center">
+                                        <Award size={32} className="text-slate-100 mx-auto mb-3" />
+                                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No ledger items recorded</p>
                                     </td>
                                 </tr>
                             )}
@@ -275,7 +287,7 @@ const CPDPoints = () => {
                         <div className="px-8 py-6 bg-slate-900 text-white flex justify-between items-center">
                             <div>
                                 <h2 className="text-xl font-black tracking-tighter uppercase font-dm-sans">Manual CPD Allocation</h2>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Award professional credits with reason</p>
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Award professional credits with reason</p>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
                                 <Plus className="rotate-45" size={24} />
@@ -285,7 +297,7 @@ const CPDPoints = () => {
                         <form onSubmit={handleManualAward} className="p-8 space-y-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Membership Number</label>
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Membership Number</label>
                                     <input
                                         required
                                         type="text"
@@ -298,7 +310,7 @@ const CPDPoints = () => {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Points to Award</label>
+                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Points to Award</label>
                                         <input
                                             required
                                             type="number"
@@ -308,7 +320,7 @@ const CPDPoints = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Activity Type</label>
+                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Activity Type</label>
                                         <select
                                             value={formData.activity_type}
                                             onChange={(e) => setFormData({ ...formData, activity_type: e.target.value })}
@@ -324,7 +336,7 @@ const CPDPoints = () => {
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Description / Reason</label>
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Description / Reason</label>
                                     <textarea
                                         required
                                         rows="3"
@@ -339,7 +351,7 @@ const CPDPoints = () => {
                             <button
                                 type="submit"
                                 disabled={isSaving}
-                                className="w-full py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-200 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50 font-dm-sans"
+                                className="w-full py-4 bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-200 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50 font-dm-sans"
                             >
                                 {isSaving ? 'Processing...' : 'Verify & Award Points'}
                             </button>

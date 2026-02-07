@@ -62,7 +62,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex bg-white font-sans">
+        <div className="min-h-screen flex bg-white">
             {/* Left Side - Image & Brand */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-emerald-900">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center opacity-40"></div>

@@ -5,6 +5,8 @@
  */
 
 require_once __DIR__ . '/../services/MpesaService.php';
+require_once __DIR__ . '/../services/PaypalService.php';
+require_once __DIR__ . '/../services/StripeService.php';
 
 class PaymentController {
     private $db;
@@ -18,6 +20,11 @@ class PaymentController {
         $id = $parts[0] ?? '';
         if ($id === 'callback' && $method === 'POST') {
             $this->handleMpesaCallback();
+            return;
+        }
+
+        if ($id === 'stripe-webhook' && $method === 'POST') {
+            $this->handleStripeWebhook();
             return;
         }
 
@@ -43,6 +50,8 @@ class PaymentController {
             } else {
                 $this->methodNotAllowed();
             }
+        } else if ($id === 'paypal-capture' && $method === 'POST') {
+            $this->capturePaypalOrder();
         } else {
             // /api/payment/:id - get payment details
             if ($method === 'GET') {
@@ -100,34 +109,66 @@ class PaymentController {
             ]);
             
             $paymentId = $this->db->lastInsertId();
-            $mpesaResponse = null;
+            $gatewayResponse = null;
 
             // Handle M-Pesa STK Push
-            if (strtolower($data['payment_method']) === 'mpesa' || strtolower($data['payment_method']) === 'm-pesa') {
+            if (in_array(strtolower($data['payment_method']), ['mpesa', 'm-pesa'])) {
                 if (empty($data['phone_number'])) {
-                    // Update to failed if phone missing
                     $this->updatePaymentStatusDb($paymentId, 'failed');
                     $this->sendResponse(400, ['error' => 'Phone number required for M-Pesa payment']);
                 }
 
                 try {
                     $mpesaService = new MpesaService();
-                    // Use invoice number as account reference
                     $response = $mpesaService->stkPush($data['phone_number'], $data['amount'], $invoiceNumber);
                     
                     if (isset($response->ResponseCode) && $response->ResponseCode === '0') {
-                        // Store CheckoutRequestID for callback matching if needed (add column later or use description)
-                        $mpesaResponse = $response;
-                        
-                        // Optionally update transaction_reference with CheckoutRequestID
+                        $gatewayResponse = $response;
                         $this->updateTransactionRef($paymentId, $response->CheckoutRequestID);
                     } else {
                         throw new Exception($response->errorMessage ?? 'M-Pesa request failed');
                     }
                 } catch (Exception $e) {
                     $this->updatePaymentStatusDb($paymentId, 'failed');
-                    error_log("M-Pesa error: " . $e->getMessage());
-                    $this->sendResponse(500, ['error' => 'M-Pesa payment initiation failed: ' . $e->getMessage()]);
+                    $this->sendResponse(500, ['error' => 'M-Pesa initiation failed: ' . $e->getMessage()]);
+                }
+            } 
+            // Handle PayPal Order Creation
+            else if (strtolower($data['payment_method']) === 'paypal') {
+                try {
+                    $paypalService = new PaypalService();
+                    $order = $paypalService->createOrder($data['amount'], $data['currency'] ?? 'USD', $invoiceNumber);
+                    
+                    if (isset($order->id)) {
+                        $gatewayResponse = $order;
+                        $this->updateTransactionRef($paymentId, $order->id);
+                    } else {
+                        throw new Exception('Failed to create PayPal order');
+                    }
+                } catch (Exception $e) {
+                    $this->updatePaymentStatusDb($paymentId, 'failed');
+                    $this->sendResponse(500, ['error' => 'PayPal initiation failed: ' . $e->getMessage()]);
+                }
+            }
+            // Handle Stripe PaymentIntent
+            else if (in_array(strtolower($data['payment_method']), ['stripe', 'card', 'visa'])) {
+                try {
+                    $stripeService = new StripeService();
+                    $intent = $stripeService->createPaymentIntent($data['amount'], $data['currency'] ?? 'usd', [
+                        'payment_id' => $paymentId,
+                        'invoice_number' => $invoiceNumber,
+                        'member_id' => $memberId
+                    ]);
+                    
+                    if (isset($intent->id)) {
+                        $gatewayResponse = $intent;
+                        $this->updateTransactionRef($paymentId, $intent->id);
+                    } else {
+                        throw new Exception('Failed to create Stripe PaymentIntent');
+                    }
+                } catch (Exception $e) {
+                    $this->updatePaymentStatusDb($paymentId, 'failed');
+                    $this->sendResponse(500, ['error' => 'Stripe initiation failed: ' . $e->getMessage()]);
                 }
             }
             
@@ -143,7 +184,7 @@ class PaymentController {
                 'message' => 'Payment recorded successfully',
                 'payment_id' => $paymentId,
                 'invoice_number' => $invoiceNumber,
-                'mpesa_response' => $mpesaResponse
+                'gateway_response' => $gatewayResponse
             ]);
             
         } catch (PDOException $e) {
@@ -188,6 +229,73 @@ class PaymentController {
         
         // Always respond success to Safaricom
         $this->sendResponse(200, ['result' => 'success']);
+    }
+
+    private function capturePaypalOrder() {
+        $data = $this->getJsonInput();
+        if (empty($data['order_id']) || empty($data['payment_id'])) {
+            $this->sendResponse(400, ['error' => 'Order ID and Payment ID are required']);
+        }
+        
+        try {
+            $paypalService = new PaypalService();
+            $capture = $paypalService->captureOrder($data['order_id']);
+            
+            if (isset($capture->status) && $capture->status === 'COMPLETED') {
+                $this->updatePaymentStatusDb($data['payment_id'], 'completed');
+                
+                // Get payment details to update membership
+                $stmt = $this->db->prepare("SELECT member_id, payment_type, membership_type_id FROM payments WHERE id = ?");
+                $stmt->execute([$data['payment_id']]);
+                $payment = $stmt->fetch();
+                
+                if ($payment && $payment['payment_type'] === 'membership') {
+                    $this->updateMembershipStatus($payment['member_id'], $payment['membership_type_id']);
+                }
+                
+                $this->sendResponse(200, ['success' => true, 'capture' => $capture]);
+            } else {
+                throw new Exception('PayPal capture failed or incomplete');
+            }
+        } catch (Exception $e) {
+            $this->sendResponse(500, ['error' => 'PayPal capture error: ' . $e->getMessage()]);
+        }
+    }
+
+    private function handleStripeWebhook() {
+        $payload = file_get_contents('php://input');
+        $sigHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
+        
+        // Log webhook for debugging
+        file_put_contents(__DIR__ . '/../../stripe.log', date('[Y-m-d H:i:s] ') . $payload . "\n", FILE_APPEND);
+        
+        $data = json_decode($payload, true);
+        if (!$data) $this->sendResponse(400, ['error' => 'Invalid payload']);
+
+        $eventType = $data['type'];
+        
+        if ($eventType === 'payment_intent.succeeded') {
+            $intentId = $data['data']['object']['id'];
+            
+            try {
+                // Find payment by Transaction Reference (Intent ID)
+                $stmt = $this->db->prepare("SELECT id, member_id, payment_type, membership_type_id FROM payments WHERE transaction_reference = ?");
+                $stmt->execute([$intentId]);
+                $payment = $stmt->fetch();
+                
+                if ($payment) {
+                    $this->updatePaymentStatusDb($payment['id'], 'completed');
+                    
+                    if ($payment['payment_type'] === 'membership') {
+                        $this->updateMembershipStatus($payment['member_id'], $payment['membership_type_id']);
+                    }
+                }
+            } catch (PDOException $e) {
+                error_log("Stripe Webhook DB Error: " . $e->getMessage());
+            }
+        }
+        
+        $this->sendResponse(200, ['received' => true]);
     }
 
     private function updateTransactionRef($id, $ref) {
@@ -242,6 +350,7 @@ class PaymentController {
             
             $status = $_GET['status'] ?? null;
             $type = $_GET['type'] ?? null;
+            $search = $_GET['search'] ?? null;
             
             $where = [];
             $params = [];
@@ -254,6 +363,16 @@ class PaymentController {
             if ($type) {
                 $where[] = "p.payment_type = ?";
                 $params[] = $type;
+            }
+
+            if ($search) {
+                $where[] = "(m.first_name LIKE ? OR m.last_name LIKE ? OR m.email LIKE ? OR p.invoice_number LIKE ? OR p.transaction_reference LIKE ?)";
+                $term = "%$search%";
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
             }
             
             $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';

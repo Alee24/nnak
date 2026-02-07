@@ -1,11 +1,25 @@
 import React from 'react';
+import { toTitleCase } from '../utils/formatters';
 
 /**
- * Pure HTML/CSS Certificate Component for Export
- * NO TAILWIND CLASSES - Only inline styles with standard CSS
+ * Senior UI/UX Architectural Certificate Component
+ * Optimized for high-fidelity PDF export
+ * Zero-overlap Flexbox architecture
  */
 const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
-    const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const currentDate = new Date().toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+
+    // Authority Design System
+    const brandGreen = '#006400';
+    const brandCrimson = '#E11D48';
+    const bodyText = '#333333';
+    const labelText = '#64748b';
+    const serifFont = 'Cambria, Georgia, serif';
+    const sansFont = 'Cambria, Georgia, serif';
 
     return (
         <div ref={ref} style={{
@@ -13,276 +27,201 @@ const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
             height: '1123px',
             backgroundColor: '#ffffff',
             position: 'relative',
-            padding: '64px',
+            padding: '60px 80px',
             display: 'flex',
             flexDirection: 'column',
-            fontFamily: '"Merriweather", serif'
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            fontFamily: sansFont
         }}>
-            {/* Outer Border - Thick Green */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                border: '16px solid #016938',
-                pointerEvents: 'none'
-            }}></div>
+            {/* 1. Architectural Frame System - BORDERS REMOVED AS REQUESTED */}
 
-            {/* Inner Border - Thin Green */}
-            <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '20px',
-                right: '20px',
-                bottom: '20px',
-                border: '2px solid #016938',
-                pointerEvents: 'none'
-            }}></div>
 
-            {/* Corner Ornaments */}
-            <div style={{ position: 'absolute', top: '20px', left: '20px', width: '64px', height: '64px', borderTop: '4px solid #E11D48', borderLeft: '4px solid #E11D48', zIndex: 20 }}></div>
-            <div style={{ position: 'absolute', top: '20px', right: '20px', width: '64px', height: '64px', borderTop: '4px solid #E11D48', borderRight: '4px solid #E11D48', zIndex: 20 }}></div>
-            <div style={{ position: 'absolute', bottom: '20px', left: '20px', width: '64px', height: '64px', borderBottom: '4px solid #E11D48', borderLeft: '4px solid #E11D48', zIndex: 20 }}></div>
-            <div style={{ position: 'absolute', bottom: '20px', right: '20px', width: '64px', height: '64px', borderBottom: '4px solid #E11D48', borderRight: '4px solid #E11D48', zIndex: 20 }}></div>
+            {/* Visual Corner Anchors */}
+            <div style={{ position: 'absolute', top: '32px', left: '32px', width: '80px', height: '80px', borderTop: `6px solid ${brandCrimson}`, borderLeft: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
+            <div style={{ position: 'absolute', top: '32px', right: '32px', width: '80px', height: '80px', borderTop: `6px solid ${brandCrimson}`, borderRight: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
+            <div style={{ position: 'absolute', bottom: '32px', left: '32px', width: '80px', height: '80px', borderBottom: `6px solid ${brandCrimson}`, borderLeft: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
+            <div style={{ position: 'absolute', bottom: '32px', right: '32px', width: '80px', height: '80px', borderBottom: `6px solid ${brandCrimson}`, borderRight: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
 
-            {/* Content Container */}
+            {/* 2. Content Stack */}
             <div style={{
                 position: 'relative',
-                zIndex: 10,
+                zIndex: 20,
+                flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                gap: '32px',
-                flex: 1
+                alignItems: 'center'
             }}>
-                {/* Logo */}
-                <div style={{ marginTop: '40px' }}>
+
+                {/* Header Section */}
+                <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>
                     {branding?.system_logo ? (
-                        <img src={branding.system_logo} alt="Logo" style={{ width: '120px', height: '120px', objectFit: 'contain' }} crossOrigin="anonymous" />
+                        <img src={branding.system_logo} alt="NNAK Logo" style={{ display: 'block', margin: '0 auto 24px auto', height: '120px', width: 'auto' }} crossOrigin="anonymous" />
                     ) : (
-                        <div style={{
-                            width: '120px',
-                            height: '120px',
-                            backgroundColor: '#d1fae5',
-                            borderRadius: '9999px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            color: '#065f46',
-                            border: '3px solid #10b981'
-                        }}>NNAK</div>
+                        <div style={{ width: '100px', height: '100px', borderRadius: '50px', backgroundColor: brandGreen, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '32px', fontWeight: 'bold', margin: '0 auto 20px auto' }}>NNAK</div>
                     )}
-                </div>
 
-                {/* Association Name */}
-                <h1 style={{
-                    fontFamily: '"Playfair Display", serif',
-                    fontSize: '32px',
-                    fontWeight: 'bold',
-                    color: '#016938',
-                    textAlign: 'center',
-                    margin: 0,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase'
-                }}>
-                    National Nurses Association of Kenya
-                </h1>
-
-                {/* Certificate Title */}
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                    <h2 style={{
-                        fontFamily: '"Playfair Display", serif',
-                        fontSize: '48px',
-                        fontWeight: 'bold',
-                        color: '#1f2937',
-                        margin: 0,
-                        marginBottom: '8px',
-                        letterSpacing: '0.1em'
+                    <h1 style={{
+                        fontFamily: serifFont,
+                        fontSize: '36px',
+                        fontWeight: '900',
+                        color: brandGreen,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        margin: '0 0 8px 0',
+                        lineHeight: '1.2'
                     }}>
-                        CERTIFICATE
-                    </h2>
+                        {branding?.association_name || 'National Nurses Association of Kenya'}
+                    </h1>
                     <p style={{
-                        fontSize: '20px',
-                        color: '#6b7280',
+                        color: brandCrimson,
+                        fontSize: '16px',
+                        fontWeight: '700',
                         fontStyle: 'italic',
-                        margin: 0,
-                        letterSpacing: '0.15em'
+                        letterSpacing: '0.2em',
+                        margin: 0
                     }}>
-                        OF MEMBERSHIP
+                        "{branding?.association_tagline || 'Advancing the Nursing Profession Through Excellence'}"
                     </p>
                 </div>
 
-                {/* Decorative Line */}
-                <div style={{
-                    width: '200px',
-                    height: '2px',
-                    background: 'linear-gradient(to right, transparent, #016938, transparent)',
-                    margin: '20px 0'
-                }}></div>
-
-                {/* Watermark-like Logo in Background */}
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    opacity: 0.03,
-                    width: '500px',
-                    height: '500px',
-                    zIndex: -1,
-                    pointerEvents: 'none'
-                }}>
-                    {branding?.system_logo && (
-                        <img src={branding.system_logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} crossOrigin="anonymous" />
-                    )}
+                <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+                    <h2 style={{
+                        fontFamily: serifFont,
+                        fontSize: '48px',
+                        fontWeight: '400',
+                        color: '#1a1a1a',
+                        margin: 0,
+                        lineHeight: '1'
+                    }}>
+                        Certificate of Membership
+                    </h2>
                 </div>
 
-                <div style={{
-                    textAlign: 'center',
-                    maxWidth: '660px',
-                    lineHeight: '1.6',
-                    fontSize: '18px',
-                    color: '#374151',
-                    margin: '0 auto'
-                }}>
-                    <p style={{ margin: '0 0 20px 0', letterSpacing: '0.01em', fontSize: '19px' }}>
-                        This{" "}is{" "}to{" "}certify{" "}that
+                {/* Recipient Section */}
+                <div style={{ textAlign: 'center', width: '100%', marginBottom: '50px' }}>
+                    <p style={{
+                        fontFamily: sansFont,
+                        fontSize: '14px',
+                        fontWeight: '800',
+                        color: labelText,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5em',
+                        marginBottom: '30px'
+                    }}>
+                        THIS IS TO CERTIFY THAT
                     </p>
 
                     <h3 style={{
-                        fontFamily: '"Playfair Display", serif',
-                        fontSize: '42px',
+                        fontFamily: serifFont,
+                        fontSize: '48px',
                         fontWeight: 'bold',
-                        color: '#016938',
-                        margin: '10px 0 25px 0',
+                        color: brandGreen,
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        borderBottom: '2px solid #016938',
-                        paddingBottom: '8px',
+                        letterSpacing: '0.02em',
+                        margin: '0 auto 20px auto',
+                        borderBottom: `1px solid #e2e8f0`,
+                        paddingBottom: '10px',
                         display: 'inline-block',
-                        minWidth: '90%'
+                        minWidth: '85%'
                     }}>
-                        {member?.first_name?.trim()}{" "}{member?.last_name?.trim()}
+                        {toTitleCase(member?.first_name)} {toTitleCase(member?.last_name)}
                     </h3>
 
-                    <p style={{ margin: '25px 0', fontSize: '18px' }}>
-                        is{" "}a{" "}registered{" "}member{" "}in{" "}good{" "}standing{" "}of{" "}the{" "}
-                        <span style={{ fontWeight: 'bold', color: '#016938' }}>
-                            National{" "}Nurses{" "}Association{" "}of{" "}Kenya
-                        </span>,{" "}
-                        and{" "}is{" "}assigned{" "}the{" "}official{" "}membership{" "}number{" "}
-                        <strong style={{ color: '#016938', borderBottom: '1px solid #01693820' }}>
-                            {member?.member_id}
-                        </strong>.
-                    </p>
-
-                    <p style={{
-                        margin: '25px 0',
-                        fontSize: '17px',
-                        fontStyle: 'italic',
-                        opacity: 0.95,
-                        lineHeight: '1.5'
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '60px',
+                        marginTop: '10px',
+                        fontFamily: sansFont,
+                        fontSize: '13px',
+                        fontWeight: '800',
+                        color: '#1a1a1a',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.15em'
                     }}>
-                        This{" "}certificate{" "}acknowledges{" "}their{" "}unwavering{" "}commitment{" "}to{" "}the{" "}nursing{" "}profession{" "}
-                        and{" "}their{" "}tireless{" "}dedication{" "}to{" "}upholding{" "}the{" "}highest{" "}standards{" "}of{" "}patient{" "}care,{" "}
-                        clinical{" "}excellence,{" "}and{" "}professional{" "}integrity.
-                    </p>
+                        <span>MEMBER NO: <span style={{ color: brandGreen, fontWeight: '900' }}>{member?.member_id || 'PENDING'}</span></span>
+                        <span>LICENSE NO: <span style={{ color: brandGreen, fontWeight: '900' }}>{member?.registration_number || member?.license_number || 'REQUIRED'}</span></span>
+                    </div>
                 </div>
 
-                {/* Date and Signatures */}
+                {/* Declaration Paragraph - FIXED CONCATENATION */}
+                <div style={{
+                    textAlign: 'center',
+                    maxWidth: '660px',
+                    margin: '0 auto 60px auto',
+                    lineHeight: '1.6',
+                    fontSize: '18px',
+                    color: bodyText,
+                    fontFamily: sansFont
+                }}>
+                    Has been duly registered as a member in good standing of the National Nurses Association of Kenya, committed to upholding excellence in nursing practice
+                </div>
+
+                {/* Footer Section - FLEXBOX ARCHITECTURE */}
                 <div style={{
                     marginTop: 'auto',
                     width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    paddingTop: '60px'
+                    paddingBottom: '60px'
                 }}>
-                    {/* Date */}
-                    <div style={{ textAlign: 'center', minWidth: '200px' }}>
-                        <div style={{
-                            borderTop: '2px solid #1f2937',
-                            paddingTop: '8px',
-                            fontSize: '14px',
-                            fontWeight: 'bold',
-                            color: '#1f2937'
-                        }}>
-                            {currentDate}
+                    {/* Top Row: Date & Signature */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-end',
+                        marginBottom: '40px',
+                        padding: '0 20px'
+                    }}>
+                        {/* Date Left-Aligned */}
+                        <div style={{ textAlign: 'left', minWidth: '220px' }}>
+                            <div style={{ fontSize: '12px', color: labelText, textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>Date of Issue</div>
+                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1a1a1a' }}>{currentDate}</div>
                         </div>
-                        <div style={{
-                            fontSize: '12px',
-                            color: '#6b7280',
-                            marginTop: '4px',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.1em'
-                        }}>
-                            Date{" "}of{" "}Issue
+
+                        {/* Signature Right-Aligned */}
+                        <div style={{ textAlign: 'right', minWidth: '280px' }}>
+                            <div style={{ height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                                {branding?.authorised_signature ? (
+                                    <img src={branding.authorised_signature} alt="Signature" style={{ maxHeight: '50px', width: 'auto' }} crossOrigin="anonymous" />
+                                ) : (
+                                    <div style={{ height: '1px', width: '200px', backgroundColor: '#cbd5e1' }}></div>
+                                )}
+                            </div>
+                            <div style={{ height: '2px', width: '260px', backgroundColor: '#1a1a1a', marginLeft: 'auto', marginBottom: '10px' }}></div>
+                            <div style={{ fontSize: '14px', fontWeight: '900', color: '#1a1a1a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>National Executive Chairman</div>
+                            <div style={{ fontSize: '12px', color: labelText, fontWeight: '700', textTransform: 'uppercase', marginTop: '4px' }}>National Nurses Association of Kenya</div>
                         </div>
                     </div>
 
-                    {/* Signature */}
-                    <div style={{ textAlign: 'center', minWidth: '250px' }}>
+                    {/* Bottom Row: Status & Verification Center-Aligned */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '12px'
+                    }}>
                         <div style={{
-                            height: '60px',
-                            display: 'flex',
-                            alignItems: 'flex-end',
-                            justifyContent: 'center',
-                            marginBottom: '8px'
-                        }}>
-                            {branding?.authorised_signature ? (
-                                <img
-                                    src={branding.authorised_signature}
-                                    alt="Signature"
-                                    style={{
-                                        height: '50px',
-                                        objectFit: 'contain',
-                                        filter: 'brightness(0) saturate(100%) invert(18%) sepia(87%) saturate(2643%) hue-rotate(224deg) brightness(85%) contrast(106%)'
-                                    }}
-                                    crossOrigin="anonymous"
-                                />
-                            ) : (
-                                <div style={{
-                                    fontSize: '24px',
-                                    fontStyle: 'italic',
-                                    color: '#1e3a8a',
-                                    fontFamily: 'cursive'
-                                }}>Signature</div>
-                            )}
-                        </div>
-                        <div style={{
-                            borderTop: '2px solid #1f2937',
-                            paddingTop: '8px',
+                            backgroundColor: `${brandGreen}10`,
+                            color: brandGreen,
+                            padding: '6px 20px',
+                            borderRadius: '4px',
                             fontSize: '14px',
-                            fontWeight: 'bold',
-                            color: '#1f2937'
+                            fontWeight: '900',
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase'
                         }}>
-                            Authorized{" "}Signatory
+                            Active Member
                         </div>
                         <div style={{
                             fontSize: '12px',
-                            color: '#6b7280',
-                            marginTop: '4px',
+                            color: labelText,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.1em'
+                            letterSpacing: '0.3em',
+                            fontWeight: 'bold'
                         }}>
-                            National{" "}Nurses{" "}Association{" "}of{" "}Kenya
+                            Verification Portal: https://portal.nnak.or.ke/verify
                         </div>
                     </div>
-                </div>
-
-                {/* Footer Seal/Badge */}
-                <div style={{
-                    marginTop: '40px',
-                    textAlign: 'center',
-                    fontSize: '10px',
-                    color: '#9ca3af',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase'
-                }}>
-                    Voice{" "}of{" "}the{" "}Nursing{" "}Profession
                 </div>
             </div>
         </div>

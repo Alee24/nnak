@@ -107,120 +107,121 @@ const Applications = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6 animate-fade-in font-inter pb-10">
-            {/* Header */}
-            <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4 animate-fade-in font-inter pb-8">
+            {/* Header Section - Standardized High Density */}
+            <div className="flex justify-between items-end px-1">
                 <div>
-                    <h1 className="text-2xl font-black text-gray-900 tracking-tight font-dm-sans">Membership Applications</h1>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Verification & Approval Queue</p>
-                </div>
-                <div className="bg-amber-50 border border-amber-100 px-4 py-2 rounded-2xl flex items-center gap-3">
-                    <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
-                        <Clock size={16} />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-amber-500 uppercase tracking-widest leading-none">Pending</div>
-                        <div className="text-lg font-black text-amber-700 leading-none">{stats.pending}</div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Info Alert */}
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-4 items-start shadow-sm">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 flex-shrink-0">
-                    <AlertCircle size={20} />
-                </div>
-                <div>
-                    <h4 className="text-sm font-bold text-blue-900">Verification Process</h4>
-                    <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
-                        Review applicant details before approval. Approving a member will automatically activate their account
-                        and award them <b>3 CPD points</b> for joining the association.
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Approval Queue</h1>
+                    <p className="text-xs text-[#059669] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                        <span className="w-4 h-px bg-[#059669]/30"></span>
+                        Membership Verification Engine
                     </p>
                 </div>
+                <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-100/50 rounded-lg shadow-sm">
+                        <Clock size={10} className="text-amber-500" />
+                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest leading-none">{stats.pending} Applications Pending</span>
+                    </div>
+                </div>
             </div>
 
-            {/* Applications Table */}
-            <div className="bg-white border border-gray-100 rounded-[2rem] shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+            {/* Info Hint - Compact */}
+            <div className="bg-blue-50/50 border border-blue-100/50 rounded-2xl p-3 flex gap-3 items-center mx-1">
+                <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
+                    <AlertCircle size={14} />
+                </div>
+                <p className="text-xs text-blue-700 font-semibold leading-relaxed">
+                    Review applicant credentials carefully. Approval triggers automatic activation and awards <b className="text-blue-900">3 CPD points</b>.
+                </p>
+            </div>
+
+            {/* Applications Table - High Density */}
+            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[400px] mx-1">
                 <div className="overflow-x-auto custom-scrollbar flex-1">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-gray-100">
-                                <th className="py-5 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Applicant</th>
-                                <th className="py-5 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Register No</th>
-                                <th className="py-5 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Contact Info</th>
-                                <th className="py-5 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Applied Date</th>
-                                <th className="py-5 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="py-3 px-6 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Applicant / Profile</th>
+                                <th className="py-3 px-6 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Registration</th>
+                                <th className="py-3 px-6 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Contact Matrix</th>
+                                <th className="py-3 px-6 text-xs font-black text-slate-400 uppercase tracking-[0.1em]">Timeline</th>
+                                <th className="py-3 px-6 text-xs font-black text-slate-400 uppercase tracking-[0.1em] text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-slate-50">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="py-32 text-center">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <Loader2 className="animate-spin text-emerald-500" size={40} />
-                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Scanning applications...</span>
+                                    <td colSpan="5" className="py-24 text-center">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Loader2 className="animate-spin text-emerald-500" size={24} />
+                                            <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Synchronizing Queue...</span>
                                         </div>
                                     </td>
                                 </tr>
                             ) : applications.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="py-32 text-center text-gray-400 italic">
-                                        <div className="flex flex-col items-center gap-3 opacity-50">
-                                            <CheckCircle size={48} className="text-emerald-500" />
-                                            <p className="text-sm font-bold">All caught up! No pending applications.</p>
+                                    <td colSpan="5" className="py-24 text-center">
+                                        <div className="flex flex-col items-center gap-2 opacity-50">
+                                            <div className="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center">
+                                                <CheckCircle size={18} />
+                                            </div>
+                                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-tight">System Clear</p>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No pending applications found</p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
                                 applications.map((app) => (
-                                    <tr key={app.id} className="group hover:bg-gray-50/80 transition-all">
-                                        <td className="py-5 px-8">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-700 flex items-center justify-center font-black text-xs ring-4 ring-white shadow-sm group-hover:scale-105 transition-transform">
+                                    <tr key={app.id} className="group hover:bg-slate-50/50 transition-all cursor-default">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shadow-xs ${false ? 'bg-slate-100 text-slate-400' : 'bg-slate-900 text-white'}`}>
                                                     {(app.first_name?.[0] || '') + (app.last_name?.[0] || '')}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-black text-gray-900 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">
+                                                    <div className="text-sm font-black text-slate-900 group-hover:text-[#059669] transition-colors uppercase tracking-tight leading-none mb-1">
                                                         {app.first_name} {app.last_name}
                                                     </div>
-                                                    <div className="text-[10px] text-gray-400 font-bold mt-0.5 tracking-wider">
+                                                    <div className="text-xs text-slate-400 font-bold tracking-widest uppercase">
                                                         PID: {app.member_id || 'PROVISIONAL'}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="py-5 px-8">
-                                            <span className="inline-flex px-2 px-3 py-1 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black text-gray-600 font-mono">
-                                                {app.registration_number || 'NOT PROVIDED'}
+                                        <td className="py-4 px-6">
+                                            <span className="inline-flex px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-xs font-black text-slate-600 font-mono tracking-tighter">
+                                                {app.registration_number || 'NULL'}
                                             </span>
                                         </td>
-                                        <td className="py-5 px-8">
-                                            <div className="text-xs font-bold text-gray-700">{app.email}</div>
-                                            <div className="text-[10px] text-gray-400 mt-1 font-bold">{app.phone || '-'}</div>
+                                        <td className="py-4 px-6">
+                                            <div>
+                                                <div className="text-sm font-black text-slate-900 leading-none">{app.email}</div>
+                                                <div className="text-[10px] text-slate-400 mt-0.5 font-bold tracking-wider">{app.phone || 'N/A'}</div>
+                                            </div>
                                         </td>
-                                        <td className="py-5 px-8">
-                                            <div className="text-[11px] font-bold text-gray-500">
+                                        <td className="py-4 px-6">
+                                            <div className="text-xs font-bold text-slate-500">
                                                 {app.created_at ? new Date(app.created_at).toLocaleDateString('en-GB', {
                                                     day: '2-digit',
                                                     month: 'short',
                                                     year: 'numeric'
-                                                }) : 'N/A'}
+                                                }) : '---'}
                                             </div>
                                         </td>
-                                        <td className="py-5 px-8 text-right">
-                                            <div className="flex justify-end gap-2">
+                                        <td className="py-4 px-6 text-right">
+                                            <div className="flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => navigate(`/dashboard/members/${app.id}`)}
-                                                    className="p-2.5 bg-white border border-gray-200 rounded-xl text-blue-500 hover:bg-blue-50 hover:border-blue-300 transition-all shadow-sm"
-                                                    title="View Full Profile"
+                                                    className="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-blue-500 hover:border-blue-200 transition-all shadow-sm"
+                                                    title="Detailed Review"
                                                 >
-                                                    <Eye size={16} />
+                                                    <Eye size={12} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleApprove(app.id, `${app.first_name} ${app.last_name}`)}
-                                                    className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black hover:bg-emerald-700 transition-all shadow-md shadow-emerald-100 active:scale-95"
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-black hover:bg-[#059669] transition-all shadow-md active:scale-95 uppercase tracking-widest"
                                                 >
-                                                    <UserCheck size={14} /> APPROVE
+                                                    <UserCheck size={10} strokeWidth={3} /> Verify
                                                 </button>
                                             </div>
                                         </td>
@@ -231,24 +232,24 @@ const Applications = () => {
                     </table>
                 </div>
 
-                {/* Pagination */}
+                {/* Pagination - Compact */}
                 {pagination.pages > 1 && (
-                    <div className="px-8 py-5 border-t border-gray-50 bg-gray-50/30 flex justify-between items-center mt-auto">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            Page {page} of {pagination.pages}
+                    <div className="px-6 py-3 border-t border-slate-50 bg-slate-50/30 flex justify-between items-center mt-auto">
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+                            Stack {page} / {pagination.pages}
                         </span>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all shadow-sm"
+                                className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:bg-slate-50 disabled:opacity-30 transition-all shadow-sm"
                             >
-                                PREVIOUS
+                                BACK
                             </button>
                             <button
                                 onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
                                 disabled={page === pagination.pages}
-                                className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all shadow-sm"
+                                className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:bg-slate-50 disabled:opacity-30 transition-all shadow-sm"
                             >
                                 NEXT
                             </button>

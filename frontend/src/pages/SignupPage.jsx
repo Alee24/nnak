@@ -136,7 +136,7 @@ const SignupPage = () => {
     };
 
     return (
-        <div className="h-screen bg-white flex overflow-hidden font-dm-sans">
+        <div className="h-screen bg-white flex overflow-hidden">
             {/* Left Panel: Branding & Progress */}
             <div className="hidden lg:flex w-[400px] bg-slate-900 relative flex-col justify-between overflow-hidden">
                 {/* Decorative Background */}

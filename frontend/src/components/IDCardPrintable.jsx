@@ -1,5 +1,6 @@
 import React from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import { toTitleCase } from '../utils/formatters';
 
 /**
  * Pure HTML/CSS ID Card Component for Export
@@ -13,7 +14,7 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
             height: '300px',
             backgroundColor: '#ffffff',
             borderRadius: '16px',
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: 'Cambria, Georgia, serif',
             overflow: 'hidden',
             boxShadow: 'none',
             background: 'linear-gradient(to bottom, #f9fafb, #f3f4f6, #e5e7eb)',
@@ -58,7 +59,7 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                     marginTop: '2px',
                     marginBottom: 0
                 }}>
-                    Voice of the{" "}Nursing Profession
+                    Voice of the Nursing Profession
                 </p>
                 <div style={{
                     width: '60%',
@@ -67,7 +68,7 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                     margin: '3px 0'
                 }}></div>
                 <p style={{
-                    fontSize: '8px',
+                    fontSize: '10px',
                     color: '#ffffff',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -78,7 +79,7 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                     MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
                 </p>
                 <p style={{
-                    fontSize: '9px',
+                    fontSize: '10px',
                     fontWeight: '900',
                     color: '#ffe4e6',
                     textTransform: 'uppercase',
@@ -167,21 +168,21 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                     <div style={{ marginTop: '0', display: 'flex', flexDirection: 'column', gap: '3px' }}>
                         {/* Vertical stack of rows with horizontal label/value */}
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#6b7280', fontWeight: '800', minWidth: '70px' }}>Name:</span>
+                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: '800', minWidth: '70px' }}>Name:</span>
                             <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                                {member?.first_name?.trim()} {member?.last_name?.trim()}
+                                {toTitleCase(member?.first_name)} {toTitleCase(member?.last_name)}
                             </span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>ID No:</span>
+                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>ID No:</span>
                             <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827' }}>{member?.id_number}</span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>Member No:</span>
+                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>Member No:</span>
                             <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827' }}>{member?.member_id?.replace('NNAK', '')}</span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>Valid Till:</span>
+                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>Valid Till:</span>
                             <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827' }}>31/12/2027</span>
                         </div>
                     </div>
@@ -189,7 +190,7 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px', paddingBottom: '4px' }}>
                         <div style={{ padding: '3px', backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '4px', flexShrink: 0 }}>
                             <QRCodeCanvas
-                                value={`https://members.nnak.or.ke/verify/${member?.member_id}`}
+                                value={`https://portal.nnak.or.ke/verify/${member?.member_id}`}
                                 size={48}
                                 level="M"
                                 includeMargin={false}
@@ -201,7 +202,7 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                                     <img src={branding.authorised_signature} alt="Sign" style={{ height: '38px', objectFit: 'contain' }} crossOrigin="anonymous" />
                                 )}
                             </div>
-                            <span style={{ fontSize: '8px', color: '#6b7280', fontWeight: 'bold', marginTop: '4px', textTransform: 'uppercase' }}>Authorized Signature</span>
+                            <span style={{ fontSize: '10px', color: '#6b7280', fontWeight: 'bold', marginTop: '4px', textTransform: 'uppercase' }}>Authorized Signature</span>
                         </div>
                     </div>
                 </div>
@@ -234,8 +235,8 @@ const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
                             overflow: 'hidden',
                             position: 'relative'
                         }}>
-                            {member?.profile_picture ? (
-                                <img src={member.profile_picture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
+                            {(member?.profile_picture || member?.profile_photo || member?.profile_image) ? (
+                                <img src={member.profile_picture || member.profile_photo || member.profile_image} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
                             ) : (
                                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', color: '#d1d5db', fontSize: '48px' }}>
                                     👤

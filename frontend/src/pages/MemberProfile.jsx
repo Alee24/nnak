@@ -15,12 +15,21 @@ import IDCardPrintable from '../components/IDCardPrintable';
 import CertificatePrintable from '../components/CertificatePrintable';
 
 const MemberProfile = () => {
-    const { id } = useParams();
+    const { id: paramId } = useParams();
+    const id = paramId || 'me';
     const navigate = useNavigate();
     const [member, setMember] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
     const [branding, setBranding] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [formData, setFormData] = useState({});
+
+    const storedUser = localStorage.getItem('user');
+    const currentUser = storedUser ? JSON.parse(storedUser) : null;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'super_admin';
+    const isSelf = id === 'me' || id === currentUser?.id?.toString();
 
     const idCardRef = useRef(null);
     const certificateRef = useRef(null);
@@ -34,7 +43,8 @@ const MemberProfile = () => {
 
     const fetchBranding = async () => {
         try {
-            const response = await AdminAPI.getSettings();
+            // Use getPublicSettings instead of getSettings to allow members to fetch branding assets
+            const response = await AdminAPI.getPublicSettings();
             if (response.success) setBranding(response.settings);
         } catch (error) {
             console.error("Failed to fetch branding:", error);
@@ -56,6 +66,7 @@ const MemberProfile = () => {
                     cpd_summary: profileResult.cpd_summary || {},
                     cpd_history: cpdResult.history || []
                 });
+                setFormData(profileResult.member);
             } else {
                 throw new Error(profileResult.error || 'Failed to load profile');
             }
@@ -82,6 +93,43 @@ const MemberProfile = () => {
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleEditToggle = () => {
+        if (isEditing) {
+            setFormData(member); // Reset if cancelling
+        }
+        setIsEditing(!isEditing);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSave = async () => {
+        try {
+            setSaving(true);
+            const res = await AdminAPI.updateMember(member.id, formData);
+            if (res.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your changes have been saved successfully.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                setMember(prev => ({ ...prev, ...formData }));
+                setIsEditing(false);
+            } else {
+                throw new Error(res.error || 'Failed to update profile');
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.message, 'error');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -240,12 +288,14 @@ const MemberProfile = () => {
             {/* --- LEFT SIDEBAR: Digital ID & Quick Contact --- */}
             <div className="lg:w-[380px] flex flex-col gap-5 flex-shrink-0 h-full overflow-y-auto custom-scrollbar pb-4">
                 {/* Back Button */}
-                <button onClick={() => navigate('/members')} className="flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-emerald-600 transition flex-shrink-0 w-fit group mb-1 uppercase tracking-widest">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-gray-100 flex items-center justify-center group-hover:border-emerald-500 transition-colors shadow-sm">
-                        <ArrowLeft size={12} />
-                    </div>
-                    <span>Back to Directory</span>
-                </button>
+                {isAdmin && (
+                    <button onClick={() => navigate('/members')} className="flex items-center gap-2 text-xs font-black text-gray-400 hover:text-emerald-600 transition flex-shrink-0 w-fit group mb-1 uppercase tracking-widest">
+                        <div className="w-7 h-7 rounded-lg bg-white border border-gray-100 flex items-center justify-center group-hover:border-emerald-500 transition-colors shadow-sm">
+                            <ArrowLeft size={12} />
+                        </div>
+                        <span>Back to Directory</span>
+                    </button>
+                )}
 
                 {/* Premium Digital ID Card Preview - Redesigned to Match Specific Mockup */}
                 <div className="relative group perspective-1000 flex-shrink-0 w-full flex justify-center overflow-hidden" style={{ height: '230px' }}>
@@ -434,7 +484,7 @@ const MemberProfile = () => {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto', marginBottom: '4px' }}>
                                         <div style={{ padding: '4px', backgroundColor: '#ffffff', border: '1px solid #991b1b', borderRadius: '2px' }}>
                                             <QRCodeSVG
-                                                value={`https://members.nnak.or.ke/verify/${member.member_id}`}
+                                                value={`https://portal.nnak.or.ke/verify/${member.member_id}`}
                                                 size={48}
                                                 level="M"
                                                 fgColor="#000000"
@@ -501,17 +551,17 @@ const MemberProfile = () => {
 
                 {/* ID Action Buttons - Grouped with Sidebar */}
                 <div className="flex gap-2 flex-shrink-0">
-                    <button onClick={downloadIdCard} className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-[#E11D48] transition-all flex items-center justify-center gap-2 active:scale-95">
-                        <Download size={14} /> Digital Badge
+                    <button onClick={downloadIdCard} className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-[#E11D48] transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <Download size={14} /> Digital ID
                     </button>
-                    <button onClick={downloadCertificate} className="flex-1 py-3 bg-white border border-gray-200 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <button onClick={downloadCertificate} className="flex-1 py-3 bg-white border border-gray-200 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center justify-center gap-2 active:scale-95">
                         <Printer size={14} /> Certificate
                     </button>
                 </div>
 
                 {/* Contact Quick Info */}
                 <div className="bg-white rounded-[2rem] p-5 shadow-sm border border-gray-100 flex-1 min-h-0 flex flex-col">
-                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">Contact Details</h3>
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 px-1">Contact Details</h3>
                     <div className="space-y-0.5 flex-1 overflow-y-auto custom-scrollbar">
                         <InfoRow label="Email" value={member.email} icon={Mail} />
                         <InfoRow label="Phone" value={member.phone} icon={Phone} />
@@ -519,14 +569,34 @@ const MemberProfile = () => {
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2">
-                        <a href={`mailto:${member.email}`} className="flex items-center justify-center gap-2 py-2 rounded-xl bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition">
+                        <a href={`mailto:${member.email}`} className="flex items-center justify-center gap-2 py-2 rounded-xl bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest hover:bg-blue-100 transition">
                             <Mail size={12} /> Email
                         </a>
-                        <a href={`tel:${member.phone}`} className="flex items-center justify-center gap-2 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-100 transition">
+                        <a href={`tel:${member.phone}`} className="flex items-center justify-center gap-2 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-black uppercase tracking-widest hover:bg-emerald-100 transition">
                             <Phone size={12} /> Call
                         </a>
                     </div>
                 </div>
+
+                {/* Admin Management Tools - Conditionally Rendered */}
+                {isAdmin && !isSelf && (
+                    <div className="bg-rose-50 rounded-[2rem] p-5 border border-rose-100">
+                        <h3 className="text-[10px] font-black text-rose-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                            <Shield size={12} /> Management Tools
+                        </h3>
+                        <div className="space-y-2">
+                            <button
+                                onClick={() => setActiveTab('settings')}
+                                className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                            >
+                                Status & Permissions
+                            </button>
+                            <button className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                                Award Special Points
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* --- MAIN CONTENT AREA: Tabs & Scrollable Content --- */}
@@ -541,19 +611,54 @@ const MemberProfile = () => {
                 {/* Tabbed Content Container */}
                 <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex-1 min-h-0 flex flex-col overflow-hidden">
                     {/* Tab Navigation */}
-                    <div className="flex px-6 border-b border-gray-100 bg-gray-50/30 flex-shrink-0">
-                        {['overview', 'cpd', 'logs', 'settings'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-5 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${activeTab === tab ? 'text-slate-900 scale-105' : 'text-gray-400 hover:text-gray-600'}`}
-                            >
-                                {tab}
-                                {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#E11D48] rounded-t-full animate-in slide-in-from-bottom-1 duration-300"></div>}
-                            </button>
-                        ))}
-                    </div>
+                    <div className="flex items-center justify-between border-b border-gray-100 px-8 bg-white/50 backdrop-blur-md sticky top-0 z-20">
+                        <div className="flex gap-8">
+                            {['overview', 'cpd', 'logs', 'settings'].map((tab) => (
+                                (tab !== 'settings' || isAdmin) && (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={clsx(
+                                            "relative py-5 text-xs font-black uppercase tracking-[0.2em] transition-all",
+                                            activeTab === tab ? "text-[#E11D48]" : "text-gray-400 hover:text-gray-600"
+                                        )}
+                                    >
+                                        {tab}
+                                        {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#E11D48] rounded-t-full animate-in slide-in-from-bottom-1 duration-300"></div>}
+                                    </button>
+                                )
+                            ))}
+                        </div>
 
+                        {activeTab === 'overview' && (isSelf || isAdmin) && (
+                            <div className="flex gap-2">
+                                {isEditing ? (
+                                    <>
+                                        <button
+                                            onClick={handleEditToggle}
+                                            className="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100 transition"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleSave}
+                                            disabled={saving}
+                                            className="px-4 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition shadow-sm disabled:opacity-50"
+                                        >
+                                            {saving ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={handleEditToggle}
+                                        className="px-4 py-1.5 rounded-lg border border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-50 transition shadow-sm"
+                                    >
+                                        Edit Profile
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     {/* Scrollable Tab Content */}
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-8" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
                         {activeTab === 'overview' && (
@@ -568,13 +673,13 @@ const MemberProfile = () => {
                                                 <div className="w-6 h-6 rounded-md bg-slate-900/10 flex items-center justify-center text-slate-600">
                                                     <Shield size={12} strokeWidth={2.5} />
                                                 </div>
-                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">License Number</p>
+                                                <p className="text-xs font-black text-slate-500 uppercase tracking-widest">License Number</p>
                                             </div>
                                             <p className="text-xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>
                                                 {member.registration_number || 'PENDING'}
                                             </p>
                                             <div className="mt-2.5 pt-2 border-t border-slate-200/40">
-                                                <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest leading-none">Nursing Council Registration</p>
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Nursing Council Registration</p>
                                             </div>
                                         </div>
                                     </div>
@@ -587,13 +692,13 @@ const MemberProfile = () => {
                                                 <div className="w-6 h-6 rounded-md bg-emerald-600/10 flex items-center justify-center text-emerald-600">
                                                     <Award size={12} strokeWidth={2.5} />
                                                 </div>
-                                                <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Member ID</p>
+                                                <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">Member ID</p>
                                             </div>
                                             <p className="text-xl font-black text-emerald-700 tracking-tight leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>
                                                 {member.member_id || 'PENDING'}
                                             </p>
                                             <div className="mt-2.5 pt-2 border-t border-emerald-200/40">
-                                                <p className="text-[7px] font-bold text-emerald-500 uppercase tracking-widest leading-none">NNAK Membership</p>
+                                                <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest leading-none">NNAK Membership</p>
                                             </div>
                                         </div>
                                     </div>
@@ -605,14 +710,15 @@ const MemberProfile = () => {
                                     <section className="space-y-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
                                             <div className="w-1 h-5 bg-emerald-500 rounded-full"></div>
-                                            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Personal Info</h3>
+                                            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Personal Info</h3>
                                         </div>
                                         <div className="space-y-3.5">
-                                            <InfoItem label="Full Name" value={`${member.first_name} ${member.last_name}`} />
-                                            <InfoItem label="National ID" value={member.id_number} />
-                                            <InfoItem label="Gender" value={member.gender} />
-                                            <InfoItem label="Phone" value={member.phone} />
-                                            <InfoItem label="Email" value={member.email} />
+                                            <EditableInfoItem label="First Name" name="first_name" value={formData.first_name} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Last Name" name="last_name" value={formData.last_name} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="National ID" name="id_number" value={formData.id_number} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Gender" name="gender" value={formData.gender} isEditing={isEditing} onChange={handleInputChange} type="select" options={['male', 'female', 'other']} />
+                                            <EditableInfoItem label="Phone" name="phone" value={formData.phone} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Email" name="email" value={formData.email} isEditing={isEditing} onChange={handleInputChange} />
                                         </div>
                                     </section>
 
@@ -620,14 +726,14 @@ const MemberProfile = () => {
                                     <section className="space-y-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
                                             <div className="w-1 h-5 bg-blue-500 rounded-full"></div>
-                                            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Professional</h3>
+                                            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Professional</h3>
                                         </div>
                                         <div className="space-y-3.5">
-                                            <InfoItem label="Nurse Cadre" value={member.cadre} />
-                                            <InfoItem label="Employment" value={member.employment_status || 'Full-time'} />
-                                            <InfoItem label="Work Station" value={member.work_station} />
-                                            <InfoItem label="Branch" value={member.branch_name} />
-                                            <InfoItem label="Designation" value={member.designation} />
+                                            <EditableInfoItem label="Nurse Cadre" name="cadre" value={formData.cadre} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Employment" name="employment_status" value={formData.employment_status} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Work Station" name="work_station" value={formData.work_station} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Branch" name="branch_name" value={formData.branch_name} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Designation" name="designation" value={formData.designation} isEditing={isEditing} onChange={handleInputChange} />
                                         </div>
                                     </section>
 
@@ -635,13 +741,13 @@ const MemberProfile = () => {
                                     <section className="space-y-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
                                             <div className="w-1 h-5 bg-orange-500 rounded-full"></div>
-                                            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Regional</h3>
+                                            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Regional</h3>
                                         </div>
                                         <div className="space-y-3.5">
-                                            <InfoItem label="County" value={member.county} />
-                                            <InfoItem label="Sub-County" value={member.sub_county} />
-                                            <InfoItem label="Chapter" value={member.chapter} />
-                                            <InfoItem label="Address" value={member.address || 'N/A'} />
+                                            <EditableInfoItem label="County" name="county" value={formData.county} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Sub-County" name="sub_county" value={formData.sub_county} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Chapter" name="chapter" value={formData.chapter} isEditing={isEditing} onChange={handleInputChange} />
+                                            <EditableInfoItem label="Address" name="address" value={formData.address} isEditing={isEditing} onChange={handleInputChange} />
                                         </div>
                                     </section>
                                 </div>
@@ -652,7 +758,7 @@ const MemberProfile = () => {
                             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">CPD History Ledger</h3>
-                                    <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                    <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-black uppercase tracking-widest">
                                         Total: {member.cpd_summary?.total || 0} Points
                                     </div>
                                 </div>
@@ -667,9 +773,9 @@ const MemberProfile = () => {
                                                         </div>
                                                         <div>
                                                             <p className="text-xs font-black text-slate-900 uppercase tracking-tight">{item.activity_type}</p>
-                                                            <p className="text-[10px] text-gray-500 font-medium leading-relaxed mt-0.5">{item.description}</p>
+                                                            <p className="text-xs text-gray-500 font-medium leading-relaxed mt-0.5">{item.description}</p>
                                                             {item.event_name && (
-                                                                <div className="flex items-center gap-1 mt-1.5 p-1 px-1.5 bg-slate-50 border border-slate-100 rounded text-[8px] font-bold text-slate-500 uppercase tracking-widest w-fit">
+                                                                <div className="flex items-center gap-1 mt-1.5 p-1 px-1.5 bg-slate-50 border border-slate-100 rounded text-xs font-bold text-slate-500 uppercase tracking-widest w-fit">
                                                                     <Calendar size={10} /> {item.event_name}
                                                                 </div>
                                                             )}
@@ -677,16 +783,16 @@ const MemberProfile = () => {
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-emerald-600 font-black text-lg">+{item.points}</div>
-                                                        <div className="text-[9px] font-bold text-gray-400 mt-0.5">{new Date(item.awarded_date).toLocaleDateString()}</div>
+                                                        <div className="text-xs font-bold text-gray-400 mt-0.5">{new Date(item.awarded_date).toLocaleDateString()}</div>
                                                     </div>
                                                 </div>
                                                 <div className="mt-3 pt-3 border-t border-gray-50 flex items-center justify-between">
                                                     <div className="flex items-center gap-1.5">
                                                         <LucideUser size={10} className="text-gray-400" />
-                                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">By: {item.awarded_by_name ? `${item.awarded_by_name} ${item.awarded_by_last_name}` : 'System'}</span>
+                                                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">By: {item.awarded_by_name ? `${item.awarded_by_name} ${item.awarded_by_last_name}` : 'System'}</span>
                                                     </div>
                                                     {item.status === 'approved' && (
-                                                        <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase tracking-widest">
+                                                        <div className="flex items-center gap-1 text-xs font-black text-emerald-600 uppercase tracking-widest">
                                                             <CheckCircle size={10} /> Verified
                                                         </div>
                                                     )}
@@ -697,7 +803,7 @@ const MemberProfile = () => {
                                 ) : (
                                     <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-[2rem]">
                                         <Award size={32} className="mx-auto text-gray-200 mb-3" />
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No CPD records found</p>
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No CPD records found</p>
                                     </div>
                                 )}
                             </div>
@@ -713,10 +819,10 @@ const MemberProfile = () => {
                                                 <div className="absolute left-[-9px] top-4 w-4 h-4 rounded-full bg-white border-4 border-slate-100 group-hover:border-emerald-500 transition-colors z-10"></div>
                                                 <div className="p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-emerald-100 hover:bg-white transition-all shadow-sm">
                                                     <div className="flex justify-between items-start mb-1">
-                                                        <span className="text-[9px] font-black text-slate-900 uppercase tracking-widest bg-white shadow-sm border border-gray-100 px-2 py-0.5 rounded-md">
+                                                        <span className="text-xs font-black text-slate-900 uppercase tracking-widest bg-white shadow-sm border border-gray-100 px-2 py-0.5 rounded-md">
                                                             {log.action_type || 'System'}
                                                         </span>
-                                                        <span className="text-[9px] font-medium text-gray-400">
+                                                        <span className="text-xs font-medium text-gray-400">
                                                             {new Date(log.created_at).toLocaleString()}
                                                         </span>
                                                     </div>
@@ -730,7 +836,7 @@ const MemberProfile = () => {
                                 ) : (
                                     <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-[2rem]">
                                         <FileText size={32} className="mx-auto text-gray-200 mb-3" />
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No activity logs found</p>
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No activity logs found</p>
                                     </div>
                                 )}
                             </div>
@@ -739,103 +845,6 @@ const MemberProfile = () => {
                 </div>
             </div>
 
-            {/* Hidden Templates for PDF Generation */}
-            <div className="fixed top-0 left-0 -z-50 pointer-events-none overflow-hidden opacity-0" style={{ width: '1200px' }}>
-                {/* Premium Certificate Template - A4 Portrait */}
-                <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-serif" style={{ backgroundColor: '#ffffff', fontFamily: '"Merriweather", serif' }}>
-                    {/* Outer Border - Thick Green */}
-                    <div className="absolute inset-0 border-[16px] border-[#016938]" style={{ borderColor: '#016938' }}></div>
-                    {/* Inner Border - Thin Green */}
-                    <div className="absolute inset-5 border-[2px] border-[#016938]" style={{ borderColor: '#016938' }}></div>
-                    {/* Corner Ornaments (CSS pseudo-elements simulation) */}
-                    <div className="absolute top-5 left-5 w-16 h-16 border-t-[4px] border-l-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
-                    <div className="absolute top-5 right-5 w-16 h-16 border-t-[4px] border-r-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
-                    <div className="absolute bottom-5 left-5 w-16 h-16 border-b-[4px] border-l-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
-                    <div className="absolute bottom-5 right-5 w-16 h-16 border-b-[4px] border-r-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
-
-                    <div className="relative z-10 flex flex-col items-center flex-1 py-4">
-                        {/* Logo Area */}
-                        <div className="mt-8 mb-4 h-32 flex items-center justify-center">
-                            {branding.system_logo ? (
-                                <img src={branding.system_logo} alt="Logo" className="h-full object-contain drop-shadow-md" crossOrigin="anonymous" />
-                            ) : (
-                                <div className="w-24 h-24 border-2 border-[#016938] rounded-full flex items-center justify-center text-[#016938] font-bold text-center p-2 text-[10px]" style={{ borderColor: '#016938', color: '#016938' }}>NNAK Logo</div>
-                            )}
-                        </div>
-
-                        {/* Association Name */}
-                        <h1 className="text-[28px] font-bold text-[#016938] uppercase tracking-widest text-center max-w-[650px] leading-tight mb-2" style={{ color: '#016938', fontFamily: '"Playfair Display", serif' }}>
-                            {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
-                        </h1>
-
-                        {/* Tagline */}
-                        <p className="text-lg font-medium text-[#E11D48] italic tracking-wide mb-10" style={{ color: '#E11D48', fontFamily: '"Playfair Display", serif' }}>
-                            "{branding.association_tagline || 'Voice of the Nursing Profession'}"
-                        </p>
-
-                        {/* Title Section */}
-                        <div className="text-center mb-8">
-                            <h2 className="text-[56px] font-normal text-[#1e3a8a] leading-none mb-2" style={{ color: '#1e3a8a', fontFamily: '"Playfair Display", serif' }}>Certificate of Membership</h2>
-                            <div className="w-32 h-1 bg-[#E11D48] mx-auto mt-4" style={{ backgroundColor: '#E11D48' }}></div>
-                        </div>
-
-                        {/* Statement */}
-                        <p className="text-sm font-bold text-gray-500 uppercase tracking-[0.3em] mb-12" style={{ color: '#6b7280' }}>
-                            THIS IS TO CERTIFY THAT
-                        </p>
-
-                        {/* Recipient Name Area */}
-                        <div className="flex flex-col items-center mb-10">
-                            <h3 className="text-[42px] font-bold text-[#016938] uppercase tracking-wide border-b-[2px] border-gray-200 px-12 pb-2 mb-6" style={{ color: '#016938', fontFamily: '"Playfair Display", serif' }}>
-                                {member.first_name} {member.last_name}
-                            </h3>
-
-                            {/* Member & License Details under the name */}
-                            <div className="flex items-center gap-8 text-[#1e3a8a] font-bold text-base tracking-wider" style={{ color: '#1e3a8a' }}>
-                                <span>MEMBER NO: <span className="font-mono text-slate-700" style={{ color: '#334155' }}>{member.member_id || 'PENDING'}</span></span>
-                                <span className="w-1.5 h-1.5 bg-[#E11D48] rounded-full" style={{ backgroundColor: '#E11D48' }}></span>
-                                <span>LICENSE NO: <span className="font-mono text-slate-700" style={{ color: '#334155' }}>{member.registration_number || 'PENDING'}</span></span>
-                            </div>
-                        </div>
-
-                        {/* Body Text */}
-                        <div className="max-w-[620px] text-center mb-16 px-4">
-                            <p className="text-lg text-slate-700 leading-loose" style={{ color: '#374151', lineHeight: '2' }}>
-                                Has been duly registered as a member of the <span className="font-bold text-[#016938]" style={{ color: '#016938' }}>National Nurses Association of Kenya</span>, having complied with the association's requirements and committed to the excellence of the nursing profession.
-                            </p>
-                        </div>
-
-                        {/* Bottom Section */}
-                        <div className="w-full mt-auto px-12 flex justify-between items-end pb-8">
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date of Issue:</span>
-                                    <span className="text-base font-bold text-slate-800 font-serif" style={{ color: '#1f2937' }}>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Valid Until:</span>
-                                    <span className="text-base font-bold text-slate-800 font-serif" style={{ color: '#1f2937' }}>31st December 2026</span>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col items-center">
-                                {branding.authorised_signature && (
-                                    <img src={branding.authorised_signature} alt="Sign" className="h-20 object-contain mb-2" crossOrigin="anonymous" />
-                                ) || <div className="h-20"></div>}
-                                <div className="w-56 h-px bg-[#016938]" style={{ backgroundColor: '#016938' }}></div>
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2" style={{ color: '#6b7280' }}>Authorized Signature</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Verification Footer */}
-                    <div className="absolute bottom-4 left-0 w-full text-center">
-                        <p className="text-[8px] font-bold text-gray-300 uppercase tracking-[0.2em]" style={{ color: '#d1d5db' }}>
-                            Verify Authenticity: https://members.nnak.or.ke/verify
-                        </p>
-                    </div>
-                </div>
-            </div>
 
             {/* Hidden Printable Components for Export - Positioned to ensure rendering but invisible */}
             <div style={{
@@ -885,7 +894,7 @@ const QuickStat = ({ label, value, icon: Icon, color }) => {
                         <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${getIconColorClasses(color)}`}>
                             <Icon size={14} strokeWidth={2.5} />
                         </div>
-                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{label}</p>
+                        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">{label}</p>
                     </div>
                 </div>
                 <div>
@@ -900,12 +909,44 @@ const QuickStat = ({ label, value, icon: Icon, color }) => {
 
 const InfoItem = ({ label, value }) => (
     <div className="group">
-        <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5" style={{ fontFamily: 'Inter, sans-serif' }}>{label}</p>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{label}</p>
         <p className="text-sm font-semibold text-slate-900 leading-snug" style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '-0.01em' }}>
             {value || <span className="text-gray-400 italic font-normal text-xs">Not provided</span>}
         </p>
     </div>
 );
+
+const EditableInfoItem = ({ label, name, value, isEditing, onChange, type = 'text', options = [] }) => {
+    if (!isEditing) return <InfoItem label={label} value={value} />;
+
+    return (
+        <div className="group">
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">{label}</label>
+            {type === 'select' ? (
+                <select
+                    name={name}
+                    value={value || ''}
+                    onChange={onChange}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all uppercase"
+                >
+                    <option value="">Select {label}</option>
+                    {options.map(opt => (
+                        <option key={opt} value={opt}>{opt.toUpperCase()}</option>
+                    ))}
+                </select>
+            ) : (
+                <input
+                    type={type}
+                    name={name}
+                    value={value || ''}
+                    onChange={onChange}
+                    placeholder={`Enter ${label}`}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+            )}
+        </div>
+    );
+};
 
 const InfoRow = ({ label, value, icon: Icon }) => (
     <div className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition group">
@@ -913,8 +954,8 @@ const InfoRow = ({ label, value, icon: Icon }) => (
             <Icon size={12} />
         </div>
         <div>
-            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
-            <p className="text-[11px] font-bold text-slate-700 leading-tight">{value || '-'}</p>
+            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{label}</p>
+            <p className="text-xs font-bold text-slate-700 leading-tight">{value || '-'}</p>
         </div>
     </div>
 );

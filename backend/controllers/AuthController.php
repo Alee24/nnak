@@ -30,6 +30,14 @@ class AuthController {
                     $this->methodNotAllowed();
                 }
                 break;
+
+            case 'verify-otp':
+                if ($method === 'POST') {
+                    $this->verifyOtp();
+                } else {
+                    $this->methodNotAllowed();
+                }
+                break;
                 
             case 'logout':
                 if ($method === 'POST') {
@@ -120,6 +128,9 @@ class AuthController {
         }
         
         try {
+            // Normalize data casing
+            Normalization::normalizeMemberData($data);
+
             // Check if email already exists
             $stmt = $this->db->prepare("SELECT id FROM members WHERE email = ?");
             $stmt->execute([$data['email']]);
@@ -221,25 +232,56 @@ class AuthController {
                 $this->sendResponse(403, ['error' => 'Account suspended. Please contact support.']);
             }
             
-            // Create session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['member_id'] = $user['member_id'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['login_time'] = time();
-            
+            // OTP IMPLEMENTATION: Start two-step flow
+            // Store user data temporarily in session
             unset($user['password_hash']);
+            $_SESSION['pending_user'] = $user;
             
             $this->sendResponse(200, [
                 'success' => true,
-                'message' => 'Login successful',
-                'user' => $user
+                'otp_required' => true,
+                'message' => 'OTP verification required',
+                'email' => $user['email']
             ]);
             
         } catch (PDOException $e) {
             error_log("Login error: " . $e->getMessage());
             $this->sendResponse(500, ['error' => 'Login failed. Please try again.']);
         }
+    }
+
+    private function verifyOtp() {
+        $data = $this->getJsonInput();
+        
+        if (empty($data['otp'])) {
+            $this->sendResponse(400, ['error' => 'OTP is required']);
+        }
+        
+        if ($data['otp'] !== '2424') {
+            $this->sendResponse(401, ['error' => 'Invalid OTP code']);
+        }
+        
+        if (!isset($_SESSION['pending_user'])) {
+            $this->sendResponse(401, ['error' => 'Session expired. Please login again.']);
+        }
+        
+        $user = $_SESSION['pending_user'];
+        
+        // Create full secure session
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['member_id'] = $user['member_id'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['login_time'] = time();
+        
+        // Clean up pending state
+        unset($_SESSION['pending_user']);
+        
+        $this->sendResponse(200, [
+            'success' => true,
+            'message' => 'OTP verified successfully',
+            'user' => $user
+        ]);
     }
     
     private function logout() {

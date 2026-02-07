@@ -18,6 +18,37 @@ class MemberController {
         if ($action !== 'verify' && !$this->isAuthenticated()) {
             $this->sendResponse(401, ['error' => 'Authentication required']);
         }
+
+        // Resolve 'me' to the current user's ID
+        if ($action === 'me') {
+            $action = (string)$_SESSION['user_id'];
+        }
+
+        $isAdmin = $this->isAdmin();
+        $currentUserId = (string)$_SESSION['user_id'];
+
+        // RBAC: Members can only access their own data
+        if (!$isAdmin && $action !== 'verify') {
+            // Actions that are NOT allowed for members
+            $adminOnlyActions = ['list', 'search', 'cpd-ledger', 'pending-count', 'dashboard-stats', 'applications', 'import', 'generate-ids'];
+            if (empty($action) || in_array($action, $adminOnlyActions)) {
+                $this->sendResponse(403, ['error' => 'Access denied. Administrative privileges required.']);
+            }
+
+            // If it's a specific member ID, it MUST be their own
+            if (!in_array($action, ['dashboard-summary'])) {
+                if ($action !== $currentUserId) {
+                    $this->sendResponse(403, ['error' => 'Access denied. You can only access your own data.']);
+                }
+
+                // Sub-actions check
+                $subAction = $parts[1] ?? '';
+                $adminOnlySubActions = ['status', 'license', 'generate-id']; 
+                if (in_array($subAction, $adminOnlySubActions)) {
+                    $this->sendResponse(403, ['error' => 'Access denied. This feature is for administrators.']);
+                }
+            }
+        }
         
         if ($action === 'verify') {
              // Public verification endpoint: /api/member/verify/:id
@@ -115,6 +146,12 @@ class MemberController {
                 } else {
                     $this->methodNotAllowed();
                 }
+            } elseif ($action === 'dashboard-summary') {
+                if ($method === 'GET') {
+                    $this->getMemberDashboardSummary();
+                } else {
+                    $this->methodNotAllowed();
+                }
             } elseif ($action === 'applications') {
                 if ($method === 'GET') {
                     $this->getPendingApplications();
@@ -162,6 +199,10 @@ class MemberController {
 
         // Check if email exists
         $email = trim($data['email']);
+        
+        // Normalize data casing
+        Normalization::normalizeMemberData($data);
+        
         $stmt = $this->db->prepare("SELECT id FROM members WHERE email = ? AND deleted_at IS NULL");
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
@@ -356,6 +397,12 @@ class MemberController {
                 'designation', 'work_station', 'cadre', 'employment_status',
                 'is_signed', 'signature_date'
             ];
+
+            // Add password_hash to data if password is provided
+            if (!empty($data['password'])) {
+                $data['password_hash'] = password_hash($data['password'], PASSWORD_BCRYPT);
+                $allowedFields[] = 'password_hash';
+            }
             
             // Admins can also update these fields
             if ($this->isAdmin()) {
@@ -363,6 +410,9 @@ class MemberController {
                     'membership_type_id', 'status', 'expiry_date', 'role'
                 ]);
             }
+
+            // Normalize data casing
+            Normalization::normalizeMemberData($data);
             
             $updates = [];
             $params = [];
@@ -529,8 +579,8 @@ class MemberController {
 
                 $memberData = [
                     'member_id' => $memberId,
-                    'first_name' => trim($row['First Name']),
-                    'last_name' => trim($row['Last Name']),
+                    'first_name' => Normalization::toTitleCase($row['First Name']),
+                    'last_name' => Normalization::toTitleCase($row['Last Name']),
                     'email' => $email,
                     // Default password: 'password123' - In production use a robust default or email triggers
                     'password_hash' => password_hash('password123', PASSWORD_BCRYPT),
@@ -538,9 +588,9 @@ class MemberController {
                     'license_number' => $row['License Number'] ?? null,
                     'gender' => strtolower($row['Gender'] ?? 'other'),
                     'address_line1' => $row['Address'] ?? null,
-                    'city' => $row['City'] ?? null,
-                    'occupation' => $row['Occupation'] ?? null,
-                    'organization' => $row['Organization'] ?? null,
+                    'city' => Normalization::toTitleCase($row['City'] ?? null),
+                    'occupation' => Normalization::toSentenceCase($row['Occupation'] ?? null),
+                    'organization' => Normalization::toSentenceCase($row['Organization'] ?? null),
                     'membership_type_id' => intval($row['Membership Type ID'] ?? 1),
                     'status' => strtolower($row['Status'] ?? 'pending'),
                     'role' => 'member', // Default role
@@ -1174,6 +1224,89 @@ class MemberController {
         } catch (PDOException $e) {
             error_log("Get pending applications error: " . $e->getMessage());
             $this->sendResponse(500, ['error' => 'Failed to retrieve applications']);
+        }
+    }
+
+    /**
+     * Get summary for the member dashboard
+     */
+    private function getMemberDashboardSummary() {
+        $memberId = $_SESSION['user_id'];
+        
+        try {
+            // 1. Get member basic info and total points
+            $stmt = $this->db->prepare("
+                SELECT m.id, m.member_id, m.first_name, m.last_name, m.status, 
+                       m.registration_number, m.id_number, m.profile_photo, m.email, m.phone,
+                       m.expiry_date, m.total_cpd_points, m.membership_type_id,
+                       mt.name as membership_type
+                FROM members m
+                LEFT JOIN membership_types mt ON m.membership_type_id = mt.id
+                WHERE m.id = ? AND m.deleted_at IS NULL
+            ");
+            $stmt->execute([$memberId]);
+            $member = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$member) {
+                $this->sendResponse(404, ['error' => 'Member not found']);
+            }
+
+            // 2. Get recent CPD points
+            $stmt = $this->db->prepare("
+                SELECT points, activity_type, awarded_date, description
+                FROM cpd_points
+                WHERE member_id = ?
+                ORDER BY awarded_date DESC
+                LIMIT 5
+            ");
+            $stmt->execute([$memberId]);
+            $recentCPD = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Get upcoming events (registered for)
+            $stmt = $this->db->prepare("
+                SELECT e.id, e.title, e.event_date, e.location, ea.status as registration_status
+                FROM event_attendance ea
+                JOIN events e ON ea.event_id = e.id
+                WHERE ea.member_id = ? AND e.event_date >= CURDATE() AND e.deleted_at IS NULL
+                ORDER BY e.event_date ASC
+                LIMIT 5
+            ");
+            $stmt->execute([$memberId]);
+            $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Get recent payments
+            $stmt = $this->db->prepare("
+                SELECT amount, payment_date, payment_status, description
+                FROM payments
+                WHERE member_id = ?
+                ORDER BY payment_date DESC
+                LIMIT 5
+            ");
+            $stmt->execute([$memberId]);
+            $recentPayments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->sendResponse(200, [
+                'success' => true,
+                'summary' => [
+                    'status' => $member['status'],
+                    'member_id' => $member['member_id'],
+                    'first_name' => $member['first_name'],
+                    'last_name' => $member['last_name'],
+                    'registration_number' => $member['registration_number'],
+                    'id_number' => $member['id_number'],
+                    'profile_picture' => $member['profile_photo'],
+                    'cpd_points' => (int)$member['total_cpd_points'],
+                    'expiry_date' => $member['expiry_date'],
+                    'membership_type' => $member['membership_type'] ?? 'Member'
+                ],
+                'recent_cpd' => $recentCPD,
+                'upcoming_events' => $upcomingEvents,
+                'recent_payments' => $recentPayments
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Member dashboard summary error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Failed to retrieve member dashboard statistics']);
         }
     }
 

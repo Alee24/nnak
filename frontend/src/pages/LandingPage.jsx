@@ -6,7 +6,7 @@ import LandingFooter from '../components/LandingFooter';
 
 const LandingPage = () => {
     return (
-        <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             <LandingNavbar />
 
             {/* Hero Section */}
