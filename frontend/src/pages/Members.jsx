@@ -87,10 +87,10 @@ const Members = () => {
             confirmButtonColor: '#ef4444',
             confirmButtonText: 'Yes, Delete',
             customClass: {
-                popup: 'rounded-[1rem] font-inter',
-                title: 'text-lg font-bold font-dm-sans',
-                confirmButton: 'rounded-lg text-xs font-bold px-4 py-2',
-                cancelButton: 'rounded-lg text-xs font-bold px-4 py-2 bg-gray-100 text-gray-600'
+                popup: 'rounded-xl font-inter',
+                title: 'text-sm font-bold font-inter',
+                confirmButton: 'rounded-lg text-[10px] font-bold px-4 py-2',
+                cancelButton: 'rounded-lg text-[10px] font-bold px-4 py-2 bg-slate-100 text-slate-600'
             }
         });
 
@@ -286,61 +286,67 @@ const Members = () => {
 
     return (
         <div className="flex flex-col gap-4 animate-fade-in font-inter">
-            {/* Header & Actions */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-shrink-0">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-900 tracking-tight font-dm-sans">Member Directory</h1>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Database Management</p>
+            {/* Compact Header & Actions */}
+            <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm gap-4">
+                <div className="flex items-center gap-2">
+                    <div className="bg-emerald-50 p-1.5 rounded-lg">
+                        <UsersIcon size={16} className="text-emerald-600" />
+                    </div>
+                    <div>
+                        <h2 className="text-sm font-bold text-slate-800">Member Directory</h2>
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest leading-none">Database Management</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={handleGenerateIDs} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm hover:border-gray-300">
-                        <Wand2 size={14} /> IDs
+                    <button onClick={handleGenerateIDs} className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:bg-slate-100 transition shadow-sm">
+                        <Wand2 size={12} /> IDs
                     </button>
-                    <button onClick={handleGenerateCertificates} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm hover:border-gray-300">
-                        <Printer size={14} /> Certificates
+                    <button onClick={handleGenerateCertificates} className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:bg-slate-100 transition shadow-sm">
+                        <Printer size={12} /> Certificates
                     </button>
-                    <button className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm hover:border-gray-300">
-                        <Upload size={14} /> Import
+                    <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:bg-slate-100 transition shadow-sm">
+                        <Upload size={12} /> Import
                     </button>
-                    <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-md shadow-green-100 transform transition bg-[#059669] text-white hover:bg-[#047857] hover:-translate-y-0.5">
+                    <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-[10px] font-bold shadow-md shadow-emerald-100 bg-emerald-600 text-white hover:bg-emerald-700 transition-all">
                         <Plus size={14} /> Add Member
                     </button>
                 </div>
             </div>
 
             {/* Compact Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Compact Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <SummaryCard icon={UsersIcon} color="blue" label="Total" value={stats.total} sub="All" />
-                <SummaryCard icon={CheckCircle} color="green" label="Active" value={stats.active} sub="Paid" />
-                <SummaryCard icon={Clock} color="yellow" label="Pending" value={stats.pending} sub="Action" />
+                <SummaryCard icon={CheckCircle} color="emerald" label="Active" value={stats.active} sub="Paid" />
+                <SummaryCard icon={Clock} color="orange" label="Pending" value={stats.pending} sub="Action" />
                 <SummaryCard icon={AlertOctagon} color="red" label="Suspended" value={stats.suspended} sub="Alert" />
             </div>
 
             {/* Table Section */}
             <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col flex-1 min-h-[400px] overflow-hidden">
                 {/* Filters */}
-                <div className="p-3 flex flex-col md:flex-row gap-3 justify-between items-center border-b border-gray-50 bg-gray-50/20">
+                <div className="p-2.5 flex flex-col md:flex-row gap-2.5 justify-between items-center border-b border-slate-50 bg-slate-50/20">
                     <div className="relative w-full md:w-64">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search size={14} className="text-gray-400" />
+                            <Search size={14} className="text-slate-400" />
                         </div>
                         <input
                             type="text"
                             placeholder="Search directory..."
-                            className="w-full pl-9 pr-4 py-1.5 bg-white border border-gray-200 rounded-lg text-[11px] font-medium outline-none transition"
+                            className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-xl text-[10px] font-semibold outline-none focus:ring-2 focus:ring-emerald-500/10 transition"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
 
-                    <div className="flex bg-gray-100/80 p-1 rounded-xl">
+                    <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-100">
                         {['all', 'active', 'pending', 'suspended'].map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={clsx(
                                     "px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all capitalize",
-                                    filter === f ? "bg-white shadow-sm text-emerald-800" : "text-gray-400 hover:text-gray-600"
+                                    filter === f ? "bg-white shadow-sm text-emerald-800" : "text-slate-400 hover:text-slate-600"
                                 )}
                             >
                                 {f}
@@ -352,15 +358,15 @@ const Members = () => {
                 {/* Table */}
                 <div className="overflow-x-auto flex-1 custom-scrollbar">
                     <table className="w-full text-left border-collapse">
-                        <thead className="sticky top-0 bg-white shadow-sm z-10">
-                            <tr className="bg-gray-50/50 border-b border-gray-100">
-                                <th className="py-3 px-6 w-12 text-center"><input type="checkbox" className="rounded border-gray-300 text-green-600 focus:ring-green-500" /></th>
-                                <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Member Details</th>
-                                <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Register No</th>
-                                <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Contact</th>
-                                <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                                <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Role</th>
-                                <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                        <thead className="sticky top-0 bg-white shadow-sm z-10 border-b border-slate-100">
+                            <tr>
+                                <th className="py-2.5 px-4 w-10 text-center"><input type="checkbox" className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" /></th>
+                                <th className="py-2.5 px-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Member Details</th>
+                                <th className="py-2.5 px-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Reg No</th>
+                                <th className="py-2.5 px-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Contact</th>
+                                <th className="py-2.5 px-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                <th className="py-2.5 px-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Role</th>
+                                <th className="py-2.5 px-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 text-xs">
@@ -377,44 +383,44 @@ const Members = () => {
                                 <tr><td colSpan="7" className="py-16 text-center text-gray-400 italic">No members found matching your filters.</td></tr>
                             ) : (
                                 members.map((m) => (
-                                    <tr key={m.id} className="group hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-none">
-                                        <td className="py-4 px-6 text-center"><input type="checkbox" className="rounded border-gray-300 text-green-600 focus:ring-green-500" /></td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 text-gray-600 flex items-center justify-center font-bold text-[10px] ring-2 ring-white shadow-sm group-hover:scale-105 transition-transform">
+                                    <tr key={m.id} className="group hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none">
+                                        <td className="py-2.5 px-4 text-center"><input type="checkbox" className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" /></td>
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-500 flex items-center justify-center font-bold text-[9px] uppercase shadow-sm group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-all">
                                                     {(m.first_name?.[0] || '') + (m.last_name?.[0] || '')}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-900 group-hover:text-[#059669] transition-colors">{m.first_name} {m.last_name}</div>
-                                                    <div className="text-[10px] text-gray-400 font-mono mt-0.5">{m.member_id || 'PENDING'}</div>
+                                                    <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-600 transition-colors leading-tight">{m.first_name} {m.last_name}</div>
+                                                    <div className="text-[9px] text-slate-400 font-semibold mt-0.5 tracking-tight">{m.member_id || 'PENDING'}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100 font-mono">{m.registration_number || 'N/A'}</span>
+                                        <td className="py-3 px-4">
+                                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50/50 px-1.5 py-0.5 rounded-md border border-emerald-100/50 font-mono tracking-tighter">{m.registration_number || 'N/A'}</span>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <div className="text-xs font-semibold text-gray-700">{m.email}</div>
-                                            <div className="text-[10px] text-gray-400 mt-0.5 font-medium">{m.phone || '-'}</div>
+                                        <td className="py-3 px-4">
+                                            <div className="text-[11px] font-bold text-slate-700 leading-none">{m.email}</div>
+                                            <div className="text-[9px] text-slate-400 mt-1 font-semibold">{m.phone || '-'}</div>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${getStatusColor(m.status)} uppercase tracking-wide shadow-sm`}>
+                                        <td className="py-3 px-4 text-center">
+                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold border ${getStatusColor(m.status)} uppercase tracking-tighter shadow-sm`}>
                                                 {m.status}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-6 whitespace-nowrap">
-                                            <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full capitalize">{m.role || 'Member'}</span>
+                                        <td className="py-3 px-4 whitespace-nowrap">
+                                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md capitalize">{m.role || 'Member'}</span>
                                         </td>
-                                        <td className="py-4 px-6 text-right">
-                                            <div className="flex justify-end gap-1.5">
-                                                <button onClick={() => navigate(`/dashboard/members/${m.id}`)} className="p-2 bg-white border border-gray-200 rounded-xl text-blue-500 hover:bg-blue-50 hover:border-blue-300 transition shadow-sm" title="View Profile">
-                                                    <Eye size={14} />
+                                        <td className="py-3 px-4 text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <button onClick={() => navigate(`/dashboard/members/${m.id}`)} className="p-1.5 bg-white border border-slate-100 rounded-lg text-blue-500 hover:bg-blue-50 transition shadow-xs" title="View Profile">
+                                                    <Eye size={12} />
                                                 </button>
-                                                <button className="p-2 bg-white border border-gray-200 rounded-xl text-emerald-500 hover:bg-emerald-50 hover:border-emerald-300 transition shadow-sm" title="Edit Member">
-                                                    <Edit size={14} />
+                                                <button className="p-1.5 bg-white border border-slate-100 rounded-lg text-emerald-500 hover:bg-emerald-50 transition shadow-xs" title="Edit Member">
+                                                    <Edit size={12} />
                                                 </button>
-                                                <button onClick={() => handleDelete(m.id)} className="p-2 bg-white border border-gray-200 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition shadow-sm" title="Delete Member">
-                                                    <Trash2 size={14} />
+                                                <button onClick={() => handleDelete(m.id)} className="p-1.5 bg-white border border-slate-100 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 transition shadow-xs" title="Delete Member">
+                                                    <Trash2 size={12} />
                                                 </button>
                                             </div>
                                         </td>
@@ -426,11 +432,11 @@ const Members = () => {
                 </div>
 
                 {/* Pagination */}
-                <div className="p-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/30">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Showing {Math.min((page - 1) * itemsPerPage + 1, members.length)}-{Math.min(page * itemsPerPage, members.length)} of {members.length}</span>
+                <div className="p-3 border-t border-slate-50 flex justify-between items-center bg-slate-50/20">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Showing {Math.min((page - 1) * itemsPerPage + 1, members.length)}-{Math.min(page * itemsPerPage, members.length)} of {members.length}</span>
                     <div className="flex items-center gap-2">
-                        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition shadow-sm">Previous</button>
-                        <button onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition shadow-sm">Next</button>
+                        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 bg-white border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition shadow-sm">Previous</button>
+                        <button onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 bg-white border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition shadow-sm">Next</button>
                     </div>
                 </div>
             </div>
@@ -440,71 +446,99 @@ const Members = () => {
                 <div className="p-10">
                     {/* ID Card Template Container - Always present to keep Ref stable if needed */}
                     {bulkItem && (
-                        <div ref={idCardRef} className="w-[325px] h-[205px] bg-white rounded-[32px] border border-gray-100 flex flex-col relative overflow-hidden font-dm-sans shadow-none" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
-                            {/* Red Top Accent */}
-                            <div className="absolute top-0 left-0 w-full h-[70px] bg-[#E11D48] flex items-center px-4" style={{ backgroundColor: '#E11D48' }}>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center p-1 shadow-sm" style={{ backgroundColor: '#ffffff' }}>
-                                        {branding.system_logo ? (
-                                            <img src={branding.system_logo} alt="L" className="w-full h-full object-contain" crossOrigin="anonymous" />
-                                        ) : (
-                                            <div className="w-full h-full bg-emerald-600 rounded-full" style={{ backgroundColor: '#059669' }}></div>
-                                        )}
-                                    </div>
-                                    <div style={{ color: '#ffffff' }}>
-                                        <div className="text-[7px] font-black text-white/80 uppercase tracking-[0.1em] leading-none" style={{ color: 'rgba(255,255,255,0.8)' }}>Membership</div>
-                                        <div className="text-[11px] font-black text-white uppercase tracking-tighter" style={{ color: '#ffffff' }}>NNA KENYA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-[55px] flex gap-4 px-5 pt-3">
-                                {/* Photo Slot */}
-                                <div className="w-[85px] h-[105px] bg-gray-50 rounded-xl border-[3px] border-white shadow-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: '#f9fafb', borderColor: '#ffffff' }}>
-                                    {bulkItem.profile_picture ? (
-                                        <img src={bulkItem.profile_picture} alt="P" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                        <div ref={idCardRef} className="w-[325px] h-[205px] bg-white rounded-[24px] border border-slate-100 flex flex-col relative overflow-hidden font-dm-sans shadow-none" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
+                            {/* Red Slanted Header */}
+                            <div className="absolute top-0 left-0 w-full h-[60px] flex" style={{ background: '#ffffff' }}>
+                                {/* Logo Area */}
+                                <div className="w-[75px] h-full flex items-center justify-center p-2 z-20">
+                                    {branding.system_logo ? (
+                                        <img src={branding.system_logo} alt="L" className="w-full h-full object-contain" crossOrigin="anonymous" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-600" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
-                                            <LucideUser size={24} />
-                                        </div>
+                                        <div className="w-8 h-8 bg-[#ed1c24] rounded-full" style={{ backgroundColor: '#ed1c24' }}></div>
                                     )}
                                 </div>
 
-                                <div className="flex-1 flex flex-col justify-end pb-1 overflow-hidden" style={{ color: '#0f172a' }}>
-                                    <h2 className="text-[14px] font-black text-slate-900 leading-none tracking-tighter uppercase truncate" style={{ color: '#0f172a' }}>{bulkItem.first_name}</h2>
-                                    <h2 className="text-[12px] font-bold text-slate-400 leading-none tracking-tighter uppercase mb-2 truncate" style={{ color: '#94a3b8' }}>{bulkItem.last_name}</h2>
-                                    <div className="inline-flex items-center px-1.5 py-0.5 rounded bg-[#FDF2F2] border border-[#FECACA] text-[7px] font-black text-[#B91C1C] uppercase tracking-widest w-fit" style={{ backgroundColor: '#FDF2F2', color: '#B91C1C', borderColor: '#FECACA' }}>
-                                        {bulkItem.occupation || 'Nurse'}
+                                {/* Slanted Red Banner */}
+                                <div className="flex-1 h-full bg-[#ed1c24] relative z-10" style={{ backgroundColor: '#ed1c24', clipPath: 'polygon(12% 0, 100% 0, 100% 100%, 0% 100%)', marginLeft: '-20px' }}>
+                                    <div className="absolute inset-0 flex flex-col justify-center pl-8 pr-4 text-white">
+                                        <h1 className="text-[10px] font-black leading-tight tracking-tight uppercase" style={{ color: '#ffffff' }}>
+                                            {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
+                                        </h1>
+                                        <p className="text-[6px] font-bold italic opacity-90 leading-tight" style={{ color: '#ffffff' }}>
+                                            "{branding.association_tagline || 'Voice of the Nursing Profession'}"
+                                        </p>
+                                        <p className="text-[5px] font-bold mt-1 tracking-widest opacity-80 uppercase leading-none" style={{ color: '#ffffff' }}>
+                                            MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
+                                        </p>
+                                        <div className="absolute bottom-1 right-2 text-[7px] font-black tracking-widest opacity-90 leading-none" style={{ color: '#ffffff' }}>
+                                            MEMBERSHIP CARD
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-2 space-y-2 px-5 pb-4 relative z-10">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#9ca3af' }}>License No</div>
-                                        <div className="text-[8px] font-mono font-black text-slate-800 tracking-tighter px-1.5 py-0.5 bg-gray-50 rounded-md border border-gray-100 leading-none" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f1f5f9' }}>
-                                            {bulkItem.registration_number || 'PENDING'}
-                                        </div>
+                            {/* Card Body */}
+                            <div className="mt-[65px] px-4 flex justify-between items-start">
+                                {/* Left Side: Details */}
+                                <div className="flex-1 space-y-1 pt-1">
+                                    <div className="flex flex-col">
+                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>Name:</span>
+                                        <span className="text-[11px] font-black text-slate-900 uppercase leading-none" style={{ color: '#0f172a' }}>{bulkItem.first_name} {bulkItem.last_name}</span>
                                     </div>
-                                    <div>
-                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#9ca3af' }}>Member ID</div>
-                                        <div className="text-[8px] font-mono font-black text-slate-800 tracking-tighter px-1.5 py-0.5 bg-gray-50 rounded-md border border-gray-100 leading-none" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f1f5f9' }}>
-                                            {bulkItem.member_id || 'PENDING'}
-                                        </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>ID No.:</span>
+                                        <span className="text-[9px] font-bold text-slate-800 leading-none" style={{ color: '#1e293b' }}>{bulkItem.id_number || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>Membership No.:</span>
+                                        <span className="text-[9px] font-bold text-slate-800 leading-none" style={{ color: '#1e293b' }}>{bulkItem.member_id || 'PENDING'}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>Valid Till:</span>
+                                        <span className="text-[9px] font-bold text-slate-800 leading-none" style={{ color: '#1e293b' }}>December, 2027</span>
                                     </div>
                                 </div>
 
-                                <div className="flex justify-between items-end">
-                                    <div className="space-y-0.5">
-                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none" style={{ color: '#9ca3af' }}>Authorized Sign</div>
-                                        <div className="h-6 w-16">
-                                            {branding.authorised_signature && (
-                                                <img src={branding.authorised_signature} alt="S" className="w-full h-full object-contain filter grayscale" crossOrigin="anonymous" />
-                                            )}
+                                {/* Right Side: Photo with Red Frame */}
+                                <div className="w-[85px] h-[105px] flex items-center justify-center p-1 bg-[#ed1c24] rounded-lg shadow-md -mt-4 z-20" style={{ backgroundColor: '#ed1c24' }}>
+                                    <div className="w-full h-full bg-white rounded flex flex-col overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+                                        {bulkItem.profile_picture ? (
+                                            <img src={bulkItem.profile_picture} alt="P" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300" style={{ backgroundColor: '#f8fafc', color: '#cbd5e1' }}>
+                                                <LucideUser size={32} strokeWidth={1} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer: QR and Signature */}
+                            <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                                <div className="flex items-center gap-2">
+                                    {/* QR Placeholder */}
+                                    <div className="w-8 h-8 bg-white border border-slate-100 p-0.5 rounded" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
+                                        <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                                            <div className="grid grid-cols-2 gap-0.5">
+                                                <div className="w-1 h-1 bg-slate-800"></div>
+                                                <div className="w-1 h-1 bg-slate-800"></div>
+                                                <div className="w-1 h-1 bg-slate-800"></div>
+                                                <div className="w-1 h-1 bg-slate-400"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="text-[7px] font-black text-slate-900 uppercase" style={{ color: '#0f172a' }}>2026/27</div>
+
+                                    <div className="flex flex-col">
+                                        <div className="h-3.5 flex items-center overflow-hidden">
+                                            {branding.authorised_signature && (
+                                                <img src={branding.authorised_signature} alt="S" className="h-5 object-contain filter grayscale opacity-80" crossOrigin="anonymous" />
+                                            )}
+                                        </div>
+                                        <span className="text-[5px] font-black text-slate-400 uppercase tracking-widest leading-none mt-0.5" style={{ color: '#94a3b8' }}>Authorised Signature</span>
+                                    </div>
+                                </div>
+                                <div className="text-[6px] font-black text-slate-400 uppercase tracking-[0.1em] opacity-50" style={{ color: '#94a3b8' }}>
+                                    NNA KENYA
                                 </div>
                             </div>
                         </div>
@@ -620,20 +654,20 @@ const Members = () => {
 const SummaryCard = ({ icon: Icon, color, label, value, sub }) => {
     const colors = {
         blue: 'text-blue-600 bg-blue-50/50 border-blue-50',
-        green: 'text-emerald-700 bg-emerald-50/50 border-emerald-50',
-        yellow: 'text-amber-700 bg-amber-50/50 border-amber-50',
+        emerald: 'text-emerald-700 bg-emerald-50/50 border-emerald-50',
+        orange: 'text-amber-700 bg-amber-50/50 border-amber-50',
         red: 'text-red-700 bg-red-50/50 border-red-50'
     };
     const c = colors[color] || colors.blue;
 
     return (
-        <div className="bg-white border border-gray-100 rounded-xl p-4 relative overflow-hidden group shadow-sm">
+        <div className="bg-white border border-slate-100 rounded-2xl p-4 relative overflow-hidden group shadow-sm">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition group-hover:scale-110">
-                <Icon size={32} />
+                <Icon size={24} />
             </div>
-            <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</div>
-            <div className="text-xl font-black text-gray-900 mb-1 leading-none">{value || '0'}</div>
-            <div className={`text-[8px] font-bold ${c} inline-block px-1.5 py-0.5 rounded border capitalize`}>{sub}</div>
+            <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</div>
+            <div className="text-lg font-bold text-slate-800 mb-1 leading-none">{value || '0'}</div>
+            <div className={`text-[8px] font-bold ${c} inline-block px-1.5 py-0.5 rounded border capitalize tracking-wider`}>{sub}</div>
         </div>
     );
 };

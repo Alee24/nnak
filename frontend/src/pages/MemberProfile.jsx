@@ -222,69 +222,98 @@ const MemberProfile = () => {
                     <span>Back to Directory</span>
                 </button>
 
-                {/* Digital ID Card Preview */}
+                {/* Premium Digital ID Card Preview */}
                 <div className="relative group perspective-1000 flex-shrink-0">
-                    <div ref={idCardRef} className="relative bg-white rounded-[2rem] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden" style={{ backgroundColor: '#ffffff', borderColor: '#f3f4f6' }}>
-                        {/* Red Top Accent */}
-                        <div className="absolute top-0 left-0 w-full h-20 bg-[#E11D48] flex items-center px-5" style={{ backgroundColor: '#E11D48' }}>
-                            <div className="flex items-center gap-2.5">
-                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-md" style={{ backgroundColor: '#ffffff' }}>
-                                    {branding.system_logo ? (
-                                        <img src={branding.system_logo} alt="NNAK" className="w-full h-full object-contain" crossOrigin="anonymous" />
-                                    ) : (
-                                        <div className="w-full h-full bg-emerald-600 rounded-full" style={{ backgroundColor: '#059669' }}></div>
-                                    )}
-                                </div>
-                                <div style={{ color: '#ffffff' }}>
-                                    <div className="text-[8px] font-black text-white/80 uppercase tracking-[0.2em] leading-none" style={{ color: 'rgba(255,255,255,0.8)' }}>Membership</div>
-                                    <div className="text-xs font-black text-white uppercase tracking-tighter" style={{ color: '#ffffff' }}>NNA KENYA</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-16 flex gap-4 relative z-10 pt-3">
-                            {/* Photo Slot */}
-                            <div className="w-28 h-36 bg-gray-50 rounded-xl border-4 border-white shadow-lg overflow-hidden flex-shrink-0 bg-noise" style={{ backgroundColor: '#f9fafb', borderColor: '#ffffff' }}>
-                                {member.profile_picture ? (
-                                    <img src={member.profile_picture} alt="Profile" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                    <div ref={idCardRef} className="relative w-[340px] h-[215px] bg-white rounded-[1.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden font-dm-sans" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
+                        {/* Red Slanted Header */}
+                        <div className="absolute top-0 left-0 w-full h-[65px] flex" style={{ background: '#ffffff' }}>
+                            {/* Logo Area (White) */}
+                            <div className="w-[85px] h-full flex items-center justify-center p-2 z-20">
+                                {branding.system_logo ? (
+                                    <img src={branding.system_logo} alt="NNAK" className="w-full h-full object-contain" crossOrigin="anonymous" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-600" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
-                                        <LucideUser size={40} strokeWidth={1} />
-                                    </div>
+                                    <div className="w-10 h-10 bg-[#ed1c24] rounded-full" style={{ backgroundColor: '#ed1c24' }}></div>
                                 )}
                             </div>
 
-                            <div className="flex-1 flex flex-col justify-end pb-1 overflow-hidden">
-                                <h2 className="text-lg font-black text-slate-900 leading-none tracking-tighter uppercase truncate mb-1.5" style={{ color: '#0f172a' }}>{member.first_name} {member.last_name}</h2>
-                                <div className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-100 text-[9px] font-black text-emerald-700 uppercase tracking-widest w-fit" style={{ backgroundColor: '#ecfdf5', color: '#047857', borderColor: '#d1fae5' }}>
-                                    {member.occupation || 'Nurse'}
+                            {/* Slanted Red Banner */}
+                            <div className="flex-1 h-full bg-[#ed1c24] relative z-10" style={{ backgroundColor: '#ed1c24', clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)', marginLeft: '-25px' }}>
+                                <div className="absolute inset-0 flex flex-col justify-center pl-10 pr-4 text-white">
+                                    <h1 className="text-[11px] font-black leading-tight tracking-tight uppercase" style={{ color: '#ffffff' }}>
+                                        {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
+                                    </h1>
+                                    <p className="text-[7px] font-bold italic opacity-90 leading-tight" style={{ color: '#ffffff' }}>
+                                        "{branding.association_tagline || 'Voice of the Nursing Profession'}"
+                                    </p>
+                                    <p className="text-[6px] font-bold mt-1 tracking-widest opacity-80 uppercase" style={{ color: '#ffffff' }}>
+                                        MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
+                                    </p>
+                                    <div className="absolute bottom-1 right-2 text-[8px] font-black tracking-widest opacity-90" style={{ color: '#ffffff' }}>
+                                        MEMBERSHIP CARD
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-4 space-y-3 pt-3 border-t border-gray-100 relative z-10" style={{ borderTopColor: '#f3f4f6' }}>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1" style={{ color: '#9ca3af' }}>License No</div>
-                                    <div className="text-[11px] font-mono font-black text-slate-800 tracking-tighter px-2 py-1 bg-gray-50 rounded-lg border border-gray-100" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f3f4f6' }}>
-                                        {member.registration_number || 'PENDING'}
-                                    </div>
+                        {/* Card Body */}
+                        <div className="mt-[70px] px-4 flex justify-between">
+                            {/* Left Side: Details */}
+                            <div className="flex-1 space-y-1.5 pt-1">
+                                <div className="flex flex-col">
+                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>Name:</span>
+                                    <span className="text-sm font-black text-slate-900 uppercase leading-none" style={{ color: '#0f172a' }}>{member.first_name} {member.last_name}</span>
                                 </div>
-                                <div>
-                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1" style={{ color: '#9ca3af' }}>Member ID</div>
-                                    <div className="text-[11px] font-mono font-black text-slate-800 tracking-tighter px-2 py-1 bg-gray-50 rounded-lg border border-gray-100" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f3f4f6' }}>
-                                        {member.member_id || 'PENDING'}
-                                    </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>ID No.:</span>
+                                    <span className="text-[11px] font-bold text-slate-800" style={{ color: '#1e293b' }}>{member.id_number || 'N/A'}</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>Membership No.:</span>
+                                    <span className="text-[11px] font-bold text-slate-800" style={{ color: '#1e293b' }}>{member.member_id || 'PENDING'}</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>Valid Till:</span>
+                                    <span className="text-[11px] font-bold text-slate-800" style={{ color: '#1e293b' }}>December, 2027</span>
                                 </div>
                             </div>
 
-                            <div className="flex justify-between items-end">
-                                <div className="h-8 w-20">
-                                    {branding.authorised_signature && (
-                                        <img src={branding.authorised_signature} alt="Sign" className="w-full h-full object-contain filter grayscale opacity-70" crossOrigin="anonymous" />
+                            {/* Right Side: Photo with Red Frame */}
+                            <div className="w-[100px] h-[125px] flex items-center justify-center p-1 bg-[#ed1c24] rounded-lg shadow-md -mt-4 z-20" style={{ backgroundColor: '#ed1c24' }}>
+                                <div className="w-full h-full bg-white rounded flex flex-col overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+                                    {member.profile_picture ? (
+                                        <img src={member.profile_picture} alt="Profile" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300" style={{ backgroundColor: '#f8fafc', color: '#cbd5e1' }}>
+                                            <LucideUser size={48} strokeWidth={1} />
+                                        </div>
                                     )}
                                 </div>
-                                <div className="text-[9px] font-black text-slate-900 uppercase" style={{ color: '#0f172a' }}>Valid 2026/27</div>
+                            </div>
+                        </div>
+
+                        {/* Footer: QR and Signature */}
+                        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                            <div className="flex items-center gap-3">
+                                {/* QR Placeholder */}
+                                <div className="w-10 h-10 bg-white border border-slate-100 p-1 rounded" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
+                                    <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                                        <div className="grid grid-cols-2 gap-0.5">
+                                            <div className="w-1.5 h-1.5 bg-slate-800"></div>
+                                            <div className="w-1.5 h-1.5 bg-slate-800"></div>
+                                            <div className="w-1.5 h-1.5 bg-slate-800"></div>
+                                            <div className="w-1.5 h-1.5 bg-slate-400"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col">
+                                    <div className="h-4 flex items-center overflow-hidden">
+                                        {branding.authorised_signature && (
+                                            <img src={branding.authorised_signature} alt="Signature" className="h-6 object-contain filter grayscale opacity-80" crossOrigin="anonymous" />
+                                        )}
+                                    </div>
+                                    <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest mt-0.5" style={{ color: '#94a3b8' }}>Authorised Signature</span>
+                                </div>
                             </div>
                         </div>
                     </div>
