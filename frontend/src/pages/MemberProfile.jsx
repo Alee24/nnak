@@ -5,11 +5,14 @@ import {
     MapPin, Mail, Phone, Briefcase, Calendar, CheckCircle, AlertTriangle, Printer,
     Activity, FileText
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import AdminAPI from '../services/api';
 import Swal from 'sweetalert2';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import clsx from 'clsx';
+import IDCardPrintable from '../components/IDCardPrintable';
+import CertificatePrintable from '../components/CertificatePrintable';
 
 const MemberProfile = () => {
     const { id } = useParams();
@@ -21,6 +24,8 @@ const MemberProfile = () => {
 
     const idCardRef = useRef(null);
     const certificateRef = useRef(null);
+    const printableIdCardRef = useRef(null);
+    const printableCertificateRef = useRef(null);
 
     useEffect(() => {
         fetchProfile();
@@ -80,8 +85,26 @@ const MemberProfile = () => {
         }
     };
 
+    const waitForImages = async (container) => {
+        const images = container.getElementsByTagName('img');
+        const promises = Array.from(images).map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => {
+                img.onload = resolve;
+                img.onerror = resolve; // Continue even if one image fails
+            });
+        });
+        await Promise.all(promises);
+        // Small extra buffer for fonts and layout
+        await new Promise(resolve => setTimeout(resolve, 500));
+    };
+
     const downloadIdCard = async () => {
-        if (!idCardRef.current) return;
+        if (!printableIdCardRef.current) {
+            console.error("Printable ID Card Ref not found");
+            Swal.fire('Error', 'ID Card component not ready. Please try again.', 'error');
+            return;
+        }
 
         Swal.fire({
             title: 'Generating ID Card...',
@@ -90,37 +113,31 @@ const MemberProfile = () => {
         });
 
         try {
-            // Wait a bit for images to load completely
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("Starting ID Card generation...");
 
-            const canvas = await html2canvas(idCardRef.current, {
+            // 1. Wait for all images in the hidden component to load
+            await waitForImages(printableIdCardRef.current);
+            console.log("Images loaded for ID Card");
+
+            const canvas = await html2canvas(printableIdCardRef.current, {
                 scale: 4,
                 useCORS: true,
                 allowTaint: false,
-                backgroundColor: null,
-                scrollX: 0,
-                scrollY: -window.scrollY,
+                backgroundColor: '#ffffff',
+                logging: true,
+                imageTimeout: 15000,
                 onclone: (clonedDoc) => {
-                    // Pre-process stylesheets to neutralize oklch for html2canvas parser
-                    const styles = clonedDoc.getElementsByTagName('style');
-                    for (let i = 0; i < styles.length; i++) {
-                        styles[i].innerHTML = styles[i].innerHTML.replace(/oklch\([^)]+\)/g, '#ffffff');
-                    }
-
-                    // Force all elements in the cloned document to use standard colors
-                    const elements = clonedDoc.getElementsByTagName('*');
-                    for (const el of elements) {
-                        // Kill any oklch variables or properties
-                        el.style.setProperty('--color-emerald-500', '#10b981');
-                        el.style.setProperty('--color-slate-900', '#0f172a');
-
-                        // If it's the main container, ensure background is set
-                        if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
-                        if (el.classList.contains('text-slate-900')) el.style.color = '#0f172a';
-                        if (el.classList.contains('bg-[#E11D48]')) el.style.backgroundColor = '#E11D48';
+                    // Critical Fix for 'oklch' error: strip all classes to avoid ANY tailwind variables
+                    const allElements = clonedDoc.body.getElementsByTagName('*');
+                    for (let i = 0; i < allElements.length; i++) {
+                        allElements[i].removeAttribute('class');
                     }
                 }
             });
+
+            console.log("Canvas generated successfully");
+
+            if (!canvas) throw new Error("Canvas generation failed");
 
             const doc = new jsPDF({
                 orientation: 'landscape',
@@ -132,6 +149,7 @@ const MemberProfile = () => {
             doc.addImage(imgData, 'PNG', 0, 0, 85.6, 54, undefined, 'FAST');
             doc.save(`NNAK_ID_${member.first_name}_${member.last_name}.pdf`);
 
+            console.log("PDF saved successfully");
             Swal.fire({ icon: 'success', title: 'ID Card Ready', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
         } catch (error) {
             console.error("PDF Export Error:", error);
@@ -139,13 +157,17 @@ const MemberProfile = () => {
                 icon: 'error',
                 title: 'Export Failed',
                 text: `Error: ${error.message || 'Unknown error occurred during generation'}`,
-                footer: 'Try checking if all images are loaded correctly'
+                footer: 'Check console for detailed logs'
             });
         }
     };
 
     const downloadCertificate = async () => {
-        if (!certificateRef.current) return;
+        if (!printableCertificateRef.current) {
+            console.error("Printable Certificate Ref not found");
+            Swal.fire('Error', 'Certificate component not ready.', 'error');
+            return;
+        }
 
         Swal.fire({
             title: 'Generating Certificate...',
@@ -154,44 +176,47 @@ const MemberProfile = () => {
         });
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1200));
+            console.log("Starting Certificate generation...");
 
-            const canvas = await html2canvas(certificateRef.current, {
+            // 1. Wait for all images in the hidden component to load
+            await waitForImages(printableCertificateRef.current);
+            console.log("Images loaded for Certificate");
+
+            const canvas = await html2canvas(printableCertificateRef.current, {
                 scale: 3,
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: '#ffffff',
-                height: 1123,
-                scrollX: 0,
-                scrollY: -window.scrollY,
+                logging: true,
+                imageTimeout: 15000,
                 onclone: (clonedDoc) => {
-                    const styles = clonedDoc.getElementsByTagName('style');
-                    for (let i = 0; i < styles.length; i++) {
-                        styles[i].innerHTML = styles[i].innerHTML.replace(/oklch\([^)]+\)/g, '#ffffff');
-                    }
-                    const elements = clonedDoc.getElementsByTagName('*');
-                    for (const el of elements) {
-                        el.style.setProperty('--color-emerald-500', '#10b981');
-                        el.style.setProperty('--color-slate-900', '#0f172a');
-                        if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
+                    // Critical Fix for 'oklch' error: strip all classes to avoid ANY tailwind variables
+                    const allElements = clonedDoc.body.getElementsByTagName('*');
+                    for (let i = 0; i < allElements.length; i++) {
+                        allElements[i].removeAttribute('class');
                     }
                 }
             });
+
+            console.log("Certificate Canvas generated");
+
+            if (!canvas) throw new Error("Certificate canvas generation failed");
 
             const doc = new jsPDF('p', 'mm', 'a4');
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
             doc.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-            doc.save(`NNAK_Certificate_${member.first_name}.pdf`);
+            doc.save(`NNAK_Certificate_${member.first_name}_${member.last_name}.pdf`);
 
-            Swal.fire({ icon: 'success', title: 'Certificate Downloaded', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+            console.log("Certificate saved");
+            Swal.fire({ icon: 'success', title: 'Certificate Ready', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
         } catch (error) {
             console.error("Certificate Export Error:", error);
             Swal.fire({
                 icon: 'error',
                 title: 'Export Failed',
                 text: `Error: ${error.message || 'Failed to generate professional certificate'}`,
-                footer: 'Ensure all profile data and branding are loaded'
+                footer: 'Check console for details'
             });
         }
     };
@@ -222,98 +247,253 @@ const MemberProfile = () => {
                     <span>Back to Directory</span>
                 </button>
 
-                {/* Premium Digital ID Card Preview */}
-                <div className="relative group perspective-1000 flex-shrink-0">
-                    <div ref={idCardRef} className="relative w-[340px] h-[215px] bg-white rounded-[1.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden font-dm-sans" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
-                        {/* Red Slanted Header */}
-                        <div className="absolute top-0 left-0 w-full h-[65px] flex" style={{ background: '#ffffff' }}>
-                            {/* Logo Area (White) */}
-                            <div className="w-[85px] h-full flex items-center justify-center p-2 z-20">
+                {/* Premium Digital ID Card Preview - Redesigned to Match Specific Mockup */}
+                <div className="relative group perspective-1000 flex-shrink-0 w-full flex justify-center overflow-hidden" style={{ height: '230px' }}>
+                    <div className="transform scale-[0.70] origin-top">
+                        {/* ID CARD CONTAINER - PURE INLINE STYLES ONLY for html2canvas compatibility */}
+                        <div ref={idCardRef} style={{
+                            position: 'relative',
+                            width: '480px',
+                            height: '300px',
+                            backgroundColor: '#ffffff',
+                            borderRadius: '16px',
+                            fontFamily: 'Arial, sans-serif',
+                            overflow: 'hidden',
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', // Replicating shadow-2xl
+                            background: 'linear-gradient(to bottom, #f3f4f6, #e5e7eb, #d1d5db)',
+                            border: '1px solid #e5e7eb'
+                        }}>
+
+                            {/* 1. Top Red Header Bar */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                width: '100%',
+                                height: '85px',
+                                zIndex: 10,
+                                paddingLeft: '100px',
+                                paddingRight: '16px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'flex-end',
+                                background: 'linear-gradient(to bottom, #dc2626, #991b1b)',
+                                borderBottom: '2px solid #b91c1c'
+                            }}>
+                                <h1 style={{
+                                    fontSize: '17px',
+                                    fontWeight: 'bold',
+                                    color: '#ffffff',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '-0.025em',
+                                    textAlign: 'right',
+                                    lineHeight: 1.25,
+                                    margin: 0,
+                                    textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+                                }}>
+                                    National Nurses Association of Kenya
+                                </h1>
+                                <p style={{
+                                    fontSize: '11px',
+                                    color: '#fee2e2',
+                                    fontStyle: 'italic',
+                                    textAlign: 'right',
+                                    marginTop: '2px',
+                                    marginBottom: 0
+                                }}>
+                                    Voice of the Nursing Profession
+                                </p>
+                                <div style={{
+                                    width: '80%',
+                                    height: '1px',
+                                    backgroundColor: '#fca5a5',
+                                    opacity: 0.5,
+                                    margin: '4px 0'
+                                }}></div>
+                                <p style={{
+                                    fontSize: '9px',
+                                    color: '#ffffff',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    textAlign: 'right',
+                                    margin: 0
+                                }}>
+                                    MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
+                                </p>
+                                <p style={{
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    color: '#ffffff',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    textAlign: 'right',
+                                    marginTop: '2px',
+                                    margin: 0
+                                }}>
+                                    MEMBERSHIP CARD
+                                </p>
+                            </div>
+
+                            {/* 2. Logo Container - Overhanging */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '10px',
+                                left: '20px',
+                                zIndex: 20,
+                                width: '90px',
+                                height: '100px',
+                                backgroundColor: '#ffffff',
+                                borderBottomLeftRadius: '20px',
+                                borderBottomRightRadius: '20px',
+                                borderTopLeftRadius: '5px',
+                                borderTopRightRadius: '5px',
+                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '4px',
+                                borderLeft: '1px solid #e5e7eb',
+                                borderRight: '1px solid #e5e7eb',
+                                borderBottom: '1px solid #e5e7eb',
+                                background: 'linear-gradient(to bottom, #ffffff, #f3f4f6)'
+                            }}>
                                 {branding.system_logo ? (
-                                    <img src={branding.system_logo} alt="NNAK" className="w-full h-full object-contain" crossOrigin="anonymous" />
+                                    <img src={branding.system_logo} alt="Logo" style={{ width: '75px', height: '75px', objectFit: 'contain', marginBottom: '4px' }} crossOrigin="anonymous" />
                                 ) : (
-                                    <div className="w-10 h-10 bg-[#ed1c24] rounded-full" style={{ backgroundColor: '#ed1c24' }}></div>
+                                    <div style={{
+                                        width: '70px',
+                                        height: '70px',
+                                        backgroundColor: '#d1fae5',
+                                        borderRadius: '9999px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '12px',
+                                        fontWeight: 'bold',
+                                        color: '#065f46',
+                                        border: '2px solid #10b981'
+                                    }}>NNAK</div>
                                 )}
+                                {/* Shield shape bottom effect */}
+                                <div style={{ width: '40px', height: '3px', backgroundColor: '#dc2626', borderRadius: '9999px', marginTop: '4px', opacity: 0.5 }}></div>
                             </div>
 
-                            {/* Slanted Red Banner */}
-                            <div className="flex-1 h-full bg-[#ed1c24] relative z-10" style={{ backgroundColor: '#ed1c24', clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)', marginLeft: '-25px' }}>
-                                <div className="absolute inset-0 flex flex-col justify-center pl-10 pr-4 text-white">
-                                    <h1 className="text-[11px] font-black leading-tight tracking-tight uppercase" style={{ color: '#ffffff' }}>
-                                        {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
-                                    </h1>
-                                    <p className="text-[7px] font-bold italic opacity-90 leading-tight" style={{ color: '#ffffff' }}>
-                                        "{branding.association_tagline || 'Voice of the Nursing Profession'}"
-                                    </p>
-                                    <p className="text-[6px] font-bold mt-1 tracking-widest opacity-80 uppercase" style={{ color: '#ffffff' }}>
-                                        MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
-                                    </p>
-                                    <div className="absolute bottom-1 right-2 text-[8px] font-black tracking-widest opacity-90" style={{ color: '#ffffff' }}>
-                                        MEMBERSHIP CARD
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            {/* 3. Left Red Curved Accent */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '100px',
+                                left: 0,
+                                width: '20px',
+                                height: '140px',
+                                background: 'linear-gradient(to right, #7f1d1d, #ef4444)',
+                                borderTopRightRadius: '16px',
+                                borderBottomRightRadius: '16px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                zIndex: 10
+                            }}></div>
 
-                        {/* Card Body */}
-                        <div className="mt-[70px] px-4 flex justify-between">
-                            {/* Left Side: Details */}
-                            <div className="flex-1 space-y-1.5 pt-1">
-                                <div className="flex flex-col">
-                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>Name:</span>
-                                    <span className="text-sm font-black text-slate-900 uppercase leading-none" style={{ color: '#0f172a' }}>{member.first_name} {member.last_name}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>ID No.:</span>
-                                    <span className="text-[11px] font-bold text-slate-800" style={{ color: '#1e293b' }}>{member.id_number || 'N/A'}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>Membership No.:</span>
-                                    <span className="text-[11px] font-bold text-slate-800" style={{ color: '#1e293b' }}>{member.member_id || 'PENDING'}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest" style={{ color: '#94a3b8' }}>Valid Till:</span>
-                                    <span className="text-[11px] font-bold text-slate-800" style={{ color: '#1e293b' }}>December, 2027</span>
-                                </div>
-                            </div>
+                            {/* 4. Main Content Container */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '90px',
+                                left: 0,
+                                width: '100%',
+                                height: '210px',
+                                display: 'flex',
+                                padding: '20px',
+                                paddingTop: '32px'
+                            }}>
 
-                            {/* Right Side: Photo with Red Frame */}
-                            <div className="w-[100px] h-[125px] flex items-center justify-center p-1 bg-[#ed1c24] rounded-lg shadow-md -mt-4 z-20" style={{ backgroundColor: '#ed1c24' }}>
-                                <div className="w-full h-full bg-white rounded flex flex-col overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
-                                    {member.profile_picture ? (
-                                        <img src={member.profile_picture} alt="Profile" className="w-full h-full object-cover" crossOrigin="anonymous" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300" style={{ backgroundColor: '#f8fafc', color: '#cbd5e1' }}>
-                                            <LucideUser size={48} strokeWidth={1} />
+                                {/* Left Side: Details & Signature */}
+                                <div style={{
+                                    flex: 1,
+                                    paddingLeft: '25px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    position: 'relative',
+                                    zIndex: 10
+                                }}>
+                                    <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#000000' }}>Name: <span style={{ textTransform: 'uppercase', fontSize: '15px' }}>{member.first_name} {member.last_name}</span></span>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer: QR and Signature */}
-                        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                            <div className="flex items-center gap-3">
-                                {/* QR Placeholder */}
-                                <div className="w-10 h-10 bg-white border border-slate-100 p-1 rounded" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
-                                    <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-                                        <div className="grid grid-cols-2 gap-0.5">
-                                            <div className="w-1.5 h-1.5 bg-slate-800"></div>
-                                            <div className="w-1.5 h-1.5 bg-slate-800"></div>
-                                            <div className="w-1.5 h-1.5 bg-slate-800"></div>
-                                            <div className="w-1.5 h-1.5 bg-slate-400"></div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#000000' }}>ID No.: <span style={{ fontSize: '15px' }}>{member.id_number}</span></span>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#000000' }}>Membership No.: <span style={{ fontSize: '15px' }}>{member.member_id?.replace('NNAK', '')}</span></span>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#000000' }}>Valid Till: <span style={{ fontSize: '15px' }}>December, 2027</span></span>
                                         </div>
                                     </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto', marginBottom: '4px' }}>
+                                        <div style={{ padding: '4px', backgroundColor: '#ffffff', border: '1px solid #991b1b', borderRadius: '2px' }}>
+                                            <QRCodeSVG
+                                                value={`https://members.nnak.or.ke/verify/${member.member_id}`}
+                                                size={48}
+                                                level="M"
+                                                fgColor="#000000"
+                                                bgColor="#ffffff"
+                                            />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <div style={{ height: '32px', display: 'flex', alignItems: 'flex-end' }}>
+                                                {branding.authorised_signature ? (
+                                                    <img src={branding.authorised_signature} alt="Sign" style={{ height: '100%', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(18%) sepia(87%) saturate(2643%) hue-rotate(224deg) brightness(85%) contrast(106%)' }} crossOrigin="anonymous" />
+                                                ) : (
+                                                    <div style={{ fontSize: '12px', fontStyle: 'italic', color: '#1e3a8a', fontFamily: 'serif' }}>Signature</div>
+                                                )}
+                                            </div>
+                                            <span style={{ fontSize: '10px', color: '#000000', fontWeight: '500' }}>Authorised Signature</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <div className="h-4 flex items-center overflow-hidden">
-                                        {branding.authorised_signature && (
-                                            <img src={branding.authorised_signature} alt="Signature" className="h-6 object-contain filter grayscale opacity-80" crossOrigin="anonymous" />
-                                        )}
+                                {/* Right Side: Photo with Red Frame */}
+                                <div style={{
+                                    width: '140px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    paddingLeft: '8px'
+                                }}>
+                                    <div style={{
+                                        width: '125px',
+                                        height: '155px',
+                                        background: 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)',
+                                        padding: '6px',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+                                        borderRadius: '2px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        position: 'relative'
+                                    }}>
+                                        {/* Inner Silver/White Border */}
+                                        <div style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            border: '3px solid #e5e7eb',
+                                            backgroundColor: '#ffffff',
+                                            overflow: 'hidden',
+                                            position: 'relative'
+                                        }}>
+                                            {member.profile_picture ? (
+                                                <img src={member.profile_picture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
+                                            ) : (
+                                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', color: '#d1d5db' }}>
+                                                    <LucideUser size={60} />
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest mt-0.5" style={{ color: '#94a3b8' }}>Authorised Signature</span>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -375,73 +555,96 @@ const MemberProfile = () => {
                     </div>
 
                     {/* Scrollable Tab Content */}
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-8" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
                         {activeTab === 'overview' && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                {/* Clean Header Card for IDs */}
-                                <div className="p-5 rounded-3xl bg-white border border-emerald-50 relative overflow-hidden group shadow-sm flex items-center justify-between">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                                    <div className="flex-1 grid grid-cols-2 gap-8 items-center pl-4">
-                                        <div className="space-y-0.5">
-                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">License Number</p>
-                                            <p className="text-xl font-mono font-black tracking-tighter text-slate-900">
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                {/* Premium ID Cards - Side by Side */}
+                                <div className="grid grid-cols-2 gap-5">
+                                    {/* License Number Card */}
+                                    <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100/50 p-3.5 border border-slate-200/60 hover:shadow-md transition-all duration-300">
+                                        <div className="absolute top-0 right-0 w-20 h-20 bg-slate-900/5 rounded-full -mr-10 -mt-10"></div>
+                                        <div className="relative z-10">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 rounded-md bg-slate-900/10 flex items-center justify-center text-slate-600">
+                                                    <Shield size={12} strokeWidth={2.5} />
+                                                </div>
+                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">License Number</p>
+                                            </div>
+                                            <p className="text-xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>
                                                 {member.registration_number || 'PENDING'}
                                             </p>
+                                            <div className="mt-2.5 pt-2 border-t border-slate-200/40">
+                                                <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest leading-none">Nursing Council Registration</p>
+                                            </div>
                                         </div>
-                                        <div className="space-y-0.5 border-l border-gray-100 pl-8">
-                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">Member ID</p>
-                                            <p className="text-xl font-mono font-black tracking-tighter text-emerald-600">
+                                    </div>
+
+                                    {/* Member ID Card */}
+                                    <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-3.5 border border-emerald-200/60 hover:shadow-md transition-all duration-300">
+                                        <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-600/5 rounded-full -mr-10 -mt-10"></div>
+                                        <div className="relative z-10">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 rounded-md bg-emerald-600/10 flex items-center justify-center text-emerald-600">
+                                                    <Award size={12} strokeWidth={2.5} />
+                                                </div>
+                                                <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Member ID</p>
+                                            </div>
+                                            <p className="text-xl font-black text-emerald-700 tracking-tight leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>
                                                 {member.member_id || 'PENDING'}
                                             </p>
+                                            <div className="mt-2.5 pt-2 border-t border-emerald-200/40">
+                                                <p className="text-[7px] font-bold text-emerald-500 uppercase tracking-widest leading-none">NNAK Membership</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Information Grids */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Information Grid - 3 Columns for Better Space Usage */}
+                                <div className="grid grid-cols-3 gap-5">
                                     {/* Personal Section */}
-                                    <section className="space-y-4">
-                                        <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                                            <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
-                                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Personal Info</h3>
+                                    <section className="space-y-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                                        <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+                                            <div className="w-1 h-5 bg-emerald-500 rounded-full"></div>
+                                            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Personal Info</h3>
                                         </div>
-                                        <div className="grid grid-cols-1 gap-y-3">
+                                        <div className="space-y-3.5">
                                             <InfoItem label="Full Name" value={`${member.first_name} ${member.last_name}`} />
-                                            <InfoItem label="National ID / Passport" value={member.id_number} />
+                                            <InfoItem label="National ID" value={member.id_number} />
                                             <InfoItem label="Gender" value={member.gender} />
-                                            <InfoItem label="Phone Number" value={member.phone} />
-                                            <InfoItem label="Email Address" value={member.email} />
+                                            <InfoItem label="Phone" value={member.phone} />
+                                            <InfoItem label="Email" value={member.email} />
                                         </div>
                                     </section>
 
                                     {/* Professional Section */}
-                                    <section className="space-y-4">
-                                        <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                                            <div className="w-1.5 h-4 bg-blue-500 rounded-full"></div>
-                                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Professional Context</h3>
+                                    <section className="space-y-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                                        <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+                                            <div className="w-1 h-5 bg-blue-500 rounded-full"></div>
+                                            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Professional</h3>
                                         </div>
-                                        <div className="grid grid-cols-1 gap-y-3">
+                                        <div className="space-y-3.5">
                                             <InfoItem label="Nurse Cadre" value={member.cadre} />
-                                            <InfoItem label="Employment Status" value={member.employment_status || 'Full-time'} />
-                                            <InfoItem label="Current Work Station" value={member.work_station} />
-                                            <InfoItem label="Assigned Branch" value={member.branch_name} />
-                                            <InfoItem label="Registration Number" value={member.registration_number || 'Not Assigned'} />
+                                            <InfoItem label="Employment" value={member.employment_status || 'Full-time'} />
+                                            <InfoItem label="Work Station" value={member.work_station} />
+                                            <InfoItem label="Branch" value={member.branch_name} />
+                                            <InfoItem label="Designation" value={member.designation} />
+                                        </div>
+                                    </section>
+
+                                    {/* Regional Section */}
+                                    <section className="space-y-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                                        <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+                                            <div className="w-1 h-5 bg-orange-500 rounded-full"></div>
+                                            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Regional</h3>
+                                        </div>
+                                        <div className="space-y-3.5">
+                                            <InfoItem label="County" value={member.county} />
+                                            <InfoItem label="Sub-County" value={member.sub_county} />
+                                            <InfoItem label="Chapter" value={member.chapter} />
+                                            <InfoItem label="Address" value={member.address || 'N/A'} />
                                         </div>
                                     </section>
                                 </div>
-
-                                {/* Regional Section */}
-                                <section className="space-y-4">
-                                    <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                                        <div className="w-1.5 h-4 bg-orange-500 rounded-full"></div>
-                                        <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Regional Details</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <InfoItem label="County" value={member.county} />
-                                        <InfoItem label="Sub-County" value={member.sub_county} />
-                                        <InfoItem label="Address" value={member.address || 'N/A'} />
-                                    </div>
-                                </section>
                             </div>
                         )}
 
@@ -539,115 +742,168 @@ const MemberProfile = () => {
             {/* Hidden Templates for PDF Generation */}
             <div className="fixed top-0 left-0 -z-50 pointer-events-none overflow-hidden opacity-0" style={{ width: '1200px' }}>
                 {/* Premium Certificate Template - A4 Portrait */}
-                <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-12 flex flex-col font-dm-sans" style={{ backgroundColor: '#ffffff' }}>
+                <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-serif" style={{ backgroundColor: '#ffffff', fontFamily: '"Merriweather", serif' }}>
                     {/* Outer Border - Thick Green */}
-                    <div className="absolute inset-0 border-[10px] border-[#016938]" style={{ borderColor: '#016938' }}></div>
+                    <div className="absolute inset-0 border-[16px] border-[#016938]" style={{ borderColor: '#016938' }}></div>
                     {/* Inner Border - Thin Green */}
-                    <div className="absolute inset-4 border-[2px] border-[#016938]" style={{ borderColor: '#016938' }}></div>
+                    <div className="absolute inset-5 border-[2px] border-[#016938]" style={{ borderColor: '#016938' }}></div>
+                    {/* Corner Ornaments (CSS pseudo-elements simulation) */}
+                    <div className="absolute top-5 left-5 w-16 h-16 border-t-[4px] border-l-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
+                    <div className="absolute top-5 right-5 w-16 h-16 border-t-[4px] border-r-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
+                    <div className="absolute bottom-5 left-5 w-16 h-16 border-b-[4px] border-l-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
+                    <div className="absolute bottom-5 right-5 w-16 h-16 border-b-[4px] border-r-[4px] border-[#E11D48] z-20" style={{ borderColor: '#E11D48' }}></div>
 
-                    <div className="relative z-10 flex flex-col items-center flex-1 py-10">
+                    <div className="relative z-10 flex flex-col items-center flex-1 py-4">
                         {/* Logo Area */}
-                        <div className="mt-8 mb-6 h-28 flex items-center justify-center">
+                        <div className="mt-8 mb-4 h-32 flex items-center justify-center">
                             {branding.system_logo ? (
-                                <img src={branding.system_logo} alt="Logo" className="h-full object-contain" crossOrigin="anonymous" />
+                                <img src={branding.system_logo} alt="Logo" className="h-full object-contain drop-shadow-md" crossOrigin="anonymous" />
                             ) : (
                                 <div className="w-24 h-24 border-2 border-[#016938] rounded-full flex items-center justify-center text-[#016938] font-bold text-center p-2 text-[10px]" style={{ borderColor: '#016938', color: '#016938' }}>NNAK Logo</div>
                             )}
                         </div>
 
                         {/* Association Name */}
-                        <h1 className="text-[32px] font-black text-[#016938] uppercase tracking-tight text-center max-w-[600px] leading-tight mb-1" style={{ color: '#016938' }}>
+                        <h1 className="text-[28px] font-bold text-[#016938] uppercase tracking-widest text-center max-w-[650px] leading-tight mb-2" style={{ color: '#016938', fontFamily: '"Playfair Display", serif' }}>
                             {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
                         </h1>
 
                         {/* Tagline */}
-                        <p className="text-lg font-bold text-[#E11D48] italic tracking-tight mb-12" style={{ color: '#E11D48' }}>
+                        <p className="text-lg font-medium text-[#E11D48] italic tracking-wide mb-10" style={{ color: '#E11D48', fontFamily: '"Playfair Display", serif' }}>
                             "{branding.association_tagline || 'Voice of the Nursing Profession'}"
                         </p>
 
                         {/* Title Section */}
-                        <div className="text-center mb-10">
-                            <h2 className="text-[64px] font-black text-[#1e3a8a] italic leading-none" style={{ color: '#1e3a8a' }}>Certificate of</h2>
-                            <h2 className="text-[64px] font-black text-[#1e3a8a] leading-none" style={{ color: '#1e3a8a' }}>Membership</h2>
+                        <div className="text-center mb-8">
+                            <h2 className="text-[56px] font-normal text-[#1e3a8a] leading-none mb-2" style={{ color: '#1e3a8a', fontFamily: '"Playfair Display", serif' }}>Certificate of Membership</h2>
+                            <div className="w-32 h-1 bg-[#E11D48] mx-auto mt-4" style={{ backgroundColor: '#E11D48' }}></div>
                         </div>
 
                         {/* Statement */}
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-[0.4em] mb-10" style={{ color: '#9ca3af' }}>
+                        <p className="text-sm font-bold text-gray-500 uppercase tracking-[0.3em] mb-12" style={{ color: '#6b7280' }}>
                             THIS IS TO CERTIFY THAT
                         </p>
 
                         {/* Recipient Name Area */}
                         <div className="flex flex-col items-center mb-10">
-                            <h3 className="text-5xl font-black text-[#016938] uppercase tracking-tight border-b-[4px] border-[#016938] px-8 pb-1 mb-4" style={{ color: '#016938', borderColor: '#016938' }}>
+                            <h3 className="text-[42px] font-bold text-[#016938] uppercase tracking-wide border-b-[2px] border-gray-200 px-12 pb-2 mb-6" style={{ color: '#016938', fontFamily: '"Playfair Display", serif' }}>
                                 {member.first_name} {member.last_name}
                             </h3>
 
                             {/* Member & License Details under the name */}
-                            <div className="flex items-center gap-6 text-[#1e3a8a] font-bold text-sm tracking-wide" style={{ color: '#1e3a8a' }}>
-                                <span>MEMBER NO: <span className="font-mono">{member.member_id || 'PENDING'}</span></span>
-                                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span>LICENSE NO: <span className="font-mono">{member.registration_number || 'PENDING'}</span></span>
+                            <div className="flex items-center gap-8 text-[#1e3a8a] font-bold text-base tracking-wider" style={{ color: '#1e3a8a' }}>
+                                <span>MEMBER NO: <span className="font-mono text-slate-700" style={{ color: '#334155' }}>{member.member_id || 'PENDING'}</span></span>
+                                <span className="w-1.5 h-1.5 bg-[#E11D48] rounded-full" style={{ backgroundColor: '#E11D48' }}></span>
+                                <span>LICENSE NO: <span className="font-mono text-slate-700" style={{ color: '#334155' }}>{member.registration_number || 'PENDING'}</span></span>
                             </div>
                         </div>
 
                         {/* Body Text */}
-                        <div className="max-w-[580px] text-center mb-20 px-4">
-                            <p className="text-base text-slate-500 leading-relaxed font-medium" style={{ color: '#64748b' }}>
-                                Has been duly registered as a member of the National Nurses Association of Kenya, having complied with the association's requirements and committed to the excellence of the nursing profession.
+                        <div className="max-w-[620px] text-center mb-16 px-4">
+                            <p className="text-lg text-slate-700 leading-loose" style={{ color: '#374151', lineHeight: '2' }}>
+                                Has been duly registered as a member of the <span className="font-bold text-[#016938]" style={{ color: '#016938' }}>National Nurses Association of Kenya</span>, having complied with the association's requirements and committed to the excellence of the nursing profession.
                             </p>
                         </div>
 
                         {/* Bottom Section */}
-                        <div className="w-full mt-auto px-16 flex justify-between items-end pb-4">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date of Issue:</span>
-                                    <span className="text-sm font-bold text-slate-700 font-mono" style={{ color: '#334155' }}>{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                        <div className="w-full mt-auto px-12 flex justify-between items-end pb-8">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date of Issue:</span>
+                                    <span className="text-base font-bold text-slate-800 font-serif" style={{ color: '#1f2937' }}>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Expiry Date:</span>
-                                    <span className="text-sm font-bold text-slate-700 font-mono" style={{ color: '#334155' }}>31st December 2026</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Valid Until:</span>
+                                    <span className="text-base font-bold text-slate-800 font-serif" style={{ color: '#1f2937' }}>31st December 2026</span>
                                 </div>
                             </div>
 
                             <div className="flex flex-col items-center">
                                 {branding.authorised_signature && (
-                                    <img src={branding.authorised_signature} alt="Sign" className="h-16 object-contain filter grayscale mb-1" crossOrigin="anonymous" />
-                                ) || <div className="h-16"></div>}
-                                <div className="w-48 h-px bg-[#016938]" style={{ backgroundColor: '#016938' }}></div>
-                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2" style={{ color: '#9ca3af' }}>Authorized Signature</span>
+                                    <img src={branding.authorised_signature} alt="Sign" className="h-20 object-contain mb-2" crossOrigin="anonymous" />
+                                ) || <div className="h-20"></div>}
+                                <div className="w-56 h-px bg-[#016938]" style={{ backgroundColor: '#016938' }}></div>
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2" style={{ color: '#6b7280' }}>Authorized Signature</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Verification Footer */}
-                    <div className="absolute bottom-10 left-0 w-full text-center">
-                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em]" style={{ color: '#9ca3af' }}>
-                            Verify this document's authenticity at members.nnak.or.ke
+                    <div className="absolute bottom-4 left-0 w-full text-center">
+                        <p className="text-[8px] font-bold text-gray-300 uppercase tracking-[0.2em]" style={{ color: '#d1d5db' }}>
+                            Verify Authenticity: https://members.nnak.or.ke/verify
                         </p>
                     </div>
+                </div>
+            </div>
+
+            {/* Hidden Printable Components for Export - Positioned to ensure rendering but invisible */}
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '1px',
+                height: '1px',
+                overflow: 'hidden',
+                opacity: 0,
+                pointerEvents: 'none',
+                zIndex: -100
+            }}>
+                <div style={{ backgroundColor: '#ffffff', width: '2000px' }}>
+                    <IDCardPrintable ref={printableIdCardRef} member={member} branding={branding} />
+                    <CertificatePrintable ref={printableCertificateRef} member={member} branding={branding} />
                 </div>
             </div>
         </div>
     );
 };
 
-const QuickStat = ({ label, value, icon: Icon, color }) => (
-    <div className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center justify-between shadow-sm hover:shadow-md transition-all group duration-300">
-        <div>
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
-            <p className="text-base font-black text-slate-900 mt-0.5 tracking-tight">{value}</p>
+const QuickStat = ({ label, value, icon: Icon, color }) => {
+    // Generate harmonious gradients based on the theme color
+    const getGradientClasses = (col) => {
+        if (col === '#10b981') return 'from-emerald-50 to-emerald-100/50 border-emerald-200/50';
+        if (col === '#3b82f6') return 'from-blue-50 to-blue-100/50 border-blue-200/50';
+        if (col === '#f59e0b') return 'from-amber-50 to-amber-100/50 border-amber-200/50';
+        return 'from-slate-50 to-slate-100/50 border-slate-200/50';
+    };
+
+    const getIconColorClasses = (col) => {
+        if (col === '#10b981') return 'text-emerald-600 bg-emerald-600/10';
+        if (col === '#3b82f6') return 'text-blue-600 bg-blue-600/10';
+        if (col === '#f59e0b') return 'text-amber-600 bg-amber-600/10';
+        return 'text-slate-600 bg-slate-600/10';
+    };
+
+    return (
+        <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClasses(color)} p-3.5 border transition-all duration-300 hover:shadow-md group`}>
+            {/* Decorative Background Element */}
+            <div className={`absolute top-0 right-0 w-16 h-16 rounded-full -mr-8 -mt-8 opacity-20`} style={{ backgroundColor: color }}></div>
+
+            <div className="relative z-10 flex flex-col justify-between h-full">
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${getIconColorClasses(color)}`}>
+                            <Icon size={14} strokeWidth={2.5} />
+                        </div>
+                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{label}</p>
+                    </div>
+                </div>
+                <div>
+                    <p className="text-lg font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {value}
+                    </p>
+                </div>
+            </div>
         </div>
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-lg" style={{ backgroundColor: color, boxShadow: `0 4px 12px ${color}20` }}>
-            <Icon size={16} />
-        </div>
-    </div>
-);
+    );
+};
 
 const InfoItem = ({ label, value }) => (
     <div className="group">
-        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-0.5 group-hover:text-emerald-500 transition-colors">{label}</p>
-        <p className="text-xs font-bold text-slate-700 tracking-tight">{value || 'Not provided'}</p>
+        <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5" style={{ fontFamily: 'Inter, sans-serif' }}>{label}</p>
+        <p className="text-sm font-semibold text-slate-900 leading-snug" style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '-0.01em' }}>
+            {value || <span className="text-gray-400 italic font-normal text-xs">Not provided</span>}
+        </p>
     </div>
 );
 

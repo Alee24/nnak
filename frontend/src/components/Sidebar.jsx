@@ -10,30 +10,42 @@ import {
   FileCheck,
   Wand2,
   Settings,
-  LogOut
+  LogOut,
+  Mail
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [pendingCount, setPendingCount] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
-    fetchPendingCount();
+    fetchCounts();
 
-    const handleUpdate = () => fetchPendingCount();
+    const handleUpdate = () => fetchCounts();
     window.addEventListener('membership-updated', handleUpdate);
-    return () => window.removeEventListener('membership-updated', handleUpdate);
+    // Add listener for message updates if needed
+    window.addEventListener('messages-updated', handleUpdate);
+
+    return () => {
+      window.removeEventListener('membership-updated', handleUpdate);
+      window.removeEventListener('messages-updated', handleUpdate);
+    };
   }, []);
 
-  const fetchPendingCount = async () => {
+  const fetchCounts = async () => {
     try {
-      const response = await AdminAPI.getPendingCount();
-      if (response.count !== undefined) {
-        setPendingCount(response.count);
-      }
+      const [pendingRes, messagesRes] = await Promise.all([
+        AdminAPI.getPendingCount(),
+        AdminAPI.getUnreadMessagesCount()
+      ]);
+
+      if (pendingRes.count !== undefined) setPendingCount(pendingRes.count);
+      if (messagesRes.success) setUnreadMessages(messagesRes.count);
+
     } catch (error) {
-      console.error("Failed to fetch pending count:", error);
+      console.error("Failed to fetch sidebar counts:", error);
     }
   };
 
@@ -67,6 +79,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/dashboard/cpd-points', icon: Award, label: 'CPD Points' },
     { to: '/dashboard/applications', icon: FileCheck, label: 'Applications', badge: pendingCount > 0 ? pendingCount.toString() : null },
     { to: '/dashboard/generate-ids', icon: Wand2, label: 'Generate IDs' },
+    { to: '/dashboard/messages', icon: Mail, label: 'Messages', badge: unreadMessages > 0 ? unreadMessages.toString() : null },
     { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
   ];
 

@@ -14,11 +14,22 @@ class MemberController {
     public function handleRequest($method, $parts) {
         $action = $parts[0] ?? '';
         
-        // Check authentication for all member operations
-        if (!$this->isAuthenticated()) {
+        // Check authentication for all member operations, EXCEPT public actions
+        if ($action !== 'verify' && !$this->isAuthenticated()) {
             $this->sendResponse(401, ['error' => 'Authentication required']);
         }
         
+        if ($action === 'verify') {
+             // Public verification endpoint: /api/member/verify/:id
+             if ($method === 'GET') {
+                 $id = $parts[1] ?? '';
+                 $this->verifyMember($id);
+             } else {
+                 $this->methodNotAllowed();
+             }
+             return;
+        }
+
         if ($action === 'search') {
             if ($method === 'GET') {
                 $this->searchMembers();
@@ -1163,6 +1174,53 @@ class MemberController {
         } catch (PDOException $e) {
             error_log("Get pending applications error: " . $e->getMessage());
             $this->sendResponse(500, ['error' => 'Failed to retrieve applications']);
+        }
+    }
+
+    /**
+     * Public Verification Endpoint
+     * Returns limited member data for public verification
+     */
+    private function verifyMember($id) {
+        if (empty($id)) {
+            $this->sendResponse(400, ['error' => 'Member ID is required']);
+        }
+
+        try {
+            // Allow lookup by internal ID, Member ID, or Registration Number
+            $stmt = $this->db->prepare("
+                SELECT member_id, first_name, last_name, status, 
+                       registration_number, expiry_date,
+                       'Member' as membership_type_name
+                FROM members 
+                WHERE (member_id = ? OR registration_number = ? OR id = ?)
+                  AND deleted_at IS NULL
+                LIMIT 1
+            ");
+            $stmt->execute([$id, $id, $id]);
+            $member = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$member) {
+                $this->sendResponse(404, ['error' => 'Member not found']);
+            }
+
+            // Return only public data
+            $this->sendResponse(200, [
+                'success' => true,
+                'member' => [
+                    'member_id' => $member['member_id'],
+                    'first_name' => $member['first_name'],
+                    'last_name' => $member['last_name'],
+                    'status' => $member['status'],
+                    'registration_number' => $member['registration_number'],
+                    'expiry_date' => $member['expiry_date'] ?? date('Y') . '-12-31', // Default to end of current year if null
+                    'membership_type' => 'Member'
+                ]
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Verify member error: " . $e->getMessage());
+            $this->sendResponse(500, ['error' => 'Verification failed']);
         }
     }
 

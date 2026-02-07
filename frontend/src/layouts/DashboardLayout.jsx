@@ -1,7 +1,11 @@
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { Menu, Search, Mail, Bell } from 'lucide-react';
+import {
+    LayoutDashboard, Users, CreditCard, Calendar, FileText,
+    Settings, LogOut, ChevronRight, Menu, X, Bell, Search, Mail
+} from 'lucide-react';
 
 const DashboardLayout = () => {
     const [user, setUser] = React.useState(null);
@@ -99,6 +103,10 @@ const DashboardLayout = () => {
                 {/* Main Content Area - Added internal scroll */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-4 lg:p-6">
                     <Outlet />
+                    {/* Footer */}
+                    <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center pb-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        Developed by <a href="https://www.kkdes.co.ke" target="_blank" rel="noopener noreferrer" className="ml-1 text-emerald-600 hover:text-emerald-700 transition">KKDES</a>
+                    </div>
                 </div>
             </main>
         </div>

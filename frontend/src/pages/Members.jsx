@@ -446,99 +446,100 @@ const Members = () => {
                 <div className="p-10">
                     {/* ID Card Template Container - Always present to keep Ref stable if needed */}
                     {bulkItem && (
-                        <div ref={idCardRef} className="w-[325px] h-[205px] bg-white rounded-[24px] border border-slate-100 flex flex-col relative overflow-hidden font-dm-sans shadow-none" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
-                            {/* Red Slanted Header */}
-                            <div className="absolute top-0 left-0 w-full h-[60px] flex" style={{ background: '#ffffff' }}>
-                                {/* Logo Area */}
-                                <div className="w-[75px] h-full flex items-center justify-center p-2 z-20">
-                                    {branding.system_logo ? (
-                                        <img src={branding.system_logo} alt="L" className="w-full h-full object-contain" crossOrigin="anonymous" />
-                                    ) : (
-                                        <div className="w-8 h-8 bg-[#ed1c24] rounded-full" style={{ backgroundColor: '#ed1c24' }}></div>
-                                    )}
-                                </div>
+                        <div ref={idCardRef} className="w-[480px] h-[280px] bg-white rounded-xl shadow-none border border-slate-100 overflow-hidden font-dm-sans flex flex-col relative" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
 
-                                {/* Slanted Red Banner */}
-                                <div className="flex-1 h-full bg-[#ed1c24] relative z-10" style={{ backgroundColor: '#ed1c24', clipPath: 'polygon(12% 0, 100% 0, 100% 100%, 0% 100%)', marginLeft: '-20px' }}>
-                                    <div className="absolute inset-0 flex flex-col justify-center pl-8 pr-4 text-white">
-                                        <h1 className="text-[10px] font-black leading-tight tracking-tight uppercase" style={{ color: '#ffffff' }}>
-                                            {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
-                                        </h1>
-                                        <p className="text-[6px] font-bold italic opacity-90 leading-tight" style={{ color: '#ffffff' }}>
-                                            "{branding.association_tagline || 'Voice of the Nursing Profession'}"
-                                        </p>
-                                        <p className="text-[5px] font-bold mt-1 tracking-widest opacity-80 uppercase leading-none" style={{ color: '#ffffff' }}>
-                                            MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
-                                        </p>
-                                        <div className="absolute bottom-1 right-2 text-[7px] font-black tracking-widest opacity-90 leading-none" style={{ color: '#ffffff' }}>
-                                            MEMBERSHIP CARD
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Card Body */}
-                            <div className="mt-[65px] px-4 flex justify-between items-start">
-                                {/* Left Side: Details */}
-                                <div className="flex-1 space-y-1 pt-1">
-                                    <div className="flex flex-col">
-                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>Name:</span>
-                                        <span className="text-[11px] font-black text-slate-900 uppercase leading-none" style={{ color: '#0f172a' }}>{bulkItem.first_name} {bulkItem.last_name}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>ID No.:</span>
-                                        <span className="text-[9px] font-bold text-slate-800 leading-none" style={{ color: '#1e293b' }}>{bulkItem.id_number || 'N/A'}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>Membership No.:</span>
-                                        <span className="text-[9px] font-bold text-slate-800 leading-none" style={{ color: '#1e293b' }}>{bulkItem.member_id || 'PENDING'}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#94a3b8' }}>Valid Till:</span>
-                                        <span className="text-[9px] font-bold text-slate-800 leading-none" style={{ color: '#1e293b' }}>December, 2027</span>
+                            {/* Header Section */}
+                            <div className="h-[85px] w-full relative">
+                                {/* Red Main Header */}
+                                <div className="absolute top-0 right-0 w-[82%] h-full bg-[#ff0000] flex flex-col justify-center px-6" style={{ backgroundColor: '#ff0000' }}>
+                                    <h1 className="text-[18px] font-bold text-white leading-tight uppercase tracking-tight" style={{ color: '#ffffff', fontFamily: 'Arial, sans-serif' }}>
+                                        NATIONAL NURSES ASSOCIATION OF KENYA
+                                    </h1>
+                                    <p className="text-[12px] text-white italic leading-tight my-0.5" style={{ color: '#ffffff' }}>
+                                        Voice of the Nursing Profession
+                                    </p>
+                                    <div className="w-full h-[1px] bg-white/50 my-1"></div>
+                                    <p className="text-[10px] text-white uppercase tracking-wider" style={{ color: '#ffffff' }}>
+                                        MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
+                                    </p>
+                                    <div className="absolute bottom-1 right-2 text-[10px] font-bold text-white uppercase tracking-widest" style={{ color: '#ffffff' }}>
+                                        MEMBERSHIP CARD
                                     </div>
                                 </div>
 
-                                {/* Right Side: Photo with Red Frame */}
-                                <div className="w-[85px] h-[105px] flex items-center justify-center p-1 bg-[#ed1c24] rounded-lg shadow-md -mt-4 z-20" style={{ backgroundColor: '#ed1c24' }}>
-                                    <div className="w-full h-full bg-white rounded flex flex-col overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
-                                        {bulkItem.profile_picture ? (
-                                            <img src={bulkItem.profile_picture} alt="P" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                {/* Logo Section with Slants */}
+                                <div className="absolute top-0 left-0 h-full w-[22%] bg-white z-10" style={{ clipPath: 'polygon(0 0, 100% 0, 75% 100%, 0% 100%)', backgroundColor: '#ffffff' }}>
+                                    <div className="w-full h-full flex items-center justify-center pr-4">
+                                        {branding.system_logo ? (
+                                            <img src={branding.system_logo} alt="NNAK" className="w-20 h-20 object-contain" crossOrigin="anonymous" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300" style={{ backgroundColor: '#f8fafc', color: '#cbd5e1' }}>
-                                                <LucideUser size={32} strokeWidth={1} />
-                                            </div>
+                                            <div className="w-16 h-16 bg-emerald-600 rounded-full"></div>
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Blue Accent Line */}
+                                <div className="absolute top-0 left-[18%] h-full w-[4px] bg-[#0055A4] z-0 transform -skew-x-[15deg] origin-bottom" style={{ backgroundColor: '#0055A4' }}></div>
                             </div>
 
-                            {/* Footer: QR and Signature */}
-                            <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                                <div className="flex items-center gap-2">
-                                    {/* QR Placeholder */}
-                                    <div className="w-8 h-8 bg-white border border-slate-100 p-0.5 rounded" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
-                                        <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-                                            <div className="grid grid-cols-2 gap-0.5">
-                                                <div className="w-1 h-1 bg-slate-800"></div>
-                                                <div className="w-1 h-1 bg-slate-800"></div>
-                                                <div className="w-1 h-1 bg-slate-800"></div>
-                                                <div className="w-1 h-1 bg-slate-400"></div>
-                                            </div>
+                            {/* Main Body Content */}
+                            <div className="flex-1 flex relative">
+                                {/* Left Content Column */}
+                                <div className="flex-1 pt-6 pl-8 pr-4 flex flex-col relative z-10">
+                                    {/* Member Details */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-baseline">
+                                            <span className="w-32 text-[13px] font-bold text-black" style={{ color: '#000000' }}>Name:</span>
+                                            <span className="text-[14px] font-medium text-black uppercase" style={{ color: '#000000' }}>{bulkItem.first_name} {bulkItem.last_name}</span>
+                                        </div>
+                                        <div className="flex items-baseline">
+                                            <span className="w-32 text-[13px] font-bold text-black" style={{ color: '#000000' }}>ID No.:</span>
+                                            <span className="text-[14px] font-medium text-black" style={{ color: '#000000' }}>{bulkItem.id_number || 'N/A'}</span>
+                                        </div>
+                                        <div className="flex items-baseline">
+                                            <span className="w-32 text-[13px] font-bold text-black" style={{ color: '#000000' }}>Membership No.:</span>
+                                            <span className="text-[14px] font-medium text-black" style={{ color: '#000000' }}>{bulkItem.member_id || 'PENDING'}</span>
+                                        </div>
+                                        <div className="flex items-baseline">
+                                            <span className="w-32 text-[13px] font-bold text-black" style={{ color: '#000000' }}>Valid Till:</span>
+                                            <span className="text-[14px] font-medium text-black" style={{ color: '#000000' }}>December, 2027</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col">
-                                        <div className="h-3.5 flex items-center overflow-hidden">
-                                            {branding.authorised_signature && (
-                                                <img src={branding.authorised_signature} alt="S" className="h-5 object-contain filter grayscale opacity-80" crossOrigin="anonymous" />
-                                            )}
+                                    {/* Footer Area with QR and Signature */}
+                                    <div className="mt-auto mb-4 flex items-end gap-3">
+                                        {/* QR Code */}
+                                        <div className="w-[50px] h-[50px] border border-red-500 p-0.5" style={{ borderColor: '#ef4444' }}>
+                                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`NNAK:${bulkItem.member_id}`)}`} alt="QR" className="w-full h-full object-contain" crossOrigin="anonymous" />
                                         </div>
-                                        <span className="text-[5px] font-black text-slate-400 uppercase tracking-widest leading-none mt-0.5" style={{ color: '#94a3b8' }}>Authorised Signature</span>
+
+                                        {/* Signature */}
+                                        <div className="flex flex-col mb-1 ml-2">
+                                            <div className="h-8 flex items-end overflow-hidden">
+                                                {branding.authorised_signature ? (
+                                                    <img src={branding.authorised_signature} alt="Sign" className="h-full object-contain" crossOrigin="anonymous" />
+                                                ) : (
+                                                    <div className="h-full w-20 flex items-end text-xs italic text-blue-600 font-script">Signature</div>
+                                                )}
+                                            </div>
+                                            <span className="text-[9px] text-black pt-1" style={{ color: '#000000' }}>Authorised Signature</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="text-[6px] font-black text-slate-400 uppercase tracking-[0.1em] opacity-50" style={{ color: '#94a3b8' }}>
-                                    NNA KENYA
+
+                                {/* Right Red Column for Photo */}
+                                <div className="w-[140px] h-full bg-[#ff0000] flex items-center justify-center p-4 relative z-0" style={{ backgroundColor: '#ff0000' }}>
+                                    <div className="w-full aspect-[3/4] bg-white p-2 shadow-sm" style={{ backgroundColor: '#ffffff' }}>
+                                        <div className="w-full h-full bg-slate-100 overflow-hidden" style={{ backgroundColor: '#f1f5f9' }}>
+                                            {bulkItem.profile_picture ? (
+                                                <img src={bulkItem.profile_picture} alt="Profile" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                    <LucideUser size={48} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

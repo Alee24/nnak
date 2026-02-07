@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "nnak-portal",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "axios": "^1.13.4",
+    "canvas-confetti": "^1.9.4",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",
     "lucide-react": "^0.563.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",

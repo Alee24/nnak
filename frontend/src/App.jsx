@@ -22,6 +22,12 @@ import SettingsPage from './pages/SettingsPage';
 import Events from './pages/Events';
 import CPDPoints from './pages/CPDPoints';
 import Applications from './pages/Applications';
+import BenefitsPage from './pages/BenefitsPage';
+import StatsPage from './pages/StatsPage';
+import ContactPage from './pages/ContactPage';
+import VerifyMemberPage from './pages/VerifyMemberPage';
+import MessagesPage from './pages/MessagesPage';
+import FAQ from './pages/FAQ';
 
 function App() {
   return (
@@ -29,6 +35,12 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/benefits" element={<BenefitsPage />} />
+        <Route path="/stats" element={<StatsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/verify" element={<VerifyMemberPage />} />
+        <Route path="/verify/:id" element={<VerifyMemberPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
@@ -44,6 +56,7 @@ function App() {
           <Route path="applications" element={<Applications />} />
           <Route path="generate-ids" element={<Placeholder title="Generate IDs" />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="messages" element={<MessagesPage />} />
         </Route>
 
         {/* Catch all redirect */}

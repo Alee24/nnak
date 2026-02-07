@@ -32,7 +32,8 @@ if ($uri === '/' || $uri === '') {
         'endpoints' => [
             'auth' => '/api/auth/*',
             'members' => '/api/member/*',
-            'events' => '/api/event/*'
+            'events' => '/api/event/*',
+            'contact' => '/api/contact/*' // Added contact endpoint
         ]
     ]);
     exit;

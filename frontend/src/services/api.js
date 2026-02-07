@@ -73,6 +73,16 @@ class AdminAPI {
         }
     }
 
+    static async verifyMember(id) {
+        try {
+            // Use the new public verify endpoint
+            const response = await api.get(`/member/verify/${id}`);
+            return response;
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
     static async getMemberCPD(id) { // Kept static
         try {
             const response = await api.get(`/member/${id}/cpd-points`); // Changed back to /member
@@ -151,6 +161,28 @@ class AdminAPI {
                 'Content-Type': 'multipart/form-data'
             }
         });
+    }
+
+    // Contact & Messages
+    static async submitContactMessage(data) {
+        return api.post('/contact/submit', data);
+    }
+
+    static async getMessages() {
+        return api.get('/contact/messages');
+    }
+
+    static async markMessageRead(id) {
+        return api.post(`/contact/read/${id}`);
+    }
+
+    static async getUnreadMessagesCount() {
+        try {
+            const response = await api.get('/contact/unread-count');
+            return response;
+        } catch (error) {
+            return { success: false, count: 0 };
+        }
     }
 
     static async inviteAllMembers(eventId) {
