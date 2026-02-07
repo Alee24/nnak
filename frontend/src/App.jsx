@@ -34,7 +34,7 @@ function App() {
 
         {/* Protected Dashboard Routes */}
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<ProjectDashboard />} />
           <Route path="members" element={<Members />} />
           <Route path="members/:id" element={<MemberProfile />} />
           <Route path="analytics" element={<Analytics />} />

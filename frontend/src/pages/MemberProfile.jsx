@@ -101,33 +101,23 @@ const MemberProfile = () => {
                 scrollX: 0,
                 scrollY: -window.scrollY,
                 onclone: (clonedDoc) => {
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        :root {
-                            --color-emerald-50: #ecfdf5 !important;
-                            --color-emerald-100: #d1fae5 !important;
-                            --color-emerald-500: #10b981 !important;
-                            --color-emerald-600: #059669 !important;
-                            --color-emerald-700: #047857 !important;
-                            --color-slate-900: #0f172a !important;
-                            --color-slate-800: #1e293b !important;
-                            --color-slate-400: #94a3b8 !important;
-                            --color-gray-50: #f9fafb !important;
-                            --color-gray-100: #f3f4f6 !important;
-                            --color-gray-400: #9ca3af !important;
-                        }
-                        * {
-                            oklch: none !important; /* Attempt to kill oklch parsing */
-                        }
-                    `;
-                    clonedDoc.head.appendChild(style);
+                    // Pre-process stylesheets to neutralize oklch for html2canvas parser
+                    const styles = clonedDoc.getElementsByTagName('style');
+                    for (let i = 0; i < styles.length; i++) {
+                        styles[i].innerHTML = styles[i].innerHTML.replace(/oklch\([^)]+\)/g, '#ffffff');
+                    }
 
-                    // Force computed styles for all elements to avoid oklch
+                    // Force all elements in the cloned document to use standard colors
                     const elements = clonedDoc.getElementsByTagName('*');
                     for (const el of elements) {
-                        const computed = window.getComputedStyle(el);
-                        if (computed.backgroundColor.includes('oklch')) el.style.backgroundColor = '#ffffff';
-                        if (computed.color.includes('oklch')) el.style.color = '#333333';
+                        // Kill any oklch variables or properties
+                        el.style.setProperty('--color-emerald-500', '#10b981');
+                        el.style.setProperty('--color-slate-900', '#0f172a');
+
+                        // If it's the main container, ensure background is set
+                        if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
+                        if (el.classList.contains('text-slate-900')) el.style.color = '#0f172a';
+                        if (el.classList.contains('bg-[#E11D48]')) el.style.backgroundColor = '#E11D48';
                     }
                 }
             });
@@ -175,23 +165,16 @@ const MemberProfile = () => {
                 scrollX: 0,
                 scrollY: -window.scrollY,
                 onclone: (clonedDoc) => {
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        :root {
-                            --color-emerald-50: #ecfdf5 !important;
-                            --color-emerald-100: #d1fae5 !important;
-                            --color-emerald-500: #10b981 !important;
-                            --color-emerald-600: #059669 !important;
-                            --color-emerald-700: #047857 !important;
-                            --color-slate-900: #0f172a !important;
-                            --color-slate-800: #1e293b !important;
-                            --color-slate-400: #94a3b8 !important;
-                            --color-gray-50: #f9fafb !important;
-                            --color-gray-100: #f3f4f6 !important;
-                            --color-gray-400: #9ca3af !important;
-                        }
-                    `;
-                    clonedDoc.head.appendChild(style);
+                    const styles = clonedDoc.getElementsByTagName('style');
+                    for (let i = 0; i < styles.length; i++) {
+                        styles[i].innerHTML = styles[i].innerHTML.replace(/oklch\([^)]+\)/g, '#ffffff');
+                    }
+                    const elements = clonedDoc.getElementsByTagName('*');
+                    for (const el of elements) {
+                        el.style.setProperty('--color-emerald-500', '#10b981');
+                        el.style.setProperty('--color-slate-900', '#0f172a');
+                        if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
+                    }
                 }
             });
 
@@ -241,55 +224,55 @@ const MemberProfile = () => {
 
                 {/* Digital ID Card Preview */}
                 <div className="relative group perspective-1000 flex-shrink-0">
-                    <div ref={idCardRef} className="relative bg-white rounded-[2rem] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
+                    <div ref={idCardRef} className="relative bg-white rounded-[2rem] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden" style={{ backgroundColor: '#ffffff', borderColor: '#f3f4f6' }}>
                         {/* Red Top Accent */}
-                        <div className="absolute top-0 left-0 w-full h-20 bg-[#E11D48] flex items-center px-5">
+                        <div className="absolute top-0 left-0 w-full h-20 bg-[#E11D48] flex items-center px-5" style={{ backgroundColor: '#E11D48' }}>
                             <div className="flex items-center gap-2.5">
-                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-md">
+                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-md" style={{ backgroundColor: '#ffffff' }}>
                                     {branding.system_logo ? (
                                         <img src={branding.system_logo} alt="NNAK" className="w-full h-full object-contain" crossOrigin="anonymous" />
                                     ) : (
-                                        <div className="w-full h-full bg-emerald-600 rounded-full"></div>
+                                        <div className="w-full h-full bg-emerald-600 rounded-full" style={{ backgroundColor: '#059669' }}></div>
                                     )}
                                 </div>
-                                <div>
-                                    <div className="text-[8px] font-black text-white/80 uppercase tracking-[0.2em] leading-none">Membership</div>
-                                    <div className="text-xs font-black text-white uppercase tracking-tighter">NNA KENYA</div>
+                                <div style={{ color: '#ffffff' }}>
+                                    <div className="text-[8px] font-black text-white/80 uppercase tracking-[0.2em] leading-none" style={{ color: 'rgba(255,255,255,0.8)' }}>Membership</div>
+                                    <div className="text-xs font-black text-white uppercase tracking-tighter" style={{ color: '#ffffff' }}>NNA KENYA</div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-16 flex gap-4 relative z-10 pt-3">
                             {/* Photo Slot */}
-                            <div className="w-28 h-36 bg-gray-50 rounded-xl border-4 border-white shadow-lg overflow-hidden flex-shrink-0 bg-noise">
+                            <div className="w-28 h-36 bg-gray-50 rounded-xl border-4 border-white shadow-lg overflow-hidden flex-shrink-0 bg-noise" style={{ backgroundColor: '#f9fafb', borderColor: '#ffffff' }}>
                                 {member.profile_picture ? (
                                     <img src={member.profile_picture} alt="Profile" className="w-full h-full object-cover" crossOrigin="anonymous" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-600">
+                                    <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-600" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
                                         <LucideUser size={40} strokeWidth={1} />
                                     </div>
                                 )}
                             </div>
 
                             <div className="flex-1 flex flex-col justify-end pb-1 overflow-hidden">
-                                <h2 className="text-lg font-black text-slate-900 leading-none tracking-tighter uppercase truncate mb-1.5">{member.first_name} {member.last_name}</h2>
-                                <div className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-100 text-[9px] font-black text-emerald-700 uppercase tracking-widest w-fit">
+                                <h2 className="text-lg font-black text-slate-900 leading-none tracking-tighter uppercase truncate mb-1.5" style={{ color: '#0f172a' }}>{member.first_name} {member.last_name}</h2>
+                                <div className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-100 text-[9px] font-black text-emerald-700 uppercase tracking-widest w-fit" style={{ backgroundColor: '#ecfdf5', color: '#047857', borderColor: '#d1fae5' }}>
                                     {member.occupation || 'Nurse'}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-4 space-y-3 pt-3 border-t border-gray-100 relative z-10">
+                        <div className="mt-4 space-y-3 pt-3 border-t border-gray-100 relative z-10" style={{ borderTopColor: '#f3f4f6' }}>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">License No</div>
-                                    <div className="text-[11px] font-mono font-black text-slate-800 tracking-tighter px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1" style={{ color: '#9ca3af' }}>License No</div>
+                                    <div className="text-[11px] font-mono font-black text-slate-800 tracking-tighter px-2 py-1 bg-gray-50 rounded-lg border border-gray-100" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f3f4f6' }}>
                                         {member.registration_number || 'PENDING'}
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Member ID</div>
-                                    <div className="text-[11px] font-mono font-black text-slate-800 tracking-tighter px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1" style={{ color: '#9ca3af' }}>Member ID</div>
+                                    <div className="text-[11px] font-mono font-black text-slate-800 tracking-tighter px-2 py-1 bg-gray-50 rounded-lg border border-gray-100" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f3f4f6' }}>
                                         {member.member_id || 'PENDING'}
                                     </div>
                                 </div>
@@ -301,7 +284,7 @@ const MemberProfile = () => {
                                         <img src={branding.authorised_signature} alt="Sign" className="w-full h-full object-contain filter grayscale opacity-70" crossOrigin="anonymous" />
                                     )}
                                 </div>
-                                <div className="text-[9px] font-black text-slate-900 uppercase">Valid 2026/27</div>
+                                <div className="text-[9px] font-black text-slate-900 uppercase" style={{ color: '#0f172a' }}>Valid 2026/27</div>
                             </div>
                         </div>
                     </div>
@@ -527,33 +510,33 @@ const MemberProfile = () => {
             {/* Hidden Templates for PDF Generation */}
             <div className="fixed top-0 left-0 -z-50 pointer-events-none overflow-hidden opacity-0" style={{ width: '1200px' }}>
                 {/* Certificate (Permit) Template - A4 Portrait */}
-                <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-dm-sans border-[20px] border-[#E11D48]">
-                    <div className="absolute inset-4 border-2 border-slate-200"></div>
+                <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-dm-sans border-[20px] border-[#E11D48]" style={{ backgroundColor: '#ffffff', borderColor: '#E11D48' }}>
+                    <div className="absolute inset-4 border-2 border-slate-200" style={{ borderColor: '#e2e8f0' }}></div>
                     <div className="relative z-10 flex flex-col items-center text-center mt-8">
                         {branding.system_logo && <img src={branding.system_logo} alt="Logo" className="w-32 h-32 object-contain mb-6" crossOrigin="anonymous" />}
-                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2">{branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}</h1>
-                        <p className="text-xl font-bold text-[#E11D48] uppercase tracking-widest mb-12">{branding.association_tagline || 'Promoting Professional Excellence'}</p>
+                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2" style={{ color: '#0f172a' }}>{branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}</h1>
+                        <p className="text-xl font-bold text-[#E11D48] uppercase tracking-widest mb-12" style={{ color: '#E11D48' }}>{branding.association_tagline || 'Promoting Professional Excellence'}</p>
                     </div>
                     <div className="relative z-10 flex-1 flex flex-col items-center text-center px-12 pt-12">
-                        <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-16"></div>
-                        <h2 className="text-2xl font-bold text-slate-400 uppercase tracking-[0.3em] mb-4">Membership Certificate</h2>
-                        <h3 className="text-5xl font-black text-slate-900 uppercase tracking-tighter mb-12">PRACTISING CERTIFICATE</h3>
-                        <p className="text-xl text-slate-600 mb-8 italic">This is to certify that</p>
-                        <h4 className="text-6xl font-black text-[#E11D48] uppercase tracking-tighter mb-8 bg-noise py-4 px-8 rounded-3xl">{member.first_name} {member.last_name}</h4>
-                        <p className="text-xl text-slate-600 max-w-2xl leading-relaxed mb-16">Is a duly registered member of the National Nurses Association of Kenya, holding registration number <span className="font-black text-slate-900">{member.registration_number}</span> and is authorized to practice as a <span className="font-black text-slate-900">{member.occupation || 'Professional Nurse'}</span>.</p>
+                        <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-16" style={{ background: 'linear-gradient(to right, transparent, #e2e8f0, transparent)' }}></div>
+                        <h2 className="text-2xl font-bold text-slate-400 uppercase tracking-[0.3em] mb-4" style={{ color: '#94a3b8' }}>Membership Certificate</h2>
+                        <h3 className="text-5xl font-black text-slate-900 uppercase tracking-tighter mb-12" style={{ color: '#0f172a' }}>PRACTISING CERTIFICATE</h3>
+                        <p className="text-xl text-slate-600 mb-8 italic" style={{ color: '#475569' }}>This is to certify that</p>
+                        <h4 className="text-6xl font-black text-[#E11D48] uppercase tracking-tighter mb-8 bg-noise py-4 px-8 rounded-3xl" style={{ color: '#E11D48' }}>{member.first_name} {member.last_name}</h4>
+                        <p className="text-xl text-slate-600 max-w-2xl leading-relaxed mb-16" style={{ color: '#475569' }}>Is a duly registered member of the National Nurses Association of Kenya, holding registration number <span className="font-black text-slate-900" style={{ color: '#0f172a' }}>{member.registration_number}</span> and is authorized to practice as a <span className="font-black text-slate-900" style={{ color: '#0f172a' }}>{member.occupation || 'Professional Nurse'}</span>.</p>
                         <div className="grid grid-cols-2 gap-24 w-full mt-auto mb-20 text-left px-12">
                             <div className="space-y-4">
-                                <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Member ID</p><p className="text-xl font-mono font-black text-slate-900">{member.member_id}</p></div>
-                                <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Date Issued</p><p className="text-xl font-mono font-black text-slate-900">{new Date().toLocaleDateString()}</p></div>
+                                <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Member ID</p><p className="text-xl font-mono font-black text-slate-900" style={{ color: '#0f172a' }}>{member.member_id}</p></div>
+                                <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date Issued</p><p className="text-xl font-mono font-black text-slate-900" style={{ color: '#0f172a' }}>{new Date().toLocaleDateString()}</p></div>
                             </div>
                             <div className="flex flex-col items-center justify-end">
                                 {branding.authorised_signature && <img src={branding.authorised_signature} alt="Signature" className="w-48 h-20 object-contain filter grayscale mb-2" crossOrigin="anonymous" />}
-                                <div className="w-full h-px bg-slate-900"></div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Authorized Signature</p>
+                                <div className="w-full h-px bg-slate-900" style={{ backgroundColor: '#0f172a' }}></div>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2" style={{ color: '#9ca3af' }}>Authorized Signature</p>
                             </div>
                         </div>
                     </div>
-                    <div className="relative z-10 border-t border-slate-100 pt-8 text-center"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">This document is valid until 31st December 2026. Verify at members.nnak.or.ke</p></div>
+                    <div className="relative z-10 border-t border-slate-100 pt-8 text-center" style={{ borderTopColor: '#f1f5f9' }}><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>This document is valid until 31st December 2026. Verify at members.nnak.or.ke</p></div>
                 </div>
             </div>
         </div>

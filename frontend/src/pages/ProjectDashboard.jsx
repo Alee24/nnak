@@ -41,247 +41,262 @@ const ProjectDashboard = () => {
         }
     };
 
-    const formatTime = (date) => {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    };
-
-    const metrics = stats ? [
-        { label: 'Total Members', value: stats.summary.total, trend: '', isUp: true },
-        { label: 'Active Members', value: stats.summary.active, trend: '', isUp: true },
-        { label: 'Pending Apps', value: stats.summary.pending, trend: '', isUp: false },
-        { label: 'Total CPD', value: stats.total_cpd, trend: '', isUp: true },
-    ] : [
-        { label: 'Total Members', value: '...', trend: '', isUp: true },
-        { label: 'Active Members', value: '...', trend: '', isUp: true },
-        { label: 'Pending Apps', value: '...', trend: '', isUp: false },
-        { label: 'Total CPD', value: '...', trend: '', isUp: true },
+    const metrics = [
+        {
+            label: 'TOTAL MEMBERS',
+            value: stats?.summary?.total || '0',
+            icon: Users,
+            color: 'blue',
+            trend: '+12%',
+            isUp: true
+        },
+        {
+            label: 'ACTIVE',
+            value: stats?.summary?.active || '0',
+            icon: UserCheck,
+            color: 'emerald',
+            trend: '+5%',
+            isUp: true
+        },
+        {
+            label: 'PENDING',
+            value: stats?.summary?.pending || '0',
+            icon: Clock,
+            color: 'orange',
+            hasBadge: true,
+            badgeText: 'ACTION'
+        },
+        {
+            label: 'SUSPENDED',
+            value: stats?.summary?.suspended || '0',
+            icon: UserX,
+            color: 'red',
+            trend: '2%',
+            isUp: false,
+            trendIcon: 'check'
+        },
     ];
 
-    const activeProjectHeaders = {
-        title: "Recent Applications",
-        plusAction: () => window.location.href = '/dashboard/applications'
-    };
+    const distribution = stats?.summary ? [
+        { label: 'Active', value: parseInt(stats.summary.active), color: '#10b981' },
+        { label: 'Pending', value: parseInt(stats.summary.pending), color: '#f59e0b' },
+        { label: 'Suspended', value: parseInt(stats.summary.suspended), color: '#ef4444' },
+        { label: 'Inactive', value: parseInt(stats.summary.inactive || 0), color: '#94a3b8' },
+    ] : [];
 
-    const recentApplications = stats?.recent_applications || [];
-
-    const analyticsData = stats?.analytics || [
-        { label: 'M', count: 0 },
-        { label: 'T', count: 0 },
-        { label: 'W', count: 0 },
-        { label: 'T', count: 0 },
-        { label: 'F', count: 0 },
-        { label: 'S', count: 0 },
-        { label: 'S', count: 0 },
-    ];
-
-    const maxAnalytics = Math.max(...analyticsData.map(d => d.count), 1);
+    const totalForDistribution = distribution.reduce((acc, curr) => acc + curr.value, 0) || 1;
 
     return (
-        <div className="space-y-8 pb-10">
-            {/* Top Row: Metric Cards */}
+        <div className="space-y-6 pb-10">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight">NNAK Dashboard</h1>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Professional Portal</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
+                        <ArrowDownRight size={14} className="rotate-180" />
+                        Report
+                    </button>
+                    <button
+                        onClick={() => window.location.href = '/dashboard/members?action=add'}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-2xl hover:bg-slate-900 transition-all shadow-lg shadow-slate-200"
+                    >
+                        <Plus size={16} />
+                        Member
+                    </button>
+                </div>
+            </div>
+
+            {/* Overview Label */}
+            <div className="flex flex-col -mb-2">
+                <h2 className="text-lg font-black text-slate-800">Overview</h2>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Real-time Statistics</p>
+            </div>
+
+            {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {metrics.map((metric, index) => (
-                    <div key={index} className="donezo-card p-6 flex flex-col justify-between">
-                        <div className="flex justify-between items-start mb-4">
-                            <span className="text-gray-500 text-sm font-medium">{metric.label}</span>
-                            <div className={`flex items-center gap-1 text-xs font-bold ${metric.isUp ? 'text-emerald-600' : 'text-red-500'}`}>
-                                {metric.trend}
-                                {metric.isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                    <div key={index} className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className={`p-3 rounded-2xl bg-${metric.color}-50 text-${metric.color}-600`}>
+                                <metric.icon size={20} />
                             </div>
+                            {metric.trend && (
+                                <div className={`flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg ${metric.isUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                                    {metric.trend}
+                                    {metric.isUp ? <ArrowUpRight size={12} /> : (metric.trendIcon === 'check' ? <CheckCircle2 size={12} /> : <ArrowDownRight size={12} />)}
+                                </div>
+                            )}
+                            {metric.hasBadge && (
+                                <div className="text-[10px] font-black px-2 py-1 rounded-lg bg-orange-50 text-orange-600 uppercase tracking-tighter">
+                                    {metric.badgeText}
+                                </div>
+                            )}
                         </div>
-                        <h3 className="text-3xl font-bold text-gray-900">{metric.value}</h3>
+                        <div>
+                            <h3 className="text-3xl font-black text-slate-800 mb-1">{metric.value}</h3>
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{metric.label}</span>
+                        </div>
                     </div>
                 ))}
             </div>
 
-            {/* Middle Row: Analytics & Reminders & Active Projects */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Project Analytics (Rounded Bar Chart) */}
-                <div className="lg:col-span-6 donezo-card p-8">
-                    <div className="flex justify-between items-center mb-8">
-                        <h3 className="font-bold text-xl text-gray-900">Member Registrations</h3>
-                        <div className="text-xs font-bold text-gray-400">Last 7 Days</div>
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4">
+                {/* Distribution Chart Card */}
+                <div className="lg:col-span-8 bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 relative group">
+                    <div className="flex items-center gap-2 mb-10">
+                        <div className="text-emerald-500">
+                            <ArrowUpRight size={20} className="rotate-45" />
+                        </div>
+                        <h3 className="font-black text-slate-800 text-lg">Distribution</h3>
+                        <div className="ml-auto flex items-center gap-2 bg-slate-50 p-1 rounded-xl">
+                            <button className="px-4 py-1.5 text-[10px] font-black bg-white shadow-sm rounded-lg text-slate-800 uppercase tracking-widest">Now</button>
+                            <button className="px-4 py-1.5 text-[10px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">History</button>
+                        </div>
                     </div>
-                    <div className="flex items-end justify-between h-48 gap-2">
-                        {analyticsData.map((val, i) => (
-                            <div key={i} className="flex-1 flex flex-col items-center gap-3">
-                                <div
-                                    className="w-full bg-emerald-600/10 rounded-full relative group cursor-pointer overflow-hidden transition-all hover:bg-emerald-600/20"
-                                    style={{ height: '100%' }}
-                                >
+
+                    <div className="flex flex-col md:flex-row items-center gap-12">
+                        {/* Donut Chart */}
+                        <div className="relative w-64 h-64 flex items-center justify-center">
+                            <svg className="w-full h-full transform -rotate-90">
+                                {distribution.map((item, i) => {
+                                    const percentage = (item.value / totalForDistribution) * 100;
+                                    const strokeDasharray = 440;
+                                    const strokeDashoffset = strokeDasharray * (1 - percentage / 100);
+
+                                    // Calculate rotation based on previous items
+                                    const precedingPercentage = distribution.slice(0, i).reduce((acc, curr) => acc + (curr.value / totalForDistribution) * 100, 0);
+                                    const rotation = (precedingPercentage / 100) * 360;
+
+                                    return (
+                                        <circle
+                                            key={i}
+                                            cx="128"
+                                            cy="128"
+                                            r="70"
+                                            fill="transparent"
+                                            stroke={item.color}
+                                            strokeWidth="32"
+                                            strokeDasharray={strokeDasharray}
+                                            strokeDashoffset={strokeDashoffset}
+                                            strokeLinecap="round"
+                                            style={{
+                                                transformOrigin: 'center',
+                                                transform: `rotate(${rotation}deg)`,
+                                                transition: 'all 1s ease-out'
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </svg>
+                            <div className="absolute flex flex-col items-center">
+                                <span className="text-4xl font-black text-slate-800 tracking-tighter">{stats?.summary?.total || '0'}</span>
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total</span>
+                            </div>
+                        </div>
+
+                        {/* Legend */}
+                        <div className="flex-1 grid grid-cols-2 gap-x-8 gap-y-6 w-full md:w-auto">
+                            {distribution.map((item, i) => (
+                                <div key={i} className="flex items-center gap-3">
+                                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-black text-slate-800">{item.label}</span>
+                                        <span className="text-[10px] font-bold text-slate-400">{Math.round((item.value / totalForDistribution) * 100)}%</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Bottom Stats Row */}
+                    <div className="grid grid-cols-2 gap-6 mt-12 pt-10 border-t border-slate-50">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Growth</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-black text-emerald-600">12.5%</span>
+                                <ArrowUpRight size={14} className="text-emerald-500" />
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Retention</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-black text-blue-600">94%</span>
+                                <ArrowUpRight size={14} className="text-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Recent Members & CPD Status */}
+                <div className="lg:col-span-4 flex flex-col gap-6">
+                    {/* Recent Members Panel */}
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex-1">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="font-black text-slate-800 tracking-tight">Recent Members</h3>
+                            <button
+                                onClick={() => window.location.href = '/dashboard/members'}
+                                className="text-[10px] font-black text-emerald-500 uppercase tracking-widest hover:text-emerald-600 transition-colors"
+                            >
+                                All
+                            </button>
+                        </div>
+                        <div className="space-y-6">
+                            {(stats?.recent_members || []).map((member, i) => (
+                                <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                                    <div className="w-11 h-11 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 font-bold text-xs uppercase group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-all">
+                                        {member.first_name[0]}{member.last_name[0]}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-sm font-black text-slate-800 truncate leading-tight mb-0.5">{member.first_name} {member.last_name}</h4>
+                                        <p className="text-[10px] text-slate-400 font-bold">{new Date(member.created_at).toLocaleDateString()} ago</p>
+                                    </div>
+                                    <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
+                                            member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
+                                                'bg-red-50 text-red-600'
+                                        }`}>
+                                        {member.status}
+                                    </span>
+                                </div>
+                            ))}
+                            {(!stats?.recent_members || stats.recent_members.length === 0) && (
+                                <div className="py-10 text-center text-slate-300 font-bold text-sm tracking-widest uppercase">
+                                    No New Members
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* CPD Status Widget */}
+                    <div className="bg-slate-900 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-6 opacity-30 text-emerald-400">
+                            <Plus size={24} className="rotate-45" />
+                        </div>
+                        <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div>
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">CPD Status</div>
+                                    <Award size={14} className="text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black text-white mb-6">Compliance</h3>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-end">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Health</span>
+                                    <span className="text-lg font-black text-white">{stats?.cpd?.compliance_ratio || 0}%</span>
+                                </div>
+                                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
                                     <div
-                                        className="absolute bottom-0 w-full bg-emerald-600 rounded-full transition-all duration-700 ease-out"
-                                        style={{ height: `${(val.count / maxAnalytics) * 100}%` }}
+                                        className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out"
+                                        style={{ width: `${stats?.cpd?.compliance_ratio || 0}%` }}
                                     ></div>
                                 </div>
-                                <span className="text-[10px] font-bold text-gray-400">{val.label}</span>
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Reminders */}
-                <div className="lg:col-span-3 flex flex-col gap-6">
-                    <div className="donezo-card p-6 flex-1 flex flex-col justify-between overflow-hidden relative group">
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors"></div>
-                        <div>
-                            <h3 className="font-bold text-xl text-gray-900 mb-2">Reminders</h3>
-                            <p className="text-gray-400 text-sm leading-relaxed">System Update meeting is scheduled for 2:00 PM today.</p>
                         </div>
-                        <button className="flex items-center justify-center gap-2 w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/20 group/btn">
-                            <Play size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
-                            Start Meeting
-                        </button>
-                    </div>
-                </div>
-
-                {/* Recent Applications */}
-                <div className="lg:col-span-3 donezo-card p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-bold text-lg text-gray-900">Recent Apps</h3>
-                        <button
-                            onClick={() => window.location.href = '/dashboard/applications'}
-                            className="text-emerald-600 p-1 hover:bg-emerald-50/50 rounded-lg transition-colors"
-                        >
-                            <Plus size={20} />
-                        </button>
-                    </div>
-                    <div className="space-y-5">
-                        {recentApplications.length === 0 ? (
-                            <p className="text-gray-400 text-sm text-center py-10">No pending apps</p>
-                        ) : recentApplications.map((app, i) => (
-                            <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-xl group-hover:scale-105 transition-transform">
-                                    👤
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="text-sm font-bold text-gray-900 leading-tight">{app.first_name} {app.last_name}</h4>
-                                    <p className="text-[11px] text-gray-400 font-medium">{new Date(app.created_at).toLocaleDateString()}</p>
-                                </div>
-                                <MoreVertical size={16} className="text-gray-300" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom Row: Team Collaboration, Project Progress, Time Tracker */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Recent Activity Table */}
-                <div className="lg:col-span-6 donezo-card p-8">
-                    <h3 className="font-bold text-xl text-gray-900 mb-8">Recent Activity</h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="text-left border-b border-gray-50">
-                                    <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Member</th>
-                                    <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Role</th>
-                                    <th className="pb-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                                    <th className="pb-4 text-right"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {(stats?.recent_activity || []).map((member, i) => (
-                                    <tr key={i} className="group">
-                                        <td className="py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold">
-                                                    {member.first_name[0]}{member.last_name[0]}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-gray-900">{member.first_name} {member.last_name}</span>
-                                                    <span className="text-[10px] text-gray-400 font-medium">#{member.member_id}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="py-4">
-                                            <span className="text-sm text-gray-500 font-medium capitalize">{member.role}</span>
-                                        </td>
-                                        <td className="py-4">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
-                                                member.status === 'pending' ? 'bg-orange-50 text-orange-600' :
-                                                    'bg-red-50 text-red-600'
-                                                }`}>
-                                                {member.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 text-right">
-                                            <button
-                                                onClick={() => window.location.href = `/dashboard/members/${member.id}/profile`}
-                                                className="text-gray-300 hover:text-gray-600 transition-colors"
-                                            >
-                                                <MoreHorizontal size={20} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(!stats || stats.recent_activity.length === 0) && (
-                                    <tr>
-                                        <td colSpan="4" className="py-10 text-center text-gray-400 text-sm">No recent activity</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {/* Project Progress (Donut Chart) */}
-                <div className="lg:col-span-3 donezo-card p-8 flex flex-col items-center justify-center text-center">
-                    <h3 className="font-bold text-xl text-gray-900 mb-8">Member Health</h3>
-                    <div className="relative w-40 h-40 flex items-center justify-center mb-6">
-                        {/* Simple SVG Donut */}
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle
-                                cx="80"
-                                cy="80"
-                                r="70"
-                                fill="transparent"
-                                stroke="#f3f4f6"
-                                strokeWidth="12"
-                            />
-                            <circle
-                                cx="80"
-                                cy="80"
-                                r="70"
-                                fill="transparent"
-                                stroke="#047857"
-                                strokeWidth="12"
-                                strokeDasharray={440}
-                                strokeDashoffset={440 * (1 - (stats && stats.summary.total > 0 ? stats.summary.active / stats.summary.total : 0))}
-                                strokeLinecap="round"
-                                className="transition-all duration-1000 ease-out"
-                            />
-                        </svg>
-                        <div className="absolute flex flex-col items-center">
-                            <span className="text-4xl font-black text-gray-900">{stats && stats.summary.total > 0 ? Math.round((stats.summary.active / stats.summary.total) * 100) : '0'}%</span>
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active</span>
-                        </div>
-                    </div>
-                    <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-[180px]">
-                        Percentage of members currently in active status.
-                    </p>
-                </div>
-
-                {/* Time Tracker Widget */}
-                <div className="lg:col-span-3 flex flex-col gap-6">
-                    <div className="bg-emerald-950 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden group">
-                        {/* Background pattern */}
-                        <div className="absolute inset-0 opacity-10 pointer-events-none">
-                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_#fff_1px,_transparent_1px)] bg-[length:24px_24px]"></div>
-                        </div>
-
-                        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-emerald-400 mb-8 backdrop-blur-md">
-                            <Clock size={24} />
-                        </div>
-
-                        <h3 className="text-white/60 text-xs font-bold uppercase tracking-[0.2em] mb-4">Current Progress</h3>
-                        <div className="text-4xl font-black text-white font-mono tracking-wider mb-8 tabular-nums">
-                            {formatTime(currentTime)}
-                        </div>
-
-                        <button className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-2xl transition-all shadow-xl shadow-black/20 group-hover:-translate-y-1">
-                            Stop Tracking
-                        </button>
                     </div>
                 </div>
             </div>

@@ -152,23 +152,15 @@ const Members = () => {
                     scrollX: 0,
                     scrollY: -window.scrollY,
                     onclone: (clonedDoc) => {
-                        const style = clonedDoc.createElement('style');
-                        style.innerHTML = `
-                            :root {
-                                --color-emerald-50: #ecfdf5 !important;
-                                --color-emerald-500: #10b981 !important;
-                                --color-slate-900: #0f172a !important;
-                                --color-gray-50: #f9fafb !important;
-                                --color-gray-100: #f3f4f6 !important;
-                                --color-gray-400: #9ca3af !important;
-                            }
-                        `;
-                        clonedDoc.head.appendChild(style);
+                        const styles = clonedDoc.getElementsByTagName('style');
+                        for (let i = 0; i < styles.length; i++) {
+                            styles[i].innerHTML = styles[i].innerHTML.replace(/oklch\([^)]+\)/g, '#ffffff');
+                        }
                         const elements = clonedDoc.getElementsByTagName('*');
                         for (const el of elements) {
-                            const comp = window.getComputedStyle(el);
-                            if (comp.backgroundColor.includes('oklch')) el.style.backgroundColor = '#ffffff';
-                            if (comp.color.includes('oklch')) el.style.color = '#333333';
+                            if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
+                            if (el.classList.contains('text-slate-900')) el.style.color = '#0f172a';
+                            if (el.classList.contains('bg-[#E11D48]')) el.style.backgroundColor = '#E11D48';
                         }
                     }
                 });
@@ -240,23 +232,13 @@ const Members = () => {
                     scrollX: 0,
                     scrollY: -window.scrollY,
                     onclone: (clonedDoc) => {
-                        const style = clonedDoc.createElement('style');
-                        style.innerHTML = `
-                            :root {
-                                --color-emerald-50: #ecfdf5 !important;
-                                --color-emerald-500: #10b981 !important;
-                                --color-slate-900: #0f172a !important;
-                                --color-slate-400: #94a3b8 !important;
-                                --color-gray-50: #f9fafb !important;
-                                --color-gray-100: #f3f4f6 !important;
-                            }
-                        `;
-                        clonedDoc.head.appendChild(style);
+                        const styles = clonedDoc.getElementsByTagName('style');
+                        for (let i = 0; i < styles.length; i++) {
+                            styles[i].innerHTML = styles[i].innerHTML.replace(/oklch\([^)]+\)/g, '#ffffff');
+                        }
                         const elements = clonedDoc.getElementsByTagName('*');
                         for (const el of elements) {
-                            const comp = window.getComputedStyle(el);
-                            if (comp.backgroundColor.includes('oklch')) el.style.backgroundColor = '#ffffff';
-                            if (comp.color.includes('oklch')) el.style.color = '#B91C1C';
+                            if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
                         }
                     }
                 });
@@ -458,40 +440,40 @@ const Members = () => {
                 <div className="p-10">
                     {/* ID Card Template Container - Always present to keep Ref stable if needed */}
                     {bulkItem && (
-                        <div ref={idCardRef} className="w-[325px] h-[205px] bg-white rounded-[32px] border border-gray-100 flex flex-col relative overflow-hidden font-dm-sans shadow-none">
+                        <div ref={idCardRef} className="w-[325px] h-[205px] bg-white rounded-[32px] border border-gray-100 flex flex-col relative overflow-hidden font-dm-sans shadow-none" style={{ backgroundColor: '#ffffff', borderColor: '#f1f5f9' }}>
                             {/* Red Top Accent */}
-                            <div className="absolute top-0 left-0 w-full h-[70px] bg-[#E11D48] flex items-center px-4">
+                            <div className="absolute top-0 left-0 w-full h-[70px] bg-[#E11D48] flex items-center px-4" style={{ backgroundColor: '#E11D48' }}>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center p-1 shadow-sm">
+                                    <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center p-1 shadow-sm" style={{ backgroundColor: '#ffffff' }}>
                                         {branding.system_logo ? (
                                             <img src={branding.system_logo} alt="L" className="w-full h-full object-contain" crossOrigin="anonymous" />
                                         ) : (
-                                            <div className="w-full h-full bg-emerald-600 rounded-full"></div>
+                                            <div className="w-full h-full bg-emerald-600 rounded-full" style={{ backgroundColor: '#059669' }}></div>
                                         )}
                                     </div>
-                                    <div>
-                                        <div className="text-[7px] font-black text-white/80 uppercase tracking-[0.1em] leading-none">Membership</div>
-                                        <div className="text-[11px] font-black text-white uppercase tracking-tighter">NNA KENYA</div>
+                                    <div style={{ color: '#ffffff' }}>
+                                        <div className="text-[7px] font-black text-white/80 uppercase tracking-[0.1em] leading-none" style={{ color: 'rgba(255,255,255,0.8)' }}>Membership</div>
+                                        <div className="text-[11px] font-black text-white uppercase tracking-tighter" style={{ color: '#ffffff' }}>NNA KENYA</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="mt-[55px] flex gap-4 px-5 pt-3">
                                 {/* Photo Slot */}
-                                <div className="w-[85px] h-[105px] bg-gray-50 rounded-xl border-[3px] border-white shadow-lg overflow-hidden flex-shrink-0">
+                                <div className="w-[85px] h-[105px] bg-gray-50 rounded-xl border-[3px] border-white shadow-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: '#f9fafb', borderColor: '#ffffff' }}>
                                     {bulkItem.profile_picture ? (
                                         <img src={bulkItem.profile_picture} alt="P" className="w-full h-full object-cover" crossOrigin="anonymous" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-600">
+                                        <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-600" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
                                             <LucideUser size={24} />
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="flex-1 flex flex-col justify-end pb-1">
-                                    <h2 className="text-[14px] font-black text-slate-900 leading-none tracking-tighter uppercase">{bulkItem.first_name}</h2>
-                                    <h2 className="text-[12px] font-bold text-slate-400 leading-none tracking-tighter uppercase mb-2">{bulkItem.last_name}</h2>
-                                    <div className="inline-flex items-center px-1.5 py-0.5 rounded bg-[#FDF2F2] border border-[#FECACA] text-[7px] font-black text-[#B91C1C] uppercase tracking-widest w-fit">
+                                <div className="flex-1 flex flex-col justify-end pb-1 overflow-hidden" style={{ color: '#0f172a' }}>
+                                    <h2 className="text-[14px] font-black text-slate-900 leading-none tracking-tighter uppercase truncate" style={{ color: '#0f172a' }}>{bulkItem.first_name}</h2>
+                                    <h2 className="text-[12px] font-bold text-slate-400 leading-none tracking-tighter uppercase mb-2 truncate" style={{ color: '#94a3b8' }}>{bulkItem.last_name}</h2>
+                                    <div className="inline-flex items-center px-1.5 py-0.5 rounded bg-[#FDF2F2] border border-[#FECACA] text-[7px] font-black text-[#B91C1C] uppercase tracking-widest w-fit" style={{ backgroundColor: '#FDF2F2', color: '#B91C1C', borderColor: '#FECACA' }}>
                                         {bulkItem.occupation || 'Nurse'}
                                     </div>
                                 </div>
@@ -500,14 +482,14 @@ const Members = () => {
                             <div className="mt-2 space-y-2 px-5 pb-4 relative z-10">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">License No</div>
-                                        <div className="text-[8px] font-mono font-black text-slate-800 tracking-tighter px-1.5 py-0.5 bg-gray-50 rounded-md border border-gray-100 leading-none">
+                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#9ca3af' }}>License No</div>
+                                        <div className="text-[8px] font-mono font-black text-slate-800 tracking-tighter px-1.5 py-0.5 bg-gray-50 rounded-md border border-gray-100 leading-none" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f1f5f9' }}>
                                             {bulkItem.registration_number || 'PENDING'}
                                         </div>
                                     </div>
                                     <div>
-                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">Member ID</div>
-                                        <div className="text-[8px] font-mono font-black text-slate-800 tracking-tighter px-1.5 py-0.5 bg-gray-50 rounded-md border border-gray-100 leading-none">
+                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5" style={{ color: '#9ca3af' }}>Member ID</div>
+                                        <div className="text-[8px] font-mono font-black text-slate-800 tracking-tighter px-1.5 py-0.5 bg-gray-50 rounded-md border border-gray-100 leading-none" style={{ backgroundColor: '#f9fafb', color: '#1e293b', borderColor: '#f1f5f9' }}>
                                             {bulkItem.member_id || 'PENDING'}
                                         </div>
                                     </div>
@@ -515,79 +497,79 @@ const Members = () => {
 
                                 <div className="flex justify-between items-end">
                                     <div className="space-y-0.5">
-                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none">Authorized Sign</div>
+                                        <div className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none" style={{ color: '#9ca3af' }}>Authorized Sign</div>
                                         <div className="h-6 w-16">
                                             {branding.authorised_signature && (
                                                 <img src={branding.authorised_signature} alt="S" className="w-full h-full object-contain filter grayscale" crossOrigin="anonymous" />
                                             )}
                                         </div>
                                     </div>
-                                    <div className="text-[7px] font-black text-slate-900 uppercase">2026/27</div>
+                                    <div className="text-[7px] font-black text-slate-900 uppercase" style={{ color: '#0f172a' }}>2026/27</div>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {bulkItem && (
-                        <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-dm-sans border-[15px] border-[#E11D48] text-left">
+                        <div ref={certificateRef} className="w-[794px] h-[1123px] bg-white relative p-16 flex flex-col font-dm-sans border-[15px] border-[#E11D48] text-left" style={{ backgroundColor: '#ffffff', borderColor: '#E11D48' }}>
                             {/* Inner Border */}
-                            <div className="absolute inset-2 border border-slate-100"></div>
+                            <div className="absolute inset-2 border border-slate-100" style={{ borderColor: '#f1f5f9' }}></div>
 
                             {/* Header */}
                             <div className="relative z-10 flex flex-col items-center text-center mt-4">
                                 {branding.system_logo && (
                                     <img src={branding.system_logo} alt="L" className="w-20 h-20 object-contain mb-4" crossOrigin="anonymous" />
                                 )}
-                                <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-tight">
+                                <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-tight" style={{ color: '#0f172a' }}>
                                     {branding.association_name || 'NATIONAL NURSES ASSOCIATION OF KENYA'}
                                 </h1>
-                                <p className="text-sm font-bold text-[#E11D48] uppercase tracking-[0.2em]">
+                                <p className="text-sm font-bold text-[#E11D48] uppercase tracking-[0.2em]" style={{ color: '#E11D48' }}>
                                     {branding.association_tagline || 'Promoting Professional Excellence'}
                                 </p>
                             </div>
 
                             {/* Main Content */}
                             <div className="relative z-10 flex-1 flex flex-col items-center text-center px-10 pt-10">
-                                <div className="w-full h-[1px] bg-slate-100 mb-10"></div>
+                                <div className="w-full h-[1px] bg-slate-100 mb-10" style={{ backgroundColor: '#f1f5f9' }}></div>
 
-                                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em] mb-2">Membership Certificate</h2>
-                                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8">PRACTISING CERTIFICATE</h3>
+                                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em] mb-2" style={{ color: '#94a3b8' }}>Membership Certificate</h2>
+                                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8" style={{ color: '#0f172a' }}>PRACTISING CERTIFICATE</h3>
 
-                                <p className="text-base text-slate-500 mb-4 italic">This is to certify that</p>
-                                <h4 className="text-4xl font-black text-[#E11D48] uppercase tracking-tighter mb-6">
+                                <p className="text-base text-slate-500 mb-4 italic" style={{ color: '#64748b' }}>This is to certify that</p>
+                                <h4 className="text-4xl font-black text-[#E11D48] uppercase tracking-tighter mb-6" style={{ color: '#E11D48' }}>
                                     {bulkItem.first_name} {bulkItem.last_name}
                                 </h4>
 
-                                <p className="text-base text-slate-600 max-w-lg leading-relaxed mb-10">
+                                <p className="text-base text-slate-600 max-w-lg leading-relaxed mb-10" style={{ color: '#475569' }}>
                                     Is a duly registered member of the association,
-                                    holding registration number <span className="font-black text-slate-900">{bulkItem.registration_number}</span>
-                                    and is authorized to practice as a <span className="font-black text-slate-900">{bulkItem.occupation || 'Professional Nurse'}</span>.
+                                    holding registration number <span className="font-black text-slate-900" style={{ color: '#0f172a' }}>{bulkItem.registration_number}</span>
+                                    and is authorized to practice as a <span className="font-black text-slate-900" style={{ color: '#0f172a' }}>{bulkItem.occupation || 'Professional Nurse'}</span>.
                                 </p>
 
                                 <div className="grid grid-cols-2 gap-10 w-full mt-auto mb-10 text-left px-8">
                                     <div className="space-y-2">
                                         <div>
-                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Member ID</p>
-                                            <p className="text-sm font-mono font-black text-slate-900 leading-none">{bulkItem.member_id}</p>
+                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none" style={{ color: '#9ca3af' }}>Member ID</p>
+                                            <p className="text-sm font-mono font-black text-slate-900 leading-none" style={{ color: '#0f172a' }}>{bulkItem.member_id}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Date Issued</p>
-                                            <p className="text-sm font-mono font-black text-slate-900 leading-none">{new Date().toLocaleDateString()}</p>
+                                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none" style={{ color: '#9ca3af' }}>Date Issued</p>
+                                            <p className="text-sm font-mono font-black text-slate-900 leading-none" style={{ color: '#0f172a' }}>{new Date().toLocaleDateString()}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center justify-end">
                                         {branding.authorised_signature && (
                                             <img src={branding.authorised_signature} alt="S" className="w-32 h-12 object-contain filter grayscale mb-1" crossOrigin="anonymous" />
                                         )}
-                                        <div className="w-full h-px bg-slate-900"></div>
-                                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">Authorized Signature</p>
+                                        <div className="w-full h-px bg-slate-900" style={{ backgroundColor: '#0f172a' }}></div>
+                                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1" style={{ color: '#9ca3af' }}>Authorized Signature</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Footer Warning */}
-                            <div className="relative z-10 border-t border-slate-50 pt-4 text-center">
-                                <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">
+                            <div className="relative z-10 border-t border-slate-50 pt-4 text-center" style={{ borderTopColor: '#f8fafc' }}>
+                                <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest" style={{ color: '#9ca3af' }}>
                                     This document is valid until 31st December 2026. Verify at members.nnak.or.ke
                                 </p>
                             </div>
