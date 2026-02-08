@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Download, Award, User as LucideUser, Bell, Shield, Clock,
     MapPin, Mail, Phone, Briefcase, Calendar, CheckCircle, AlertTriangle, Printer,
-    Activity, FileText
+    Activity, FileText, Camera, Edit2
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import AdminAPI from '../services/api';
@@ -35,6 +35,7 @@ const MemberProfile = () => {
     const certificateRef = useRef(null);
     const printableIdCardRef = useRef(null);
     const printableCertificateRef = useRef(null);
+    const profileInputRef = useRef(null);
 
     useEffect(() => {
         fetchProfile();
@@ -130,6 +131,49 @@ const MemberProfile = () => {
             Swal.fire('Error', error.message, 'error');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleProfilePhotoUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire('File too large', 'Please select an image under 2MB', 'warning');
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Updating your profile photo',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const formDataUpload = new FormData();
+            formDataUpload.append('image', file);
+            const res = await AdminAPI.uploadProfilePhoto(formDataUpload);
+
+            if (res.success) {
+                // Update member state and formData to reflect new URL
+                setMember(prev => ({ ...prev, profile_photo: res.url, profile_picture: res.url }));
+                setFormData(prev => ({ ...prev, profile_photo: res.url }));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Photo Updated',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                throw new Error(res.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error("Photo upload error:", error);
+            Swal.fire('Error', error.message, 'error');
         }
     };
 
@@ -512,35 +556,57 @@ const MemberProfile = () => {
                                     justifyContent: 'center',
                                     paddingLeft: '8px'
                                 }}>
-                                    <div style={{
-                                        width: '125px',
-                                        height: '155px',
-                                        background: 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)',
-                                        padding: '6px',
-                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-                                        borderRadius: '2px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        position: 'relative'
-                                    }}>
-                                        {/* Inner Silver/White Border */}
+                                    <div className="relative group/photo">
                                         <div style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            border: '3px solid #e5e7eb',
-                                            backgroundColor: '#ffffff',
-                                            overflow: 'hidden',
+                                            width: '125px',
+                                            height: '155px',
+                                            background: 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)',
+                                            padding: '6px',
+                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+                                            borderRadius: '2px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
                                             position: 'relative'
                                         }}>
-                                            {member.profile_picture ? (
-                                                <img src={member.profile_picture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
-                                            ) : (
-                                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', color: '#d1d5db' }}>
-                                                    <LucideUser size={60} />
-                                                </div>
-                                            )}
+                                            {/* Inner Silver/White Border */}
+                                            <div style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                border: '3px solid #e5e7eb',
+                                                backgroundColor: '#ffffff',
+                                                overflow: 'hidden',
+                                                position: 'relative'
+                                            }}>
+                                                {(member.profile_picture || member.profile_photo) ? (
+                                                    <img src={member.profile_picture || member.profile_photo} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
+                                                ) : (
+                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', color: '#d1d5db' }}>
+                                                        <LucideUser size={60} />
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
+
+                                        {/* Clickable Overlay for Upload */}
+                                        {(isSelf || isAdmin) && (
+                                            <>
+                                                <button
+                                                    onClick={() => profileInputRef.current.click()}
+                                                    className="absolute inset-0 z-30 opacity-0 group-hover/photo:opacity-100 transition-all duration-300 bg-black/40 flex flex-col items-center justify-center text-white gap-2 backdrop-blur-[1px]"
+                                                >
+                                                    <Camera size={24} className="animate-bounce" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">Update Photo</span>
+                                                </button>
+                                                <input
+                                                    type="file"
+                                                    ref={profileInputRef}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleProfilePhotoUpload}
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
