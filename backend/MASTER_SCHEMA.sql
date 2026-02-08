@@ -96,6 +96,8 @@ CREATE TABLE `events` (
     `event_time` TIME,
     `location` VARCHAR(255),
     `type` VARCHAR(100) DEFAULT 'General',
+    `fee` DECIMAL(10,2) DEFAULT 0.00,
+    `cpd_points` INT DEFAULT 0,
     `image_url` VARCHAR(255),
     `status` VARCHAR(50) DEFAULT 'published',
     `created_by` INT,

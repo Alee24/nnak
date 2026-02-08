@@ -15,15 +15,17 @@ const api = axios.create({
 api.interceptors.response.use(
     (response) => response.data,
     (error) => {
-        const message = error.response?.data?.error || error.message || 'An error occurred';
+        const errorData = error.response?.data;
+        const mainError = errorData?.error || error.message || 'An error occurred';
+        const details = errorData?.message ? ` (${errorData.message})` : '';
+        const combinedMessage = `${mainError}${details}`;
 
         // Handle Session Expiry
-        if (message.includes('Session expired') || message.includes('Authentication required')) {
-            // redirect handled by component or router usually, but here we could trigger event
+        if (combinedMessage.includes('Session expired') || combinedMessage.includes('Authentication required')) {
             window.location.href = '/login';
         }
 
-        return Promise.reject(new Error(message));
+        return Promise.reject(new Error(combinedMessage));
     }
 );
 
