@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Save, Upload, Image as ImageIcon, Check, Info, Phone, MapPin, Globe, Mail } from 'lucide-react';
+import { Save, Upload, Image as ImageIcon, Check, Info, Phone, MapPin, Globe, Mail, User, Shield } from 'lucide-react';
 import AdminAPI from '../services/api';
 import Swal from 'sweetalert2';
 
@@ -42,11 +42,15 @@ const SettingsPage = () => {
         paypal_secret: '',
         paypal_env: 'sandbox',
 
-        // Stripe (Visa/Mastercard)
-        stripe_publishable_key: '',
-        stripe_secret_key: '',
-        stripe_env: 'sandbox'
+        personal_city: '',
+        personal_address: '',
+        personal_first_name: '',
+        personal_last_name: '',
+        profile_photo: '',
+        new_password: '',
+        confirm_password: ''
     });
+    const [profileFile, setProfileFile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const logoInputRef = useRef(null);
@@ -74,13 +78,16 @@ const SettingsPage = () => {
             // If member, fetch their personal profile details for the account tab
             if (!isAdmin) {
                 const profileRes = await AdminAPI.getMemberProfile('me');
-                if (profileRes.success) {
+                if (profileRes.success && profileRes.user) {
+                    const member = profileRes.user;
                     setSettings(prev => ({
                         ...prev,
-                        personal_phone: profileRes.member.phone,
-                        personal_city: profileRes.member.city,
-                        personal_address: profileRes.member.address_line1,
-                        personal_name: `${profileRes.member.first_name} ${profileRes.member.last_name}`
+                        personal_phone: member.phone || '',
+                        personal_city: member.city || '',
+                        personal_address: member.address_line1 || '',
+                        personal_first_name: member.first_name || '',
+                        personal_last_name: member.last_name || '',
+                        profile_photo: member.profile_photo || ''
                     }));
                 }
             }
@@ -99,6 +106,7 @@ const SettingsPage = () => {
                 Swal.fire('File too large', 'Please select an image under 2MB', 'warning');
                 return;
             }
+            setProfileFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setSettings(prev => ({ ...prev, [key]: reader.result }));
@@ -109,36 +117,56 @@ const SettingsPage = () => {
 
     const handleSave = async () => {
         try {
+            if (settings.new_password && settings.new_password !== settings.confirm_password) {
+                Swal.fire('Error', 'Passwords do not match', 'error');
+                return;
+            }
+
             setSaving(true);
             let response;
+
+            // Handle Profile Photo Upload first if exists
+            if (profileFile) {
+                const formData = new FormData();
+                formData.append('image', profileFile);
+                const uploadRes = await AdminAPI.uploadProfilePhoto(formData);
+                if (uploadRes.success) {
+                    setSettings(prev => ({ ...prev, profile_photo: uploadRes.url }));
+                }
+            }
+
             if (isAdmin) {
                 response = await AdminAPI.updateSettings(settings);
             } else {
                 // Member updating personal info
-                response = await AdminAPI.updateMember('me', {
+                const updatePayload = {
+                    first_name: settings.personal_first_name,
+                    last_name: settings.personal_last_name,
                     phone: settings.personal_phone,
                     city: settings.personal_city,
-                    address_line1: settings.personal_address,
-                    password: settings.new_password // Only if provided
-                });
+                    address_line1: settings.personal_address
+                };
+
+                if (settings.new_password) {
+                    updatePayload.password = settings.new_password;
+                }
+
+                response = await AdminAPI.updateMember('me', updatePayload);
             }
 
             if (response.success) {
-                const Toast = Swal.mixin({
+                Swal.fire({
+                    icon: 'success',
+                    title: isAdmin ? 'System Settings Saved' : 'Account Updated Successfully',
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
+                    timer: 3000
                 });
-                Toast.fire({
-                    icon: 'success',
-                    title: isAdmin ? 'System Settings Saved' : 'Account Updated Successfully'
-                });
+
+                // Clear password fields after save
+                setSettings(prev => ({ ...prev, new_password: '', confirm_password: '' }));
+                setProfileFile(null);
             }
         } catch (error) {
             Swal.fire('Error', error.message, 'error');
@@ -220,9 +248,35 @@ const SettingsPage = () => {
                             </div>
 
                             <div className="space-y-6 text-xs text-black">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Full Name</label>
-                                    <input type="text" value={settings.personal_name || ''} readOnly className="w-full px-5 py-3.5 bg-slate-50 text-slate-400 border border-slate-100 rounded-2xl text-sm font-black tracking-tight cursor-not-allowed" />
+                                <div className="flex flex-col items-center mb-8">
+                                    <div className="relative group/avatar">
+                                        <div className="w-32 h-32 rounded-[2rem] bg-slate-50 border-2 border-slate-100 flex items-center justify-center overflow-hidden shadow-xl group-hover/avatar:border-[#E11D48]/30 transition-all duration-500">
+                                            {settings.profile_photo ? (
+                                                <img src={settings.profile_photo} alt="Profile" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <ImageIcon className="text-slate-200" size={48} />
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => logoInputRef.current.click()}
+                                            className="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[#E11D48] transition-all active:scale-90"
+                                        >
+                                            <Upload size={18} strokeWidth={2.5} />
+                                        </button>
+                                        <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'profile_photo')} />
+                                    </div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Change Profile Picture</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">First Name</label>
+                                        <input type="text" value={settings.personal_first_name || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_first_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Last Name</label>
+                                        <input type="text" value={settings.personal_last_name || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_last_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Phone Number</label>

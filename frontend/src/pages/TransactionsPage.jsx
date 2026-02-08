@@ -51,11 +51,16 @@ const TransactionsPage = () => {
 
             if (response.payments) {
                 setTransactions(response.payments);
-                setPagination(response.pagination);
-
-                // Calculate mini-stats from the current view or ideally from a separate stats API
-                // For now, let's just use the current view's totals if pagination isn't too large
-                // In a real app, you'd want a dedicated endpoint for transaction stats
+                if (response.pagination) {
+                    setPagination(response.pagination);
+                } else {
+                    // Fallback pagination if missing from response
+                    setPagination(prev => ({
+                        ...prev,
+                        total: response.payments.length,
+                        pages: Math.ceil(response.payments.length / prev.limit)
+                    }));
+                }
             }
         } catch (error) {
             console.error("Failed to fetch transactions:", error);
@@ -67,7 +72,7 @@ const TransactionsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [filters, pagination.limit]);
+    }, [filters, pagination.limit, isAdmin]);
 
     const fetchBranding = useCallback(async () => {
         try {

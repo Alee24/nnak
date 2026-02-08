@@ -109,6 +109,14 @@ class AdminAPI {
         return api.put(`/member/${id}`, data);
     }
 
+    static async uploadProfilePhoto(formData) {
+        return api.post('/upload/image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
+
     static async updateMemberStatus(id, status) {
         return api.put(`/member/${id}/status`, { status });
     }
