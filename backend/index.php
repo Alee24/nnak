@@ -21,10 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Force JSON errors
 set_exception_handler(function($e) {
     http_response_code(500);
+    $isDebug = (defined('APP_DEBUG') && APP_DEBUG) || (defined('APP_ENV') && APP_ENV === 'development');
     echo json_encode([
         'error' => 'Internal Server Error',
         'message' => $e->getMessage(),
-        'trace' => APP_ENV === 'development' ? $e->getTraceAsString() : null
+        'trace' => $isDebug ? $e->getTraceAsString() : null,
+        'file' => $isDebug ? $e->getFile() : null,
+        'line' => $isDebug ? $e->getLine() : null
     ]);
     exit();
 });
@@ -39,11 +42,12 @@ register_shutdown_function(function() {
     if ($error !== NULL && ($error['type'] === E_ERROR || $error['type'] === E_PARSE || $error['type'] === E_CORE_ERROR || $error['type'] === E_COMPILE_ERROR)) {
         http_response_code(500);
         header('Content-Type: application/json');
+        $isDebug = (defined('APP_DEBUG') && APP_DEBUG) || (defined('APP_ENV') && APP_ENV === 'development');
         echo json_encode([
             'error' => 'Fatal Error',
             'message' => $error['message'],
-            'file' => $error['file'],
-            'line' => $error['line']
+            'file' => $isDebug ? $error['file'] : null,
+            'line' => $isDebug ? $error['line'] : null
         ]);
     }
 });

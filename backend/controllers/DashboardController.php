@@ -19,7 +19,8 @@ class DashboardController {
         try {
             // Total members
             $stmt = $this->db->query("SELECT COUNT(*) as count FROM members WHERE deleted_at IS NULL");
-            $totalMembers = $stmt->fetch()['count'];
+            $res = $stmt->fetch();
+            $totalMembers = $res ? $res['count'] : 0;
 
             // Status counts
             $stmt = $this->db->query("
@@ -42,10 +43,12 @@ class DashboardController {
 
             // Growth calculation (this month vs last month)
             $thisMonthStmt = $this->db->query("SELECT COUNT(*) as count FROM members WHERE join_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01') AND deleted_at IS NULL");
-            $thisMonth = $thisMonthStmt->fetch()['count'];
+            $resThis = $thisMonthStmt->fetch();
+            $thisMonth = $resThis ? $resThis['count'] : 0;
             
             $lastMonthStmt = $this->db->query("SELECT COUNT(*) as count FROM members WHERE join_date >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01') AND join_date < DATE_FORMAT(CURDATE(), '%Y-%m-01') AND deleted_at IS NULL");
-            $lastMonth = $lastMonthStmt->fetch()['count'];
+            $resLast = $lastMonthStmt->fetch();
+            $lastMonth = $resLast ? $resLast['count'] : 0;
             
             $growth = ($lastMonth > 0) ? (($thisMonth - $lastMonth) / $lastMonth) * 100 : 0;
 
