@@ -79,13 +79,12 @@ function getJsonInput() {
 
 // Route the request
 try {
-    // API routes start with 'api'
-    if (empty($requestParts) || $requestParts[0] !== 'api') {
-        sendResponse(404, ['error' => 'Not found']);
+    // Route the request
+    // If served via Alias /api, the 'api' part might already be stripped by Apache.
+    // We only require 'api' if it's there.
+    if (!empty($requestParts) && $requestParts[0] === 'api') {
+        array_shift($requestParts);
     }
-    
-    // Remove 'api' from parts
-    array_shift($requestParts);
     
     if (empty($requestParts)) {
         sendResponse(200, [

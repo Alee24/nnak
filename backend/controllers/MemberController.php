@@ -310,13 +310,14 @@ class MemberController {
             $countStmt->execute($params);
             $total = $countStmt->fetchColumn();
             
-            // Get members (removed LEFT JOIN temporarily due to missing membership_types table)
+            // Get members
             $stmt = $this->db->prepare("
                 SELECT m.id, m.member_id, m.email, m.first_name, m.last_name, 
                        m.phone, m.status, m.role,
                        m.created_at,
-                       m.registration_number, 'Member' as membership_type_name
+                       m.registration_number, mt.name as membership_type_name
                 FROM members m
+                LEFT JOIN membership_types mt ON m.membership_type_id = mt.id
                 WHERE $whereClause
                 ORDER BY m.created_at DESC
                 LIMIT $limit OFFSET $offset
