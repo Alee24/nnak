@@ -358,6 +358,7 @@ class AuthController {
         exit();
     }
     
+
     private function methodNotAllowed() {
         $this->sendResponse(405, ['error' => 'Method not allowed']);
     }

@@ -4,10 +4,13 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import {
     LayoutDashboard, Users, CreditCard, Calendar, FileText,
-    Settings, LogOut, ChevronRight, Menu, X, Bell, Search, Mail
+    Settings, LogOut, ChevronRight, Menu, X, Bell, Search, Mail,
+    Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const DashboardLayout = () => {
+    const { theme, toggleTheme } = useTheme();
     const [user, setUser] = React.useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(true); // Add explicit loading state
@@ -82,12 +85,23 @@ const DashboardLayout = () => {
                         </div>
 
                         <div className="flex items-center gap-1.5">
-                            <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 hover:text-[#059669] transition-all group">
+                            <button
+                                onClick={toggleTheme}
+                                className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-500 transition-all group"
+                                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                            >
+                                {theme === 'light' ? (
+                                    <Moon size={14} className="group-hover:scale-110 transition-transform" />
+                                ) : (
+                                    <Sun size={14} className="group-hover:scale-110 transition-transform" />
+                                )}
+                            </button>
+                            <button className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#059669] transition-all group">
                                 <Mail size={14} className="group-hover:scale-110 transition-transform" />
                             </button>
-                            <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 hover:text-rose-500 transition-all relative group">
+                            <button className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-rose-500 transition-all relative group">
                                 <Bell size={14} className="group-hover:rotate-12 transition-transform" />
-                                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900"></span>
                             </button>
                         </div>
 

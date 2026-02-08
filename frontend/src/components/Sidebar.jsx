@@ -15,12 +15,13 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * Sidebar Sub-component for individual navigation items
  * Uses useLocation to manually track isActive for 100% reliability
  */
-const NavItem = ({ to, icon: Icon, label, badge, onClick }) => {
+const NavItem = ({ to, icon: Icon, label, badge, onClick, theme }) => {
   const location = useLocation();
   const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
 
@@ -29,24 +30,42 @@ const NavItem = ({ to, icon: Icon, label, badge, onClick }) => {
       to={to}
       onClick={onClick}
       className={`
-        flex items-center gap-2.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200
+        flex items-center gap-3 px-4 py-2.5 text-[11px] font-black rounded-xl transition-all duration-300 group relative
         ${isActive
-          ? 'text-[#059669] bg-[#059669]/5 shadow-sm ring-1 ring-[#059669]/10'
-          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}
+          ? (theme === 'dark'
+            ? 'text-white bg-emerald-600 shadow-lg shadow-emerald-600/20'
+            : 'text-emerald-700 bg-emerald-50 shadow-sm border border-emerald-100')
+          : (theme === 'dark'
+            ? 'text-slate-400 hover:text-white hover:bg-white/5'
+            : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50/50')}
       `}
     >
-      <Icon size={14} strokeWidth={isActive ? 3 : 2} />
-      <span className="flex-1 tracking-tight">{label}</span>
+      <Icon size={16} strokeWidth={isActive ? 3 : 2} className={`
+        ${isActive
+          ? (theme === 'dark' ? 'text-white' : 'text-emerald-600')
+          : (theme === 'dark' ? 'text-slate-500 group-hover:text-emerald-400' : 'text-slate-400 group-hover:text-emerald-600')}
+        transition-colors
+      `} />
+      <span className="flex-1 tracking-wider uppercase">{label}</span>
       {badge && (
-        <span className="bg-[#059669] text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+        <span className={`
+          ${isActive
+            ? (theme === 'dark' ? 'bg-white text-emerald-600' : 'bg-emerald-600 text-white')
+            : 'bg-emerald-500 text-white'}
+          text-[9px] font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center shadow-sm
+        `}>
           {badge}
         </span>
+      )}
+      {isActive && (
+        <div className={`absolute right-2 w-1.5 h-1.5 rounded-full animate-pulse ${theme === 'dark' ? 'bg-white' : 'bg-emerald-600'}`}></div>
       )}
     </NavLink>
   );
 };
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const { theme } = useTheme();
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -135,32 +154,58 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Sidebar Container */}
       <aside className={`
-        fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 flex flex-col z-50 transition-transform duration-300 ease-out
+        fixed inset-y-0 left-0 w-60 flex flex-col z-50 transition-all duration-300 ease-out
         lg:static lg:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${theme === 'dark'
+          ? 'bg-[#0f172a] border-r border-white/5 shadow-2xl'
+          : 'bg-white border-r border-slate-200 shadow-sm'}
       `}>
-        <div className="h-14 flex items-center px-5 border-b border-slate-100 mb-4 flex-shrink-0">
-          <div className="w-7 h-7 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black mr-2.5 shadow-md text-xs">
+        <div className="h-16 flex items-center px-6 mb-6 flex-shrink-0">
+          <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-black mr-3 shadow-lg shadow-emerald-500/20">
             N
           </div>
-          <span className="font-black text-sm tracking-tight text-slate-900 uppercase">NNAK <span className="text-[#059669]">Admin</span></span>
+          <div className="flex flex-col">
+            <span className={`font-black text-[13px] tracking-tight uppercase leading-none ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+              NNAK <span className="text-emerald-500">Admin</span>
+            </span>
+            <span className={`text-[7px] uppercase tracking-[0.3em] font-black mt-1 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+              Professional Suite
+            </span>
+          </div>
         </div>
 
-        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto custom-scrollbar">
-          <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2 px-2 opacity-70">Main Systems</div>
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+          <div className={`text-[10px] font-black uppercase tracking-[0.25em] mb-4 px-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+            Main Systems
+          </div>
           {navItems.map((item) => (
-            <NavItem key={item.to} {...item} onClick={onClose} />
+            <NavItem key={item.to} {...item} onClick={onClose} theme={theme} />
           ))}
 
-          <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mt-6 mb-2 px-2 opacity-70">Management</div>
+          <div className="pt-8 mb-4">
+            <div className={`h-px mx-2 mb-6 ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'}`}></div>
+            <div className={`text-[10px] font-black uppercase tracking-[0.25em] mb-4 px-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+              Management
+            </div>
+          </div>
+
           {managementItems.map((item) => (
-            <NavItem key={item.to} {...item} onClick={onClose} />
+            <NavItem key={item.to} {...item} onClick={onClose} theme={theme} />
           ))}
         </nav>
 
-        <div className="p-3 border-t border-slate-100 flex-shrink-0">
-          <button onClick={handleLogout} className="w-full flex items-center gap-2.5 text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-all font-black text-xs uppercase tracking-widest">
-            <LogOut size={12} strokeWidth={3} /> Logout Session
+        <div className={`p-4 flex-shrink-0 border-t ${theme === 'dark' ? 'bg-slate-800/20 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+          <button
+            onClick={handleLogout}
+            className={`
+              w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-black text-[10px] uppercase tracking-widest border
+              ${theme === 'dark'
+                ? 'text-rose-400 border-rose-500/20 hover:text-white hover:bg-rose-500/10 hover:border-rose-500/40'
+                : 'text-rose-600 border-rose-100 hover:bg-rose-50 hover:border-rose-200'}
+            `}
+          >
+            <LogOut size={14} strokeWidth={3} /> Logout Session
           </button>
         </div>
       </aside>
