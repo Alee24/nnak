@@ -8,6 +8,11 @@ export default defineConfig({
     port: 4875,
     strictPort: true,
     host: true,
+    allowedHosts: [
+      "nnak.kkdes.co.ke",
+      "185.192.97.84",
+      "localhost"
+    ],
     proxy: {
       // Proxying API requests to backend on port 4549
       '/api': {
