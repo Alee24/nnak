@@ -178,7 +178,7 @@ const Analytics = () => {
                                 </div>
                             </div>
                             <div className="w-full bg-slate-100 rounded-full h-1 mt-4">
-                                <div className="bg-emerald-500 h-1 rounded-full" style={{ width: '65%' }}></div>
+                                <div className="bg-emerald-500 h-1 rounded-full" style={{ width: `${(data.revenue.realized_revenue / data.revenue.total_potential_revenue * 100) || 0}%` }}></div>
                             </div>
                         </div>
 
@@ -274,14 +274,14 @@ const Analytics = () => {
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition group">
                             <p className="text-[10px] font-black text-emerald-400 mb-1.5 uppercase tracking-widest">Top Performer</p>
                             <p className="text-xs text-slate-300 leading-snug font-medium">
-                                <span className="text-white font-black">{data.growth.sort((a, b) => b.count - a.count)[0]?.month || 'N/A'}</span> recorded a peak of <span className="text-emerald-400 font-black">+{data.growth.sort((a, b) => b.count - a.count)[0]?.count || 0}</span> new registrations.
+                                <span className="text-white font-black">{data.growth.length > 0 ? data.growth.sort((a, b) => b.count - a.count)[0].month : 'No data'}</span> recorded a peak of <span className="text-emerald-400 font-black">+{data.growth.length > 0 ? data.growth.sort((a, b) => b.count - a.count)[0].count : 0}</span> new registrations.
                             </p>
                         </div>
 
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition">
                             <p className="text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-widest">Regional Growth</p>
                             <p className="text-xs text-slate-300 leading-snug font-medium">
-                                <span className="text-white font-black">{data.cities[0]?.city || 'N/A'}</span> leads regional engagement with consistent month-over-month growth.
+                                <span className="text-white font-black">{data.cities.length > 0 ? data.cities[0].city : 'Global'}</span> leads regional engagement with consistent month-over-month growth.
                             </p>
                         </div>
 
@@ -292,14 +292,14 @@ const Analytics = () => {
                                 <span className="text-xs text-white">KES {parseInt(data.revenue.pending_revenue || 0).toLocaleString()}</span>
                             </div>
                             <div className="w-full bg-white/10 h-1.5 mt-2 rounded-full overflow-hidden">
-                                <div className="bg-amber-500 h-full rounded-full shadow-[0_0_8px_rgba(245,158,11,0.4)]" style={{ width: '40%' }}></div>
+                                <div className="bg-amber-500 h-full rounded-full shadow-[0_0_8px_rgba(245,158,11,0.4)]" style={{ width: `${(data.revenue.pending_revenue / data.revenue.total_potential_revenue * 100) || 0}%` }}></div>
                             </div>
                         </div>
 
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition">
-                            <p className="text-[10px] font-black text-purple-400 mb-1.5 uppercase tracking-widest">Member Retention</p>
+                            <p className="text-[10px] font-black text-purple-400 mb-1.5 uppercase tracking-widest">System Health</p>
                             <p className="text-xs text-slate-300 leading-snug font-medium">
-                                <span className="text-white font-black">95%</span> renewal rate for annual subscriptions detected in current quarter.
+                                <span className="text-white font-black">{(data.revenue.realized_revenue / data.revenue.total_potential_revenue * 100).toFixed(1)}%</span> revenue realization rate detected in current cycle.
                             </p>
                         </div>
                     </div>

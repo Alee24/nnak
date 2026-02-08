@@ -19,24 +19,13 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                await new Promise(resolve => setTimeout(resolve, 800));
-                setStats({
-                    total_members: 1248,
-                    active: 892,
-                    suspended: 45,
-                    pending: 156,
-                    inactive: 155,
-                    growth: 12.5,
-                    revenue: 452000
-                });
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
 
-                setRecentMembers([
-                    { id: 1, first_name: 'Emily', last_name: 'Wanjiku', role: 'Nurse', join_date: '2 min ago', status: 'pending' },
-                    { id: 2, first_name: 'Sarah', last_name: 'Kimani', role: 'Midwife', join_date: '15 min ago', status: 'pending' },
-                    { id: 3, first_name: 'David', last_name: 'Otieno', role: 'Student', join_date: '1 hour ago', status: 'active' },
-                    { id: 4, first_name: 'Robert', last_name: 'Njoroge', role: 'Nurse', join_date: '2 hours ago', status: 'suspended' },
-                    { id: 5, first_name: 'Grace', last_name: 'Achieng', role: 'Specialist', join_date: '5 hours ago', status: 'active' },
-                ]);
+                if (data.success) {
+                    setStats(data.stats);
+                    setRecentMembers(data.recent_members);
+                }
             } catch (err) {
                 console.error("Dashboard Error:", err);
             } finally {

@@ -68,6 +68,7 @@ import VerifyMemberPage from './pages/VerifyMemberPage';
 import MessagesPage from './pages/MessagesPage';
 import FAQ from './pages/FAQ';
 import TransactionsPage from './pages/TransactionsPage';
+import GenerateIDs from './pages/GenerateIDs';
 
 function App() {
   return (
@@ -95,7 +96,7 @@ function App() {
           <Route path="events" element={<Events />} />
           <Route path="cpd-points" element={<CPDPoints />} />
           <Route path="applications" element={<AdminRoute><Applications /></AdminRoute>} />
-          <Route path="generate-ids" element={<AdminRoute><Placeholder title="Generate IDs" /></AdminRoute>} />
+          <Route path="generate-ids" element={<AdminRoute><GenerateIDs /></AdminRoute>} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="messages" element={<AdminRoute><MessagesPage /></AdminRoute>} />
         </Route>

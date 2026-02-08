@@ -38,7 +38,27 @@ class DashboardController {
                 ORDER BY created_at DESC 
                 LIMIT 5
             ");
-            $recentMembers = $stmt->fetchAll();
+            $recentMembers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Growth calculation (this month vs last month)
+            $thisMonthStmt = $this->db->query("SELECT COUNT(*) as count FROM members WHERE join_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01') AND deleted_at IS NULL");
+            $thisMonth = $thisMonthStmt->fetch()['count'];
+            
+            $lastMonthStmt = $this->db->query("SELECT COUNT(*) as count FROM members WHERE join_date >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01') AND join_date < DATE_FORMAT(CURDATE(), '%Y-%m-01') AND deleted_at IS NULL");
+            $lastMonth = $lastMonthStmt->fetch()['count'];
+            
+            $growth = ($lastMonth > 0) ? (($thisMonth - $lastMonth) / $lastMonth) * 100 : 0;
+
+            // Revenue summary
+            $revStmt = $this->db->query("
+                SELECT 
+                    SUM(mt.price) as total_potential_revenue,
+                    SUM(CASE WHEN m.status = 'active' THEN mt.price ELSE 0 END) as realized_revenue
+                FROM members m
+                JOIN membership_types mt ON m.membership_type_id = mt.id
+                WHERE m.deleted_at IS NULL
+            ");
+            $revenue = $revStmt->fetch(PDO::FETCH_ASSOC);
 
             echo json_encode([
                 'success' => true,
@@ -48,6 +68,8 @@ class DashboardController {
                     'suspended' => $statusCounts['suspended'] ?? 0,
                     'pending' => $statusCounts['pending'] ?? 0,
                     'inactive' => $statusCounts['inactive'] ?? 0,
+                    'growth' => round($growth, 1),
+                    'revenue' => $revenue['realized_revenue'] ?? 0
                 ],
                 'recent_members' => $recentMembers
             ]);

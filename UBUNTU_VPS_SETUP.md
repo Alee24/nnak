@@ -1,91 +1,76 @@
-# Ubuntu VPS Installation Guide: NNAK System
+# Ubuntu VPS Installation Guide: NNAK System ('/var/www/nnak.kkdes.co.ke')
 
-Follow these commands step-by-step to deploy the NNAK Membership Management System on a clean Ubuntu VPS (20.04 or 22.04).
+Since your project is located at `/var/www/nnak.kkdes.co.ke`, use these exact commands to update and fix the live server.
 
-## 1. System Update & Dependencies
+## 1. Fix Database Schema & Seed Accounts
+Crucial to make the "Registration" flow work (adds missing `profile_picture` column).
+
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y git curl wget unzip build-essential
+# FIX: Trust the directory (Run this first!)
+git config --global --add safe.directory /var/www/nnak.kkdes.co.ke
+
+cd /var/www/nnak.kkdes.co.ke
+sudo git pull origin main
+
+# Apply Master Schema
+sudo mysql -u root -p nnak_system < backend/MASTER_SCHEMA.sql
+
+# Seed Admin & Test Accounts
+sudo mysql -u root -p nnak_system < backend/seed_accounts.sql
 ```
 
-## 2. Install LAMP Stack (Apache, MySQL, PHP)
-```bash
-# Install Apache
-sudo apt install -y apache2
-sudo systemctl enable apache2
-sudo systemctl start apache2
+## 2. Rebuild Frontend
+Ensures the latest React code is compiled.
 
-# Install MySQL
-sudo apt install -y mysql-server
-sudo mysql_secure_installation
-
-# Install PHP & Extensions
-sudo apt install -y php php-mysql php-curl php-json php-gd php-mbstring php-xml php-zip libapache2-mod-php
-```
-
-## 3. Enable Apache mod_rewrite (Crucial for API)
-```bash
-sudo a2enmod rewrite
-sudo systemctl restart apache2
-```
-
-## 4. Install Node.js & NPM (via NVM)
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
-nvm install 20
-nvm use 20
-```
-
-## 5. Clone Project & Permissions
-```bash
-cd /var/www/html
-sudo git clone https://github.com/Alee24/nnak.git
-sudo chown -R $USER:$USER /var/www/html/nnak
-cd nnak
-```
-
-## 6. Configure Environment
-```bash
-cp .env.example .env
-nano .env
-```
-*Update `DB_NAME`, `DB_USER`, `DB_PASS`, and change `http://localhost` to your VPS IP or Domain.*
-
-## 7. Database Setup
-```bash
-# Create Database
-sudo mysql -u root -p -e "CREATE DATABASE nnak_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# Run Migrations
-php backend/run_migrations.php
-```
-
-## 8. Frontend Installation
 ```bash
 cd frontend
 npm install
 npm run build
 ```
 
-## 9. Set Up PM2 for Continuous Running (Optional but Recommended)
+## 3. Configure Apache (Copy & Paste All)
+This configures Apache to serve the React app and route API requests.
+
 ```bash
-npm install -g pm2
+sudo bash -c 'cat > /etc/apache2/sites-available/nnak.conf <<EOF
+<VirtualHost *:80>
+    ServerName nnak.kkdes.co.ke
+    ServerAlias 185.192.97.84
+    DocumentRoot /var/www/nnak.kkdes.co.ke/frontend/dist
 
-# Run Backend (if using PHP built-in server for certain paths)
-pm2 start "php -S 0.0.0.0:4549 ../backend/server_router.php" --name nnak-api
+    <Directory /var/www/nnak.kkdes.co.ke/frontend/dist>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^ index.html [QSA,L]
+    </Directory>
 
-# Run Frontend Dev Server (or serve static build with Nginx/Apache)
-pm2 start "npm run dev -- --host --port 4875" --name nnak-frontend
+    Alias /api /var/www/nnak.kkdes.co.ke/backend
+    <Directory /var/www/nnak.kkdes.co.ke/backend>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ index.php?request=$1 [QSA,L]
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/nnak_error.log
+    CustomLog \${APACHE_LOG_DIR}/nnak_access.log combined
+</VirtualHost>
+EOF'
+
+# Enable & Restart
+sudo a2ensite nnak.conf
+sudo a2enmod rewrite
+sudo systemctl restart apache2
 ```
 
-## 10. Firewall Configuration
-```bash
-sudo ufw allow 80/tcp
-sudo ufw allow 4875/tcp
-sudo ufw allow 4549/tcp
-sudo ufw enable
-```
-
----
-**Verification**: Visit `http://your-vps-ip:4875` to access the system.
+## 4. Verification
+1.  **URL**: Visit `http://185.192.97.84` or `http://nnak.kkdes.co.ke`
+2.  **Login**: `admin@nnak.org` / `Digital2025`
+3.  **Register**: Try creating a new account (should work now).
