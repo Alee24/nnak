@@ -43,7 +43,7 @@ echo "🗄️  Applying Database Migrations & Seed Data..."
 php "$PROJECT_DIR/backend/run_migrations.php" || true
 php "$PROJECT_DIR/backend/migrations/015_gcms_seed_data.php" || true
 
-# 6. Configure Apache VirtualHost
+# 6. Configure Apache VirtualHost (Handles both direct and Docker port 5879 proxy)
 echo "🌐 Configuring Apache VirtualHost for mms.kkdes.co.ke..."
 cat <<EOF > /etc/apache2/sites-available/mms.conf
 <VirtualHost *:80>
@@ -86,7 +86,7 @@ EOF
 
 # 7. Enable Site & Apache Modules
 echo "🔄 Enabling Apache Modules and Site..."
-a2enmod rewrite headers
+a2enmod rewrite headers proxy proxy_http || true
 a2ensite mms.conf
 systemctl restart apache2
 
