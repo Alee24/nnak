@@ -1,43 +1,50 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X } from 'lucide-react';
+import { Flag, Menu, X, Trophy, Calendar, Users, Shield } from 'lucide-react';
 
 const LandingNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
 
     const isActive = (path) => location.pathname === path;
-    const linkClass = (path) => `font-medium transition-colors ${isActive(path) ? 'text-emerald-600 font-bold' : 'text-gray-600 hover:text-emerald-600'}`;
-    const mobileLinkClass = (path) => `block px-3 py-2 rounded-md text-base font-medium ${isActive(path) ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700 hover:text-emerald-600 hover:bg-gray-50'}`;
+    const linkClass = (path) => `font-bold text-xs uppercase tracking-wider transition-colors ${isActive(path) ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-600'}`;
+    const mobileLinkClass = (path) => `block px-3 py-2 rounded-md text-sm font-bold uppercase ${isActive(path) ? 'bg-emerald-50 text-emerald-600' : 'text-slate-700 hover:text-emerald-600 hover:bg-slate-50'}`;
 
     return (
-        <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
+        <nav className="fixed w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
                     {/* Logo */}
                     <Link to="/" className="flex-shrink-0 flex items-center gap-3 group">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-800 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-emerald-500/30 transition-all">
-                            <Shield className="text-white w-6 h-6" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-800 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/20 text-white font-black text-sm">
+                            MMS
                         </div>
-                        <span className="font-bold text-xl text-gray-900 tracking-tight">NNAK <span className="text-emerald-600">Portal</span></span>
+                        <div className="flex flex-col">
+                            <span className="font-black text-base text-slate-900 tracking-tight uppercase leading-none">
+                                Golf Club <span className="text-emerald-600">MMS</span>
+                            </span>
+                            <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-slate-400 mt-0.5">
+                                Member Management Suite
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex space-x-8 items-center">
+                    <div className="hidden md:flex space-x-7 items-center">
                         <Link to="/" className={linkClass('/')}>Home</Link>
-                        <Link to="/benefits" className={linkClass('/benefits')}>Benefits</Link>
-                        <Link to="/stats" className={linkClass('/stats')}>Stats</Link>
-                        <Link to="/contact" className={linkClass('/contact')}>Contact</Link>
-                        <Link to="/faq" className={linkClass('/faq')}>FAQ</Link>
-                        <Link to="/verify" className={linkClass('/verify')}>Verify Member</Link>
+                        <Link to="/benefits" className={linkClass('/benefits')}>Membership Tiers</Link>
+                        <Link to="/stats" className={linkClass('/stats')}>Club Stats</Link>
+                        <Link to="/contact" className={linkClass('/contact')}>Contact Club</Link>
+                        <Link to="/faq" className={linkClass('/faq')}>Club Rules & FAQ</Link>
+                        <Link to="/verify" className={linkClass('/verify')}>Verify Member Card</Link>
 
-                        <div className="h-6 w-px bg-gray-200 mx-2"></div>
+                        <div className="h-6 w-px bg-slate-200 mx-1"></div>
 
                         <Link
                             to="/login"
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:scale-95"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-emerald-600/20"
                         >
-                            Member Login
+                            Member Portal
                         </Link>
                     </div>
 
@@ -45,9 +52,9 @@ const LandingNavbar = () => {
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                            className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
                         >
-                            {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+                            {isOpen ? <X size={22} /> : <Menu size={22} />}
                         </button>
                     </div>
                 </div>
@@ -55,23 +62,21 @@ const LandingNavbar = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden bg-white border-b border-gray-100 shadow-xl absolute w-full">
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <Link to="/" className={mobileLinkClass('/')} onClick={() => setIsOpen(false)}>Home</Link>
-                        <Link to="/benefits" className={mobileLinkClass('/benefits')} onClick={() => setIsOpen(false)}>Benefits</Link>
-                        <Link to="/stats" className={mobileLinkClass('/stats')} onClick={() => setIsOpen(false)}>Stats</Link>
-                        <Link to="/contact" className={mobileLinkClass('/contact')} onClick={() => setIsOpen(false)}>Contact</Link>
-                        <Link to="/faq" className={mobileLinkClass('/faq')} onClick={() => setIsOpen(false)}>FAQ</Link>
-                        <Link to="/verify" className={mobileLinkClass('/verify')} onClick={() => setIsOpen(false)}>Verify Member</Link>
-                        <div className="border-t border-gray-100 my-2 pt-2">
-                            <Link
-                                to="/login"
-                                className="block w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-md"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                Member Login
-                            </Link>
-                        </div>
+                <div className="md:hidden bg-white border-b border-slate-100 shadow-xl absolute w-full px-4 py-4 space-y-2">
+                    <Link to="/" className={mobileLinkClass('/')} onClick={() => setIsOpen(false)}>Home</Link>
+                    <Link to="/benefits" className={mobileLinkClass('/benefits')} onClick={() => setIsOpen(false)}>Membership Tiers</Link>
+                    <Link to="/stats" className={mobileLinkClass('/stats')} onClick={() => setIsOpen(false)}>Club Stats</Link>
+                    <Link to="/contact" className={mobileLinkClass('/contact')} onClick={() => setIsOpen(false)}>Contact Club</Link>
+                    <Link to="/faq" className={mobileLinkClass('/faq')} onClick={() => setIsOpen(false)}>FAQ</Link>
+                    <Link to="/verify" className={mobileLinkClass('/verify')} onClick={() => setIsOpen(false)}>Verify Member Card</Link>
+                    <div className="pt-2 border-t">
+                        <Link
+                            to="/login"
+                            className="block w-full text-center bg-emerald-600 text-white py-3 rounded-xl font-bold uppercase text-xs"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Member Portal
+                        </Link>
                     </div>
                 </div>
             )}

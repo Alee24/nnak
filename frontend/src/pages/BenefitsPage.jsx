@@ -1,61 +1,109 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Check, Shield, Award, Users, Trophy, Flag, Clock, Star } from 'lucide-react';
 import LandingNavbar from '../components/LandingNavbar';
 import LandingFooter from '../components/LandingFooter';
-import { Award, BookOpen, Users, Star, Layers, Globe, ShieldCheck } from 'lucide-react';
 
 const BenefitsPage = () => {
+    const categories = [
+        {
+            name: 'Full Member',
+            price: 'KES 60,000 / yr',
+            joining: 'KES 50,000 joining fee',
+            badge: 'Most Popular',
+            features: [
+                'Unlimited 7-day golfing rights on all 18 holes',
+                'Official World Handicap System (WHS) index',
+                'Unlimited entry to club tournaments & medal competitions',
+                'Full access to Clubhouse, Restaurant, Bar & Lounge',
+                'Priority tee time bookings (up to 14 days in advance)',
+                'Up to 4 registered family dependants included',
+                'Reciprocal golfing privileges with affiliated clubs'
+            ]
+        },
+        {
+            name: 'Corporate Member',
+            price: 'KES 200,000 / yr',
+            joining: 'KES 100,000 joining fee',
+            badge: 'Business',
+            features: [
+                '4 transferable corporate player slots',
+                'Access to executive meeting & conference rooms',
+                'Corporate tournament hosting discounts',
+                'Dedicated account manager & monthly invoicing',
+                'Full dining & entertainment privileges',
+                'VIP guest passes & customized corporate days'
+            ]
+        },
+        {
+            name: 'Associate Member',
+            price: 'KES 30,000 / yr',
+            joining: 'KES 20,000 joining fee',
+            features: [
+                'Weekday golfing rights (Monday – Friday)',
+                'Official handicap index maintenance',
+                'Access to clubhouse, dining, and social events',
+                'Discounted weekend green fees',
+                'Up to 2 registered family dependants'
+            ]
+        },
+        {
+            name: 'Junior Member (Under 25)',
+            price: 'KES 15,000 / yr',
+            joining: 'KES 10,000 joining fee',
+            features: [
+                'Golfing rights on junior tee boxes',
+                'Junior golf academy coaching sessions',
+                'Entry to junior championships and holiday camps',
+                'Free range balls during training clinics'
+            ]
+        }
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
+        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
             <LandingNavbar />
 
-            <div className="flex-1 pt-32 pb-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20 animate-fade-in-up">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 mb-6">
-                            <Star className="w-5 h-5 text-emerald-500 fill-current" />
-                            <span className="text-sm font-bold text-emerald-800 tracking-wide uppercase">Membership Benefits</span>
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight leading-tight">
-                            Elevate Your Nursing Career <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">With NNAK Membership</span>
-                        </h1>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                            Join a community dedicated to professional excellence, advocacy, and welfare. Discover why thousands of nurses choose NNAK.
-                        </p>
-                    </div>
+            <div className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div className="text-center max-w-3xl mx-auto space-y-3">
+                    <h1 className="text-xs font-black uppercase tracking-[0.25em] text-emerald-600">Club Membership</h1>
+                    <p className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">Membership Categories & Privileges</p>
+                    <p className="text-sm text-slate-500 font-medium">Join Kenya's premier golfing community with world-class facilities and flexible membership tiers.</p>
+                </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <BenefitCard
-                            icon={<Award className="w-8 h-8 text-emerald-600" />}
-                            title="Professional Recognition"
-                            description="Gain official recognition as a registered member of the National Nurses Association of Kenya, enhancing your professional standing."
-                        />
-                        <BenefitCard
-                            icon={<BookOpen className="w-8 h-8 text-teal-600" />}
-                            title="CPD Opportunities"
-                            description="Access exclusive Continuous Professional Development (CPD) courses, workshops, and seminars to keep your skills sharp."
-                        />
-                        <BenefitCard
-                            icon={<Users className="w-8 h-8 text-blue-600" />}
-                            title="Networking & Community"
-                            description="Connect with peers, mentors, and industry leaders through conferences, local chapters, and special interest groups."
-                        />
-                        <BenefitCard
-                            icon={<ShieldCheck className="w-8 h-8 text-indigo-600" />}
-                            title="Legal & Welfare Support"
-                            description="Receive guidance and support on professional indemnity, labor rights, and workplace welfare issues."
-                        />
-                        <BenefitCard
-                            icon={<Globe className="w-8 h-8 text-purple-600" />}
-                            title="Global Representation"
-                            description="Be part of the International Council of Nurses (ICN) through NNAK, giving you a voice on the global stage."
-                        />
-                        <BenefitCard
-                            icon={<Layers className="w-8 h-8 text-amber-600" />}
-                            title="Career Resources"
-                            description="Access job boards, career counseling, and mentorship programs designed to accelerate your professional growth."
-                        />
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {categories.map((cat, idx) => (
+                        <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-5 flex flex-col justify-between hover:shadow-xl transition-all">
+                            <div className="space-y-4">
+                                {cat.badge && (
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                                        {cat.badge}
+                                    </span>
+                                )}
+                                <div>
+                                    <h3 className="font-black text-slate-900 text-lg">{cat.name}</h3>
+                                    <div className="text-xl font-black text-emerald-600 mt-1">{cat.price}</div>
+                                    <div className="text-[10px] font-bold text-slate-400 mt-0.5">{cat.joining}</div>
+                                </div>
+
+                                <ul className="space-y-2.5 text-xs text-slate-600">
+                                    {cat.features.map((f, fIdx) => (
+                                        <li key={fIdx} className="flex items-start gap-2">
+                                            <Check size={14} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                                            <span>{f}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <Link
+                                to="/signup"
+                                className="w-full text-center bg-slate-900 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all"
+                            >
+                                Apply for Membership
+                            </Link>
+                        </div>
+                    ))}
                 </div>
             </div>
 
@@ -63,15 +111,5 @@ const BenefitsPage = () => {
         </div>
     );
 };
-
-const BenefitCard = ({ icon, title, description }) => (
-    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
-        <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-50 transition-colors">
-            {icon}
-        </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
-        <p className="text-gray-600 leading-relaxed text-sm">{description}</p>
-    </div>
-);
 
 export default BenefitsPage;
