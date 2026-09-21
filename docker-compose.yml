@@ -14,7 +14,7 @@ services:
       - ./backend/MASTER_SCHEMA.sql:/docker-entrypoint-initdb.d/00_master_schema.sql:ro
       - ./backend/migrations:/migrations:ro
     ports:
-      - "3306:3306"
+      - "3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS:-mms_root_2024}"]
       interval: 10s
