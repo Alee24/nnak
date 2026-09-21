@@ -75,7 +75,7 @@ const DEFAULT_GUESTS = [
 ];
 
 const GuestsPage = () => {
-    const [guests, setGuests] = useState(DEFAULT_GUESTS);
+    const [guests, setGuests] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -100,14 +100,14 @@ const GuestsPage = () => {
         try {
             const res = await AdminAPI.getGuests();
             const list = res?.data || res?.guests || [];
-            if (Array.isArray(list) && list.length > 0) {
+            if (Array.isArray(list)) {
                 setGuests(list);
             } else {
-                setGuests(DEFAULT_GUESTS);
+                setGuests([]);
             }
         } catch (e) {
-            console.warn("Using fallback guests:", e);
-            setGuests(DEFAULT_GUESTS);
+            console.warn("Error fetching guests:", e);
+            setGuests([]);
         } finally {
             setLoading(false);
         }

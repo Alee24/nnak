@@ -98,7 +98,7 @@ const DEFAULT_INVOICES = [
 ];
 
 const InvoicesPage = () => {
-    const [invoices, setInvoices] = useState(DEFAULT_INVOICES);
+    const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -126,14 +126,14 @@ const InvoicesPage = () => {
         try {
             const res = await AdminAPI.getInvoices();
             const list = res?.data || res?.invoices || [];
-            if (Array.isArray(list) && list.length > 0) {
+            if (Array.isArray(list)) {
                 setInvoices(list);
             } else {
-                setInvoices(DEFAULT_INVOICES);
+                setInvoices([]);
             }
         } catch (e) {
-            console.warn("Using fallback invoices:", e);
-            setInvoices(DEFAULT_INVOICES);
+            console.warn("Error fetching invoices:", e);
+            setInvoices([]);
         } finally {
             setLoading(false);
         }

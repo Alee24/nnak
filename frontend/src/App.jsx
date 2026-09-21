@@ -36,6 +36,13 @@ import FinancePage from './pages/FinancePage';
 import FacilitiesPage from './pages/FacilitiesPage';
 import ScorecardsPage from './pages/ScorecardsPage';
 import HandicapPage from './pages/HandicapPage';
+import RestaurantPage from './pages/RestaurantPage';
+import GolfShopPage from './pages/GolfShopPage';
+import CaddiesPage from './pages/CaddiesPage';
+import GolfCartsPage from './pages/GolfCartsPage';
+import AssetsPage from './pages/AssetsPage';
+import SuppliersPage from './pages/SuppliersPage';
+import StaffPage from './pages/StaffPage';
 
 // Dashboard Switcher based on role
 const DashboardSwitcher = () => {
@@ -105,6 +112,13 @@ function App() {
           <Route path="facilities" element={<FacilitiesPage />} />
           <Route path="scorecards" element={<ScorecardsPage />} />
           <Route path="handicaps" element={<HandicapPage />} />
+          <Route path="restaurant" element={<RestaurantPage />} />
+          <Route path="golf-shop" element={<GolfShopPage />} />
+          <Route path="caddies" element={<CaddiesPage />} />
+          <Route path="golf-carts" element={<GolfCartsPage />} />
+          <Route path="assets" element={<AdminRoute><AssetsPage /></AdminRoute>} />
+          <Route path="suppliers" element={<AdminRoute><SuppliersPage /></AdminRoute>} />
+          <Route path="staff" element={<AdminRoute><StaffPage /></AdminRoute>} />
         </Route>
 
         {/* Catch all redirect */}

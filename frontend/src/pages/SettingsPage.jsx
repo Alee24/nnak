@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Save, Upload, Image as ImageIcon, Check, Info, Phone, MapPin, Globe, Mail, User, Shield } from 'lucide-react';
+import { Save, Upload, Image as ImageIcon, Check, Info, Phone, MapPin, Globe, Mail, User, Shield, Database, Sparkles, Trash2, RefreshCw, ToggleLeft, ToggleRight } from 'lucide-react';
 import AdminAPI from '../services/api';
 import Swal from 'sweetalert2';
 
@@ -181,9 +181,119 @@ const SettingsPage = () => {
         </div>
     );
 
+    const [demoMode, setDemoMode] = useState(true);
+    const [demoLoading, setDemoLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchDemoStatus = async () => {
+            try {
+                const res = await AdminAPI.getDemoStatus();
+                if (res && res.success) {
+                    setDemoMode(res.demo_mode);
+                }
+            } catch (e) {
+                // ignore
+            }
+        };
+        fetchDemoStatus();
+    }, []);
+
+    const handleToggleDemoMode = async () => {
+        try {
+            setDemoLoading(true);
+            const nextMode = !demoMode;
+            const res = await AdminAPI.toggleDemoMode(nextMode);
+            if (res.success) {
+                setDemoMode(res.demo_mode);
+                Swal.fire({
+                    icon: 'success',
+                    title: res.demo_mode ? 'Demo Mode Activated' : 'Live Mode Activated',
+                    text: res.demo_mode
+                        ? 'Login page will now display default demo credentials for all member and staff types.'
+                        : 'Login page will now act as a live production portal without demo credentials.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        } catch (error) {
+            Swal.fire('Error', error.message || 'Failed to toggle demo mode', 'error');
+        } finally {
+            setDemoLoading(false);
+        }
+    };
+
+    const handlePopulateDemoData = async () => {
+        const result = await Swal.fire({
+            title: 'Populate Demo Data?',
+            text: 'This will seed complete realistic demo records into the database (members, courses, tee times, tournaments, restaurant tables, products, caddies, carts, and staff).',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, Populate Database'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            setDemoLoading(true);
+            const res = await AdminAPI.populateDemoData();
+            if (res.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Database Populated!',
+                    text: 'Demo data has been seeded across all modules.',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                fetchSettings();
+            }
+        } catch (error) {
+            Swal.fire('Error', error.message || 'Failed to populate demo data', 'error');
+        } finally {
+            setDemoLoading(false);
+        }
+    };
+
+    const handleClearDemoData = async () => {
+        const result = await Swal.fire({
+            title: 'Clear All Operational Data?',
+            text: 'This will wipe all tee times, tournament registrations, scorecards, orders, invoices, and guest records. Core admin accounts and system schema will be preserved.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, Clear All Data'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            setDemoLoading(true);
+            const res = await AdminAPI.clearDemoData();
+            if (res.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Database Cleared!',
+                    text: 'All operational records have been cleared. The system is fresh.',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                fetchSettings();
+            }
+        } catch (error) {
+            Swal.fire('Error', error.message || 'Failed to clear data', 'error');
+        } finally {
+            setDemoLoading(false);
+        }
+    };
+
     const tabs = [
         { id: 'account', label: 'My Account' },
         ...(isAdmin ? [
+            { id: 'demo', label: 'Demo & Database' },
             { id: 'branding', label: 'Branding & Identity' },
             { id: 'contact', label: 'Contact Details' },
             { id: 'payments', label: 'Payment Gateways' }
@@ -233,7 +343,106 @@ const SettingsPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {activeTab === 'account' ? (
+                {activeTab === 'demo' ? (
+                    <>
+                        {/* Demo Mode Toggle Card */}
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner">
+                                    <Sparkles size={24} strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900">Demo Mode Control</h3>
+                                    <div className="h-1 w-8 bg-emerald-500 rounded-full mt-1"></div>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                                Toggle Demo Mode on or off. When <strong>ON</strong>, the login portal shows quick-fill buttons with default credentials for all member roles (Admin, Member, Pro, Cashier, etc.). When <strong>OFF</strong>, the login portal behaves as an active live production environment with zero demo text.
+                            </p>
+
+                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <div className="text-xs font-black uppercase tracking-wider text-slate-900">
+                                        System State: {demoMode ? (
+                                            <span className="text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] ml-2">DEMO ACTIVE</span>
+                                        ) : (
+                                            <span className="text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-[10px] ml-2">LIVE PRODUCTION</span>
+                                        )}
+                                    </div>
+                                    <span className="text-[11px] text-slate-500 block mt-1">
+                                        {demoMode ? 'Default credentials visible on login page' : 'Login credentials box completely hidden'}
+                                    </span>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={handleToggleDemoMode}
+                                    disabled={demoLoading}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md ${
+                                        demoMode
+                                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                                    }`}
+                                >
+                                    {demoMode ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                                    <span>{demoMode ? 'Turn Demo OFF' : 'Turn Demo ON'}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Database Seed & Wipe Actions Card */}
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
+                                    <Database size={24} strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900">Database Management</h3>
+                                    <div className="h-1 w-8 bg-blue-500 rounded-full mt-1"></div>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                                Manage the live database contents with one click. Populate rich demo records across all modules, or clear operational tables to start a fresh club season.
+                            </p>
+
+                            <div className="space-y-4 pt-2">
+                                <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-100 flex items-center justify-between">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-emerald-900">Populate Demo Records</h4>
+                                        <p className="text-[11px] text-slate-600 mt-0.5">Seeds courses, tee times, tournaments, shop items, caddies, carts & staff</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handlePopulateDemoData}
+                                        disabled={demoLoading}
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition active:scale-95"
+                                    >
+                                        <Sparkles size={14} />
+                                        <span>Populate</span>
+                                    </button>
+                                </div>
+
+                                <div className="p-4 bg-rose-50/60 rounded-2xl border border-rose-100 flex items-center justify-between">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-rose-900">Clear Operational Data</h4>
+                                        <p className="text-[11px] text-slate-600 mt-0.5">Wipes tee bookings, scorecards, orders, invoices & guest passes cleanly</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleClearDemoData}
+                                        disabled={demoLoading}
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition active:scale-95"
+                                    >
+                                        <Trash2 size={14} />
+                                        <span>Clear Data</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : activeTab === 'account' ? (
                     <>
                         {/* Account Basic Info */}
                         <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">

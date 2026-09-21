@@ -84,8 +84,8 @@ const DEFAULT_BOOKINGS = [
 ];
 
 const FacilitiesPage = () => {
-    const [facilities, setFacilities] = useState(DEFAULT_FACILITIES);
-    const [bookings, setBookings] = useState(DEFAULT_BOOKINGS);
+    const [facilities, setFacilities] = useState([]);
+    const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showBookModal, setShowBookModal] = useState(false);
     const [bookForm, setBookForm] = useState({
@@ -108,14 +108,14 @@ const FacilitiesPage = () => {
         try {
             const res = await AdminAPI.getFacilities();
             const list = res?.data || res?.facilities || [];
-            if (Array.isArray(list) && list.length > 0) {
+            if (Array.isArray(list)) {
                 setFacilities(list);
             } else {
-                setFacilities(DEFAULT_FACILITIES);
+                setFacilities([]);
             }
         } catch (e) {
-            console.warn("Using fallback facilities:", e);
-            setFacilities(DEFAULT_FACILITIES);
+            console.warn("Error fetching facilities:", e);
+            setFacilities([]);
         } finally {
             setLoading(false);
         }

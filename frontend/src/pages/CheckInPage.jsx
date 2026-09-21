@@ -43,14 +43,10 @@ const CheckInPage = () => {
         try {
             const res = await AdminAPI.getTodayCheckIns();
             const list = res?.data || res?.checkins || [];
-            if (Array.isArray(list) && list.length > 0) {
-                setTodayCheckIns(list);
-            } else {
-                setTodayCheckIns(DEFAULT_CHECKINS);
-            }
+            setTodayCheckIns(Array.isArray(list) ? list : []);
         } catch (e) {
-            console.warn("Using fallback checkins:", e);
-            setTodayCheckIns(DEFAULT_CHECKINS);
+            console.warn("Failed to fetch checkins:", e);
+            setTodayCheckIns([]);
         }
     };
 

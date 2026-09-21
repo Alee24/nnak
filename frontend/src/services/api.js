@@ -440,6 +440,12 @@ class AdminAPI {
     static async payRestaurantOrder(orderId, data) { return api.post(`/restaurant/orders/${orderId}/pay`, data); }
     static async getDailySalesRestaurant(date) { return api.get(`/restaurant/daily-sales?date=${date}`); }
     static async getRestaurantMenu() { return api.get('/restaurant/menu'); }
+
+    // Demo & Data Management Methods
+    static async getDemoStatus() { return api.get('/demo/status'); }
+    static async toggleDemoMode(enabled) { return api.post('/demo/toggle', { enabled }); }
+    static async populateDemoData() { return api.post('/demo/populate'); }
+    static async clearDemoData() { return api.post('/demo/clear'); }
 }
 
 export default AdminAPI;

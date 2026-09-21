@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Mail, Lock, Loader, ArrowRight, ShieldCheck, KeyRound, Flag, Trophy, Sparkles } from 'lucide-react';
@@ -8,11 +8,27 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1); // 1: Credentials, 2: OTP
+    const [isDemoMode, setIsDemoMode] = useState(true);
     const [formData, setFormData] = useState({
         email: 'gm@mmsgolfclub.co.ke',
         password: '',
         otp: '2424'
     });
+
+    useEffect(() => {
+        const checkDemoMode = async () => {
+            try {
+                const res = await AdminAPI.getPublicSettings();
+                const dm = res?.settings?.demo_mode;
+                if (dm !== undefined) {
+                    setIsDemoMode(dm === '1' || dm === 'true' || dm === true);
+                }
+            } catch (e) {
+                // Keep default demo mode enabled on error
+            }
+        };
+        checkDemoMode();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -227,12 +243,48 @@ const LoginPage = () => {
                                 )}
                             </button>
 
-                            {/* Demo Credentials Helper Box */}
-                            <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-                                <span className="font-black text-slate-700 dark:text-slate-200 block uppercase text-[9px] tracking-wider">Default Demo Access:</span>
-                                <div>Admin: <strong className="text-slate-800 dark:text-slate-200">gm@mmsgolfclub.co.ke</strong></div>
-                                <div>Pass: <strong className="text-slate-800 dark:text-slate-200">Digital2025</strong> | OTP: <strong className="text-emerald-600">2424</strong></div>
-                            </div>
+                            {/* Demo Credentials Helper Box (Shown ONLY when demo_mode is ON) */}
+                            {isDemoMode && (
+                                <div className="p-3.5 bg-emerald-50/70 dark:bg-slate-700/50 rounded-xl border border-emerald-200 dark:border-slate-600 text-[11px] space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-black text-emerald-800 dark:text-emerald-300 uppercase text-[9px] tracking-wider flex items-center gap-1">
+                                            <Sparkles size={11} className="text-emerald-600" />
+                                            Active Demo Accounts (Click to Fill):
+                                        </span>
+                                        <span className="text-[9px] font-mono font-bold text-slate-500">Pass: Digital2025 | OTP: 2424</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-1.5 pt-1">
+                                        {[
+                                            { label: 'General Manager', email: 'gm@mmsgolfclub.co.ke' },
+                                            { label: 'Club Member', email: 'member@mmsgolfclub.co.ke' },
+                                            { label: 'Golf Pro', email: 'pro@mmsgolfclub.co.ke' },
+                                            { label: 'Finance Director', email: 'finance@mmsgolfclub.co.ke' },
+                                            { label: 'Club Cashier', email: 'cashier@mmsgolfclub.co.ke' },
+                                            { label: 'Front Desk', email: 'reception@mmsgolfclub.co.ke' }
+                                        ].map((acc) => (
+                                            <button
+                                                key={acc.email}
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData({
+                                                        email: acc.email,
+                                                        password: 'Digital2025',
+                                                        otp: '2424'
+                                                    });
+                                                }}
+                                                className="text-left px-2 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-slate-200 dark:border-slate-600 transition truncate group"
+                                            >
+                                                <span className="block font-bold text-[10px] text-slate-800 dark:text-slate-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 truncate">
+                                                    {acc.label}
+                                                </span>
+                                                <span className="block text-[8px] text-slate-500 dark:text-slate-400 font-mono truncate">
+                                                    {acc.email}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </form>
                     ) : (
                         <form onSubmit={handleOtpSubmit} className="space-y-4 animate-fade-in">

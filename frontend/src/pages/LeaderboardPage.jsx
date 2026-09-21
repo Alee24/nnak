@@ -60,14 +60,14 @@ const LeaderboardPage = () => {
         try {
             const res = await AdminAPI.getCompetitionLeaderboard(compId);
             const list = res?.data || res?.leaderboard || [];
-            if (Array.isArray(list) && list.length > 0) {
+            if (Array.isArray(list)) {
                 setLeaderboard(list);
             } else {
-                setLeaderboard(DEFAULT_LEADERBOARD);
+                setLeaderboard([]);
             }
         } catch (e) {
-            console.warn("Using fallback leaderboard:", e);
-            setLeaderboard(DEFAULT_LEADERBOARD);
+            console.warn("Error fetching leaderboard:", e);
+            setLeaderboard([]);
         } finally {
             setLoading(false);
         }

@@ -9,6 +9,7 @@ import {
 import AdminAPI from '../services/api';
 import Swal from 'sweetalert2';
 import clsx from 'clsx';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const CPDPoints = () => {
     const [ledger, setLedger] = useState([]);
@@ -297,14 +298,21 @@ const CPDPoints = () => {
                         <form onSubmit={handleManualAward} className="p-8 space-y-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Membership Number</label>
-                                    <input
-                                        required
-                                        type="text"
-                                        placeholder="e.g. NNAK-2024-001"
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Club Member (Search or enter number) *</label>
+                                    <MemberSearchInput
                                         value={formData.member_id_str}
-                                        onChange={(e) => setFormData({ ...formData, member_id_str: e.target.value })}
-                                        className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-emerald-500/20 transition-all font-dm-sans"
+                                        placeholder="Type member name or MMS ID..."
+                                        required
+                                        onChange={(val) => {
+                                            if (typeof val === 'object' && val !== null) {
+                                                setFormData({
+                                                    ...formData,
+                                                    member_id_str: val.member_number || val.player_name
+                                                });
+                                            } else {
+                                                setFormData({ ...formData, member_id_str: val });
+                                            }
+                                        }}
                                     />
                                 </div>
 

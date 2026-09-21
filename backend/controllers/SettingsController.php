@@ -48,7 +48,7 @@ class SettingsController {
                 'social_facebook', 'social_twitter', 'social_instagram', 'social_linkedin',
                 'office_hours_weekdays', 'office_hours_saturday', 'office_hours_sunday',
                 'mpesa_shortcode', 'mpesa_env', 'paypal_client_id', 'paypal_env',
-                'stripe_publishable_key', 'stripe_env'
+                'stripe_publishable_key', 'stripe_env', 'demo_mode'
             ];
             
             $placeholders = implode(',', array_fill(0, count($safeKeys), '?'));

@@ -98,14 +98,14 @@ const ScorecardsPage = () => {
         try {
             const res = await AdminAPI.getScorecards();
             const list = res?.data || res?.scorecards || [];
-            if (Array.isArray(list) && list.length > 0) {
+            if (Array.isArray(list)) {
                 setScorecards(list);
             } else {
-                setScorecards(DEFAULT_SCORECARDS);
+                setScorecards([]);
             }
         } catch (e) {
-            console.warn("Using fallback scorecards:", e);
-            setScorecards(DEFAULT_SCORECARDS);
+            console.warn("Error fetching scorecards:", e);
+            setScorecards([]);
         } finally {
             setLoading(false);
         }

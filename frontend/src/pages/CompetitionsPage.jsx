@@ -111,14 +111,10 @@ const CompetitionsPage = () => {
         try {
             const res = await AdminAPI.getCompetitions();
             const list = res?.data || res?.competitions || [];
-            if (Array.isArray(list) && list.length > 0) {
-                setCompetitions(list);
-            } else {
-                setCompetitions(DEFAULT_COMPETITIONS);
-            }
+            setCompetitions(Array.isArray(list) ? list : []);
         } catch (e) {
-            console.warn("Using fallback competitions:", e);
-            setCompetitions(DEFAULT_COMPETITIONS);
+            console.warn("Failed to fetch competitions:", e);
+            setCompetitions([]);
         } finally {
             setLoading(false);
         }

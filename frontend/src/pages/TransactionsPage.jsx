@@ -69,11 +69,11 @@ const TransactionsPage = () => {
                     }));
                 }
             } else {
-                setTransactions(DEFAULT_PAYMENTS);
+                setTransactions([]);
             }
         } catch (error) {
-            console.warn("Using fallback transactions:", error);
-            setTransactions(DEFAULT_PAYMENTS);
+            console.warn("Error loading transactions:", error);
+            setTransactions([]);
         } finally {
             setLoading(false);
         }

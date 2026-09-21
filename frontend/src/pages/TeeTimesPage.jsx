@@ -96,15 +96,10 @@ const TeeTimesPage = () => {
         try {
             const res = await AdminAPI.getTeeTimes({ date: selectedDate, course_id: selectedCourse });
             const list = res?.data || res?.tee_times || [];
-            if (Array.isArray(list) && list.length > 0) {
-                setTeeTimes(list);
-            } else {
-                // Populate default championship slots so the page is never blank
-                setTeeTimes(generateDefaultSlots(selectedDate));
-            }
+            setTeeTimes(Array.isArray(list) ? list : []);
         } catch (e) {
-            console.warn("Using fallback tee sheet data:", e);
-            setTeeTimes(generateDefaultSlots(selectedDate));
+            console.warn("Failed to fetch tee times:", e);
+            setTeeTimes([]);
         } finally {
             setLoading(false);
         }
