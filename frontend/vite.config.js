@@ -9,6 +9,7 @@ export default defineConfig({
     strictPort: true,
     host: true,
     allowedHosts: [
+      "mms.kkdes.co.ke",
       "nnak.kkdes.co.ke",
       "185.192.97.84",
       "localhost"
