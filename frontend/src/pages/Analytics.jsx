@@ -68,18 +68,28 @@ const Analytics = () => {
         fetch('/api/analytics')
             .then(res => res.json())
             .then(res => {
-                if (res?.success && res?.data) setAnalytics(res.data);
+                if (res?.success && res?.data) {
+                    setAnalytics(prev => ({
+                        ...prev,
+                        ...res.data,
+                        rounds_by_month: res.data.rounds_by_month || prev.rounds_by_month || DEFAULT_ANALYTICS.rounds_by_month,
+                        handicap_distribution: res.data.handicap_distribution || prev.handicap_distribution || DEFAULT_ANALYTICS.handicap_distribution,
+                        course_utilization: res.data.course_utilization || prev.course_utilization || DEFAULT_ANALYTICS.course_utilization,
+                        revenue_breakdown: res.data.revenue_breakdown || prev.revenue_breakdown || DEFAULT_ANALYTICS.revenue_breakdown
+                    }));
+                }
             })
             .catch(err => console.warn("Using fallback analytics:", err));
     }, []);
 
     // Rounds Played Chart
+    const roundsList = analytics?.rounds_by_month || DEFAULT_ANALYTICS.rounds_by_month;
     const roundsData = {
-        labels: analytics.rounds_by_month.map(d => d.month),
+        labels: roundsList.map(d => d.month),
         datasets: [
             {
                 label: '18-Hole Rounds Played',
-                data: analytics.rounds_by_month.map(d => d.count),
+                data: roundsList.map(d => d.count),
                 borderColor: '#059669',
                 backgroundColor: 'rgba(5, 150, 105, 0.1)',
                 fill: true,
@@ -89,11 +99,12 @@ const Analytics = () => {
     };
 
     // Handicap Doughnut
+    const hcpList = analytics?.handicap_distribution || DEFAULT_ANALYTICS.handicap_distribution;
     const hcpData = {
-        labels: analytics.handicap_distribution.map(d => d.category),
+        labels: hcpList.map(d => d.category),
         datasets: [
             {
-                data: analytics.handicap_distribution.map(d => d.count),
+                data: hcpList.map(d => d.count),
                 backgroundColor: ['#8b5cf6', '#059669', '#3b82f6', '#f59e0b'],
                 borderWidth: 0
             }
@@ -101,12 +112,13 @@ const Analytics = () => {
     };
 
     // Utilization Bar
+    const utilList = analytics?.course_utilization || DEFAULT_ANALYTICS.course_utilization;
     const utilData = {
-        labels: analytics.course_utilization.map(d => d.day),
+        labels: utilList.map(d => d.day),
         datasets: [
             {
                 label: 'Course Utilization %',
-                data: analytics.course_utilization.map(d => d.rate),
+                data: utilList.map(d => d.rate),
                 backgroundColor: '#059669',
                 borderRadius: 8
             }
@@ -252,11 +264,11 @@ const Analytics = () => {
                             Annual Revenue Stream Distribution
                         </h3>
                         <div className="space-y-3">
-                            {analytics.revenue_breakdown.map((rev, idx) => (
+                            {(analytics?.revenue_breakdown || DEFAULT_ANALYTICS.revenue_breakdown || []).map((rev, idx) => (
                                 <div key={idx} className="flex justify-between items-center text-xs">
                                     <span className="font-bold text-slate-700 dark:text-slate-300">{rev.label}</span>
                                     <span className="font-black text-slate-900 dark:text-white">
-                                        KES {Number(rev.amount).toLocaleString()}
+                                         KES {Number(rev.amount).toLocaleString()}
                                     </span>
                                 </div>
                             ))}

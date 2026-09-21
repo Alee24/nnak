@@ -259,7 +259,7 @@ const MemberDashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                                {data.recent_scores.map((sc, idx) => (
+                                {(data?.recent_scores || []).map((sc, idx) => (
                                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
                                         <td className="p-3 text-slate-500 font-medium">{sc.date}</td>
                                         <td className="p-3 font-bold text-slate-800 dark:text-slate-200">{sc.course}</td>
@@ -292,7 +292,7 @@ const MemberDashboard = () => {
                         </div>
 
                         <div className="space-y-2">
-                            {data.upcoming_events.map((ev) => (
+                            {(data?.upcoming_events || []).map((ev) => (
                                 <div key={ev.id} className="p-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1">
                                     <div className="flex justify-between items-start">
                                         <h4 className="font-semibold text-slate-900 dark:text-white text-xs leading-snug">

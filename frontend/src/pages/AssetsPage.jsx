@@ -90,8 +90,8 @@ const AssetsPage = () => {
         return matchesSearch && matchesCategory;
     });
 
-    const categories = Array.from(new Set(assets.map(a => a.category).filter(Boolean)));
-    const totalValuation = assets.reduce((sum, a) => sum + Number(a.purchase_cost || 0), 0);
+    const categories = Array.isArray(assets) ? Array.from(new Set(assets.map(a => a?.category).filter(Boolean))) : [];
+    const totalValuation = Array.isArray(assets) ? assets.reduce((sum, a) => sum + Number(a?.purchase_cost || 0), 0) : 0;
 
     return (
         <div className="flex flex-col gap-6 pb-12 animate-fade-in">

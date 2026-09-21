@@ -140,7 +140,7 @@ const GolfShopPage = () => {
         return matchesSearch && matchesCat;
     });
 
-    const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+    const categories = Array.isArray(products) ? Array.from(new Set(products.map(p => p?.category).filter(Boolean))) : [];
 
     return (
         <div className="flex flex-col gap-6 pb-12 animate-fade-in">
