@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_COURSES = [
     { id: 1, name: 'Championship 18-Hole Course', holes: 18, par: 72 },
@@ -599,15 +600,24 @@ const TeeTimesPage = () => {
                         <form onSubmit={handleConfirmBooking} className="p-5 space-y-4">
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                    Golfer Full Name *
+                                    Golfer Full Name * (Search member or type)
                                 </label>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="e.g. Alex Metto"
+                                <MemberSearchInput
                                     value={bookingForm.member_name}
-                                    onChange={(e) => setBookingForm({ ...bookingForm, member_name: e.target.value })}
-                                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500"
+                                    placeholder="Search club member or enter name..."
+                                    required
+                                    onChange={(val) => {
+                                        if (typeof val === 'object' && val !== null) {
+                                            setBookingForm({
+                                                ...bookingForm,
+                                                member_name: val.player_name,
+                                                member_number: val.member_number || bookingForm.member_number,
+                                                handicap: val.handicap || bookingForm.handicap
+                                            });
+                                        } else {
+                                            setBookingForm({ ...bookingForm, member_name: val });
+                                        }
+                                    }}
                                 />
                             </div>
 

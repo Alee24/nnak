@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_SCORECARDS = [
     {
@@ -361,15 +362,24 @@ const ScorecardsPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                        Golfer Name *
+                                        Golfer Name * (Search member)
                                     </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="Alex Metto"
+                                    <MemberSearchInput
                                         value={entryForm.player_name}
-                                        onChange={(e) => setEntryForm({ ...entryForm, player_name: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none"
+                                        placeholder="Alex Metto"
+                                        required
+                                        onChange={(val) => {
+                                            if (typeof val === 'object' && val !== null) {
+                                                setEntryForm({
+                                                    ...entryForm,
+                                                    player_name: val.player_name,
+                                                    member_number: val.member_number || entryForm.member_number,
+                                                    playing_handicap: val.handicap ? Math.round(Number(val.handicap)) : entryForm.playing_handicap
+                                                });
+                                            } else {
+                                                setEntryForm({ ...entryForm, player_name: val });
+                                            }
+                                        }}
                                     />
                                 </div>
                                 <div>
@@ -385,14 +395,15 @@ const ScorecardsPage = () => {
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                        Marker Name
+                                        Marker Name (Search member)
                                     </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Collins Korir"
+                                    <MemberSearchInput
                                         value={entryForm.marker_name}
-                                        onChange={(e) => setEntryForm({ ...entryForm, marker_name: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none"
+                                        placeholder="Collins Korir"
+                                        onChange={(val) => {
+                                            const name = typeof val === 'object' && val !== null ? val.player_name : val;
+                                            setEntryForm({ ...entryForm, marker_name: name });
+                                        }}
                                     />
                                 </div>
                             </div>

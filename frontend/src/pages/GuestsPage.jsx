@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_GUESTS = [
     {
@@ -396,14 +397,15 @@ const GuestsPage = () => {
 
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                    Host Member Name
+                                    Host Member Name (Search member or leave blank for walk-in)
                                 </label>
-                                <input
-                                    type="text"
-                                    placeholder="Alex Metto (or leave blank if walk-in visitor)"
+                                <MemberSearchInput
                                     value={form.host_member_name}
-                                    onChange={(e) => setForm({ ...form, host_member_name: e.target.value })}
-                                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none"
+                                    placeholder="Search host member (e.g. Kevin Omondi)..."
+                                    onChange={(val) => {
+                                        const name = typeof val === 'object' && val !== null ? val.player_name : val;
+                                        setForm({ ...form, host_member_name: name });
+                                    }}
                                 />
                             </div>
 

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_COMPETITIONS = [
     {
@@ -568,15 +569,24 @@ const CompetitionsPage = () => {
                         <form onSubmit={handleConfirmRegister} className="p-5 space-y-3.5">
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                    Golfer Full Name *
+                                    Golfer Full Name * (Search member or type)
                                 </label>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="e.g. Alex Metto"
+                                <MemberSearchInput
                                     value={regForm.player_name}
-                                    onChange={(e) => setRegForm({ ...regForm, player_name: e.target.value })}
-                                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500"
+                                    placeholder="Type member name or MMS ID..."
+                                    required
+                                    onChange={(val) => {
+                                        if (typeof val === 'object' && val !== null) {
+                                            setRegForm({
+                                                ...regForm,
+                                                player_name: val.player_name,
+                                                member_number: val.member_number || regForm.member_number,
+                                                handicap: val.handicap || regForm.handicap
+                                            });
+                                        } else {
+                                            setRegForm({ ...regForm, player_name: val });
+                                        }
+                                    }}
                                 />
                             </div>
 

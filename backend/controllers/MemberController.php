@@ -499,7 +499,7 @@ class MemberController {
             $searchTerm = "%$query%";
             $stmt = $this->db->prepare("
                 SELECT m.id, m.member_id, m.email, m.first_name, m.last_name, 
-                       m.phone, m.status, mt.name as membership_type_name
+                       m.phone, m.status, m.handicap_index, mt.name as membership_type_name
                 FROM members m
                 LEFT JOIN membership_types mt ON m.membership_type_id = mt.id
                 WHERE m.deleted_at IS NULL

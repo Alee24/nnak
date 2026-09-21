@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_FACILITIES = [
     {
@@ -330,15 +331,16 @@ const FacilitiesPage = () => {
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                        Member Full Name *
+                                        Member Full Name * (Search member)
                                     </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="Alex Metto"
+                                    <MemberSearchInput
                                         value={bookForm.member_name}
-                                        onChange={(e) => setBookForm({ ...bookForm, member_name: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none"
+                                        placeholder="Alex Metto"
+                                        required
+                                        onChange={(val) => {
+                                            const name = typeof val === 'object' && val !== null ? val.player_name : val;
+                                            setBookForm({ ...bookForm, member_name: name });
+                                        }}
                                     />
                                 </div>
                                 <div>

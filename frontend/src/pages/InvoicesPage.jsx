@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_INVOICES = [
     {
@@ -427,15 +428,24 @@ const InvoicesPage = () => {
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                        Member Name *
+                                        Member Name * (Search member)
                                     </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="Alex Metto"
+                                    <MemberSearchInput
                                         value={createForm.member_name}
-                                        onChange={(e) => setCreateForm({ ...createForm, member_name: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none"
+                                        placeholder="Search member name..."
+                                        required
+                                        onChange={(val) => {
+                                            if (typeof val === 'object' && val !== null) {
+                                                setCreateForm({
+                                                    ...createForm,
+                                                    member_name: val.player_name,
+                                                    member_number: val.member_number || createForm.member_number,
+                                                    email: val.email || createForm.email
+                                                });
+                                            } else {
+                                                setCreateForm({ ...createForm, member_name: val });
+                                            }
+                                        }}
                                     />
                                 </div>
                                 <div>

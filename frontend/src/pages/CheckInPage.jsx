@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
+import MemberSearchInput from '../components/MemberSearchInput';
 
 const DEFAULT_CHECKINS = [
     { id: 1, member_name: 'Alex Metto', member_number: 'MMS-0042', purpose: 'Golf (Championship 18H)', check_in_time: '07:15 AM', status: 'on_course', handicap: 6.4, cart_assigned: 'Cart #12' },
@@ -230,15 +231,26 @@ const CheckInPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="md:col-span-2">
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                Search Member by Name, Phone or Membership Number *
+                                Search Member by Name or Membership Number *
                             </label>
-                            <input
-                                type="text"
-                                required
-                                placeholder="Type member name (e.g. Alex Metto, Arthur Mwangi) or MMS-0042..."
+                            <MemberSearchInput
                                 value={query}
-                                onChange={(e) => handleSearchCheck(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                placeholder="Search member name or MMS ID (e.g. Alex Metto, MMS-0042)..."
+                                required
+                                onChange={(val) => {
+                                    if (typeof val === 'object' && val !== null) {
+                                        setQuery(val.player_name);
+                                        setMatchedMember({
+                                            name: val.player_name,
+                                            member_number: val.member_number || 'MMS-0042',
+                                            status: 'Active Member',
+                                            handicap: val.handicap || '14.0',
+                                            balance: 'KES 0 (Up to date)'
+                                        });
+                                    } else {
+                                        handleSearchCheck(val);
+                                    }
+                                }}
                             />
                         </div>
 
@@ -423,14 +435,15 @@ const CheckInPage = () => {
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                        Host Member Name
+                                        Host Member Name (Search member)
                                     </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Alex Metto"
+                                    <MemberSearchInput
                                         value={guestForm.host_member}
-                                        onChange={(e) => setGuestForm({ ...guestForm, host_member: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none"
+                                        placeholder="Type host member name..."
+                                        onChange={(val) => {
+                                            const name = typeof val === 'object' && val !== null ? val.player_name : val;
+                                            setGuestForm({ ...guestForm, host_member: name });
+                                        }}
                                     />
                                 </div>
                                 <div>
