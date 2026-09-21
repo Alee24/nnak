@@ -88,61 +88,59 @@ const MemberDashboard = () => {
     const s = data.summary || DEFAULT_MEMBER_DATA.summary;
 
     return (
-        <div className="flex flex-col gap-6 pb-12 animate-fade-in max-w-[1500px] mx-auto">
+        <div className="flex flex-col gap-5 pb-12 animate-fade-in max-w-[1500px] mx-auto">
             {/* Member Profile Hero Card */}
-            <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 rounded-3xl p-6 lg:p-8 text-white shadow-xl relative overflow-hidden border border-emerald-800/30">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+            <div className="bg-emerald-950 text-white rounded-xl p-5 lg:p-6 shadow-xs relative overflow-hidden border border-emerald-900/80">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center font-serif font-black text-2xl text-white shadow-lg border border-white/20 flex-shrink-0">
+                        <div className="w-14 h-14 rounded-lg bg-emerald-900/80 border border-emerald-700/50 flex items-center justify-center font-serif font-bold text-xl text-emerald-200 shadow-xs flex-shrink-0">
                             {s.first_name?.[0] || 'M'}{s.last_name?.[0] || 'G'}
                         </div>
                         <div>
-                            <div className="flex items-center gap-2.5">
-                                <h1 className="text-2xl font-serif font-black tracking-tight">
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-xl lg:text-2xl font-serif font-bold tracking-tight">
                                     {s.first_name} {s.last_name}
                                 </h1>
-                                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-emerald-900 text-emerald-300 border border-emerald-700/50">
                                     {s.status}
                                 </span>
                             </div>
-                            <p className="text-xs text-slate-300 font-bold mt-1">
+                            <p className="text-xs text-emerald-100/80 font-medium mt-0.5">
                                 {s.member_id} • {s.membership_type}
                             </p>
-                            <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest mt-0.5">
-                                MMS Golf Club • Member Since 2024
+                            <p className="text-[11px] text-emerald-400 font-medium mt-0.5">
+                                MMS Golf Club • Member In Good Standing
                             </p>
                         </div>
                     </div>
 
                     {/* Handicap Badge & Action Buttons */}
                     <div className="flex flex-wrap items-center gap-3">
-                        <div className="bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10 text-center">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400 block">
-                                Official WHS Handicap
+                        <div className="bg-emerald-900/60 px-4 py-2.5 rounded-lg border border-emerald-800/80 text-center">
+                            <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-300 block">
+                                WHS Handicap Index
                             </span>
-                            <span className="text-3xl font-black tracking-tight text-white block mt-0.5">
+                            <span className="text-2xl font-bold font-serif tracking-tight text-white block">
                                 {s.handicap_index}
                             </span>
-                            <span className="text-[8px] uppercase tracking-widest text-slate-400 font-bold block">
-                                Course Handicap: 7
+                            <span className="text-[10px] text-emerald-200/70 block">
+                                Course HCP: 7
                             </span>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-2">
                             <button
                                 onClick={() => navigate('/dashboard/tee-times')}
-                                className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-lg flex items-center justify-center gap-2 active:scale-95"
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition shadow-xs flex items-center justify-center gap-1.5 active:scale-98"
                             >
-                                <Clock size={15} />
+                                <Clock size={14} />
                                 Book Tee Slot
                             </button>
                             <button
                                 onClick={() => navigate('/dashboard/scorecards')}
-                                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition flex items-center justify-center gap-2"
+                                className="bg-emerald-900/60 hover:bg-emerald-900 text-white border border-emerald-700/50 px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition flex items-center justify-center gap-1.5"
                             >
-                                <FileText size={15} />
+                                <FileText size={14} />
                                 Post Scorecard
                             </button>
                         </div>
@@ -151,67 +149,67 @@ const MemberDashboard = () => {
             </div>
 
             {/* KPI Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Handicap Index</span>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block mt-1">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1">Handicap Index</span>
+                    <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white leading-none block">
                         {s.handicap_index}
                     </span>
-                    <span className="text-[10px] text-emerald-600 font-bold block mt-1.5 flex items-center gap-1">
-                        <ArrowUpRight size={12} /> Low index this season: 5.8
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium block mt-1.5 flex items-center gap-1">
+                        <ArrowUpRight size={12} /> Low this season: 5.8
                     </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Rounds Played 2025</span>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block mt-1">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1">Rounds Played 2025</span>
+                    <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white leading-none block">
                         {s.rounds_played} Rounds
                     </span>
-                    <span className="text-[10px] text-slate-400 font-bold block mt-1.5">
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium block mt-1.5">
                         Avg Gross Score: 74.8
                     </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Best Round</span>
-                    <span className="text-2xl font-black text-emerald-600 leading-none block mt-1">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1">Season Best Gross</span>
+                    <span className="text-2xl font-bold font-serif text-emerald-700 dark:text-emerald-400 leading-none block">
                         {s.best_gross} Gross
                     </span>
-                    <span className="text-[10px] text-slate-400 font-bold block mt-1.5">
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium block mt-1.5">
                         -1 Under Par (Championship Course)
                     </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Member Account Balance</span>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block mt-1">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1">Member Ledger Balance</span>
+                    <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white leading-none block">
                         KES {Number(s.account_balance).toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-emerald-600 font-bold block mt-1.5">
-                        All Dues Up to Date
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium block mt-1.5">
+                        Dues Up to Date
                     </span>
                 </div>
             </div>
 
             {/* Next Scheduled Tee Time Alert Card */}
             {data.upcoming_tee_time && (
-                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-slate-800 p-6 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
-                            <Clock size={22} />
+                <div className="bg-emerald-50/60 dark:bg-slate-900 p-4 rounded-xl border border-emerald-200/70 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+                    <div className="flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-lg bg-emerald-800 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                            <Clock size={18} />
                         </div>
                         <div>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
-                                Your Next Confirmed Flight
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400 block">
+                                Your Next Scheduled Flight
                             </span>
-                            <h3 className="font-serif font-black text-lg text-slate-900 dark:text-white mt-0.5">
+                            <h3 className="font-serif font-bold text-base text-slate-900 dark:text-white mt-0.5">
                                 {data.upcoming_tee_time.date} at {data.upcoming_tee_time.time} — {data.upcoming_tee_time.hole}
                             </h3>
-                            <p className="text-xs text-slate-600 dark:text-slate-300 font-bold mt-1">
+                            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">
                                 {data.upcoming_tee_time.course}
                             </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                Flight: {data.upcoming_tee_time.partners}
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                Flight Players: {data.upcoming_tee_time.partners}
                             </p>
                         </div>
                     </div>
@@ -219,7 +217,7 @@ const MemberDashboard = () => {
                     <div className="flex gap-2">
                         <button
                             onClick={() => navigate('/dashboard/tee-times')}
-                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition"
+                            className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-semibold tracking-wide shadow-xs transition"
                         >
                             View Tee Sheet
                         </button>
@@ -228,23 +226,23 @@ const MemberDashboard = () => {
             )}
 
             {/* Main Portal Grids */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Recent Scores Matrix */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm p-6 space-y-4">
-                    <div className="flex items-center justify-between">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                         <div>
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-base">
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-base">
                                 Recent Scores & Handicap Record
                             </h3>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                                Last official rounds counted for handicap revision
+                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                                Official qualifying rounds recorded for WHS handicap
                             </p>
                         </div>
                         <button
                             onClick={() => navigate('/dashboard/scorecards')}
-                            className="text-xs font-black uppercase tracking-wider text-emerald-600 hover:text-emerald-700"
+                            className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400"
                         >
-                            All Scorecards →
+                            All Scorecards &rarr;
                         </button>
                     </div>
 
@@ -279,34 +277,34 @@ const MemberDashboard = () => {
                 {/* Right Column: Upcoming Tournaments & Quick Shortcuts */}
                 <div className="space-y-4">
                     {/* Tournaments Card */}
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm p-5 space-y-3">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
                                 <Trophy size={14} className="text-amber-500" />
                                 Upcoming Tournaments
                             </h3>
                             <button
                                 onClick={() => navigate('/dashboard/competitions')}
-                                className="text-[10px] font-black uppercase text-emerald-600"
+                                className="text-xs font-medium text-emerald-700 hover:text-emerald-800 dark:text-emerald-400"
                             >
-                                View Calendar
+                                Calendar
                             </button>
                         </div>
 
-                        <div className="space-y-2.5">
+                        <div className="space-y-2">
                             {data.upcoming_events.map((ev) => (
-                                <div key={ev.id} className="p-3 bg-slate-50 dark:bg-slate-700/40 rounded-xl border border-slate-100 dark:border-white/5 space-y-1">
+                                <div key={ev.id} className="p-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1">
                                     <div className="flex justify-between items-start">
-                                        <h4 className="font-bold text-slate-900 dark:text-white text-xs leading-tight">
+                                        <h4 className="font-semibold text-slate-900 dark:text-white text-xs leading-snug">
                                             {ev.title}
                                         </h4>
-                                        <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
+                                        <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                             {ev.status}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-400 pt-1">
+                                    <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
                                         <span>{ev.date}</span>
-                                        <span className="font-bold text-slate-700 dark:text-slate-300">Entry: KES {ev.fee.toLocaleString()}</span>
+                                        <span className="font-semibold text-slate-700 dark:text-slate-300">Entry: KES {ev.fee.toLocaleString()}</span>
                                     </div>
                                 </div>
                             ))}
@@ -314,46 +312,46 @@ const MemberDashboard = () => {
                     </div>
 
                     {/* Quick Services Grid */}
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm p-5 space-y-3">
-                        <h3 className="font-serif font-black text-slate-900 dark:text-white text-xs uppercase tracking-wider">
-                            Clubhouse Member Services
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 space-y-3">
+                        <h3 className="font-serif font-bold text-slate-900 dark:text-white text-sm pb-2 border-b border-slate-100 dark:border-slate-800">
+                            Member Services
                         </h3>
 
                         <div className="grid grid-cols-2 gap-2">
                             <button
-                                onClick={() => navigate('/dashboard/statement')}
-                                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left transition border border-transparent hover:border-emerald-200"
+                                onClick={() => navigate('/dashboard/statements')}
+                                className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left transition border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800"
                             >
-                                <CreditCard size={16} className="text-emerald-600 mb-1" />
-                                <span className="text-xs font-black text-slate-800 dark:text-white block">Account Ledger</span>
-                                <span className="text-[9px] text-slate-400 block">Statement & tabs</span>
+                                <CreditCard size={15} className="text-emerald-700 dark:text-emerald-400 mb-1" />
+                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">Statement</span>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 block">Monthly ledger</span>
                             </button>
 
                             <button
                                 onClick={() => navigate('/dashboard/facilities')}
-                                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left transition border border-transparent hover:border-emerald-200"
+                                className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left transition border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800"
                             >
-                                <Calendar size={16} className="text-emerald-600 mb-1" />
-                                <span className="text-xs font-black text-slate-800 dark:text-white block">Venues & Pool</span>
-                                <span className="text-[9px] text-slate-400 block">Facility bookings</span>
+                                <Calendar size={15} className="text-emerald-700 dark:text-emerald-400 mb-1" />
+                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">Facilities</span>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 block">Book courts & halls</span>
                             </button>
 
                             <button
                                 onClick={() => navigate('/dashboard/guests')}
-                                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left transition border border-transparent hover:border-emerald-200"
+                                className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left transition border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800"
                             >
-                                <User size={16} className="text-emerald-600 mb-1" />
-                                <span className="text-xs font-black text-slate-800 dark:text-white block">Guest Passes</span>
-                                <span className="text-[9px] text-slate-400 block">Invite a golfer</span>
+                                <User size={15} className="text-emerald-700 dark:text-emerald-400 mb-1" />
+                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">Guests</span>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 block">Invite guest golfers</span>
                             </button>
 
                             <button
                                 onClick={() => navigate('/dashboard/leaderboard')}
-                                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left transition border border-transparent hover:border-emerald-200"
+                                className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left transition border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800"
                             >
-                                <Trophy size={16} className="text-emerald-600 mb-1" />
-                                <span className="text-xs font-black text-slate-800 dark:text-white block">Leaderboards</span>
-                                <span className="text-[9px] text-slate-400 block">Tournament ranks</span>
+                                <Trophy size={15} className="text-emerald-700 dark:text-emerald-400 mb-1" />
+                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">Leaderboard</span>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 block">Club standings</span>
                             </button>
                         </div>
                     </div>

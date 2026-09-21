@@ -96,105 +96,128 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="flex flex-col gap-6 animate-fade-in pb-12 max-w-[1600px] mx-auto">
+        <div className="flex flex-col gap-5 animate-fade-in pb-12 max-w-[1600px] mx-auto">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <Flag className="text-emerald-600" size={26} />
-                        MMS Golf Club Management Center
+                    <h1 className="text-xl lg:text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
+                        <Flag className="text-emerald-700 dark:text-emerald-400" size={22} />
+                        MMS Operations Center
                     </h1>
-                    <p className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
-                        <span className="w-3 h-px bg-emerald-600"></span>
-                        Executive Operations & Daily Clubhouse Overview
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Daily course activity, golfer roster, and financial pulse
                     </p>
                 </div>
 
-                {/* Quick Shortcuts */}
+                {/* Quick Action Shortcuts */}
                 <div className="flex flex-wrap items-center gap-2">
                     <button
                         onClick={() => navigate('/dashboard/tee-times')}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm flex items-center gap-1.5 active:scale-95"
+                        className="bg-emerald-800 hover:bg-emerald-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition shadow-xs flex items-center gap-1.5 active:scale-98"
                     >
-                        <Clock size={13} strokeWidth={2.5} />
+                        <Clock size={14} strokeWidth={2} />
                         Tee Sheet
                     </button>
                     <button
-                        onClick={() => navigate('/dashboard/checkin')}
-                        className="bg-slate-900 dark:bg-slate-700 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm flex items-center gap-1.5 active:scale-95"
+                        onClick={() => navigate('/dashboard/check-in')}
+                        className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition shadow-xs flex items-center gap-1.5 active:scale-98"
                     >
-                        <UserCheck size={13} strokeWidth={2.5} />
-                        Check-In Golfer
+                        <UserCheck size={14} strokeWidth={2} />
+                        Golfer Check-In
                     </button>
                     <button
                         onClick={() => navigate('/dashboard/members')}
-                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-slate-50 transition shadow-sm flex items-center gap-1.5"
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition shadow-xs flex items-center gap-1.5"
                     >
-                        <Plus size={13} strokeWidth={2.5} />
+                        <Plus size={14} strokeWidth={2} />
                         New Member
                     </button>
                 </div>
             </div>
 
             {/* Top 4 KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                {/* 1. Total Members */}
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Registered Members</span>
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Registered Members</span>
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
                             <Users size={16} />
                         </div>
                     </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block mt-2">
-                        {stats?.total_members || 524}
-                    </span>
-                    <span className="text-[10px] text-emerald-600 font-bold block mt-1.5 flex items-center gap-1">
-                        <ArrowUpRight size={12} /> +{stats?.growth || 14}% this year
+                    <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white">
+                            {stats?.total_members || 524}
+                        </span>
+                        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-0.5">
+                            <ArrowUpRight size={12} /> +{stats?.growth || 14}%
+                        </span>
+                    </div>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">
+                        {stats?.active || 486} active WHS profiles
                     </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
+                {/* 2. Today's Flights */}
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Today's Tee Sheet</span>
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 flex items-center justify-center text-blue-600">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Today's Tee Sheet</span>
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
                             <Clock size={16} />
                         </div>
                     </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block mt-2">
-                        48 Golfers
-                    </span>
-                    <span className="text-[10px] text-blue-600 font-bold block mt-1.5">
+                    <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white">
+                            48
+                        </span>
+                        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                            Golfers Booked
+                        </span>
+                    </div>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">
                         82% Peak Flight Capacity
                     </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
+                {/* 3. Active On Course */}
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Active On Course</span>
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Active On Course</span>
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-700 dark:text-amber-400">
                             <UserCheck size={16} />
                         </div>
                     </div>
-                    <span className="text-2xl font-black text-amber-600 leading-none block mt-2">
-                        28 Golfers
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-bold block mt-1.5">
-                        7 Active Flights In Play
+                    <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold font-serif text-amber-700 dark:text-amber-400">
+                            28
+                        </span>
+                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                            In Play
+                        </span>
+                    </div>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">
+                        7 flights across Holes 1–18
                     </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
+                {/* 4. Monthly Revenue */}
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Monthly Revenue</span>
-                        <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950 flex items-center justify-center text-purple-600">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Monthly Billing</span>
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
                             <DollarSign size={16} />
                         </div>
                     </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block mt-2">
-                        KES 4.85M
-                    </span>
-                    <span className="text-[10px] text-purple-600 font-bold block mt-1.5 flex items-center gap-1">
-                        <ArrowUpRight size={12} /> Dues, Green Fees & F&B
+                    <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white">
+                            KES 4.85M
+                        </span>
+                        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-0.5">
+                            <ArrowUpRight size={12} /> On Target
+                        </span>
+                    </div>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">
+                        Dues, Green Fees & Dining
                     </span>
                 </div>
             </div>
@@ -202,46 +225,46 @@ const Dashboard = () => {
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Left: Today's Tee Sheet & Flights */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                         <div>
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-sm flex items-center gap-2">
-                                <Clock size={16} className="text-emerald-600" />
-                                Today’s Live Tee Sheet & Course Timeline
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                                <Clock size={16} className="text-emerald-700 dark:text-emerald-400" />
+                                Live Flight Sheet & Timeline
                             </h3>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                                 Championship Course • First Tee to Sunset
                             </p>
                         </div>
                         <button
                             onClick={() => navigate('/dashboard/tee-times')}
-                            className="text-emerald-600 hover:text-emerald-700 text-xs font-black uppercase tracking-wider"
+                            className="text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 text-xs font-semibold tracking-wide flex items-center gap-1"
                         >
-                            Full Sheet →
+                            Complete Schedule &rarr;
                         </button>
                     </div>
 
-                    <div className="space-y-2.5">
+                    <div className="space-y-2">
                         {DEFAULT_TODAY_FLIGHTS.map((flight, idx) => (
                             <div
                                 key={idx}
-                                className="p-3 bg-slate-50 dark:bg-slate-700/40 hover:bg-white dark:hover:bg-slate-700 rounded-xl border border-slate-100 dark:border-white/5 transition flex items-center justify-between text-xs"
+                                className="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-emerald-50/30 dark:hover:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-800 transition-colors flex items-center justify-between text-xs"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="font-black text-slate-900 dark:text-white font-mono text-xs w-20">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="font-mono font-semibold text-slate-800 dark:text-slate-200 w-18 flex-shrink-0">
                                         {flight.time}
                                     </div>
-                                    <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 font-bold text-[10px]">
+                                    <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-[11px] flex-shrink-0">
                                         {flight.hole}
                                     </span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-xs">
+                                    <span className="font-medium text-slate-800 dark:text-slate-200 truncate">
                                         {flight.players}
                                     </span>
                                 </div>
-                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ml-2 ${
                                     flight.status === 'On Course'
-                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
+                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/40'
+                                        : 'bg-blue-50 text-blue-800 border border-blue-200/70 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/40'
                                 }`}>
                                     {flight.status}
                                 </span>
@@ -250,92 +273,94 @@ const Dashboard = () => {
                     </div>
 
                     {/* Course Conditions Bar */}
-                    <div className="pt-2 border-t border-slate-100 dark:border-white/5 grid grid-cols-3 gap-3 text-center text-xs">
-                        <div className="p-2.5 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl">
-                            <span className="text-[9px] font-black uppercase text-emerald-800 dark:text-emerald-400 block">Championship Course</span>
-                            <span className="font-black text-emerald-700 dark:text-emerald-300 block mt-0.5">Open • Greens 10.5 Stimp</span>
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Championship Course</span>
+                            <span className="font-semibold text-emerald-800 dark:text-emerald-300 block mt-0.5">Open • Greens 10.5 Stimp</span>
                         </div>
-                        <div className="p-2.5 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl">
-                            <span className="text-[9px] font-black uppercase text-emerald-800 dark:text-emerald-400 block">Executive 9-Hole</span>
-                            <span className="font-black text-emerald-700 dark:text-emerald-300 block mt-0.5">Open • Fairways Good</span>
+                        <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Executive 9-Hole</span>
+                            <span className="font-semibold text-emerald-800 dark:text-emerald-300 block mt-0.5">Open • Fairways Good</span>
                         </div>
-                        <div className="p-2.5 bg-amber-50/50 dark:bg-amber-950/20 rounded-xl">
-                            <span className="text-[9px] font-black uppercase text-amber-800 dark:text-amber-400 block">Weather Conditions</span>
-                            <span className="font-black text-amber-700 dark:text-amber-300 block mt-0.5">24°C • Light Breeze 8km/h</span>
+                        <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Course Weather</span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-200 block mt-0.5">24°C • Fair Winds 8 km/h</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Right: Membership Distribution & Quick Actions */}
+                {/* Right: Membership Distribution & Recent Registrations */}
                 <div className="flex flex-col gap-4">
                     {/* Distribution Card */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-3">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-xs uppercase tracking-wider">
-                                Member Category Breakdown
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-sm">
+                                Membership Categories
                             </h3>
-                            <span className="text-[9px] font-black text-emerald-600 uppercase">Active WHS</span>
+                            <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                                WHS Active
+                            </span>
                         </div>
 
-                        <div className="h-44 relative flex items-center justify-center">
+                        <div className="h-40 relative flex items-center justify-center">
                             <Doughnut data={statusData} options={chartOptions} />
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">
+                                <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white leading-none">
                                     {stats?.total_members || 524}
                                 </span>
-                                <span className="text-[8px] text-slate-400 uppercase font-black tracking-widest mt-1">
-                                    Total Golfers
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-wide mt-1">
+                                    Total Members
                                 </span>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-slate-600 dark:text-slate-300 pt-2 border-t border-slate-100 dark:border-white/5">
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                        <div className="grid grid-cols-2 gap-2 text-xs font-medium text-slate-600 dark:text-slate-300 pt-2 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-sm bg-[#059669]"></span>
                                 <span>Full: 280 (53%)</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-sm bg-[#3b82f6]"></span>
                                 <span>Social: 110 (21%)</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-sm bg-[#f59e0b]"></span>
                                 <span>Ladies: 75 (14%)</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-sm bg-[#8b5cf6]"></span>
                                 <span>Junior: 59 (12%)</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Recent Member Arrivals */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-3 flex-1">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-xs uppercase tracking-wider">
+                    {/* Recent Registrations */}
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3 flex-1">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-sm">
                                 Recent Registrations
                             </h3>
                             <button
                                 onClick={() => navigate('/dashboard/members')}
-                                className="text-emerald-600 hover:text-emerald-700 text-[10px] font-black uppercase"
+                                className="text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 text-xs font-medium"
                             >
-                                View All
+                                View Directory
                             </button>
                         </div>
 
                         <div className="space-y-2">
                             {recentMembers.slice(0, 4).map((m) => (
-                                <div key={m.id} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-700/40 text-xs">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 flex items-center justify-center font-black text-[10px]">
+                                <div key={m.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 text-xs">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-7 h-7 rounded-md bg-emerald-950 text-emerald-300 flex items-center justify-center font-bold text-[10px] flex-shrink-0">
                                             {m.first_name[0]}{m.last_name[0]}
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-slate-900 dark:text-white">{m.first_name} {m.last_name}</p>
-                                            <p className="text-[9px] text-slate-400">{m.membership_number || 'MMS Member'}</p>
+                                        <div className="min-w-0">
+                                            <p className="font-semibold text-slate-900 dark:text-white truncate">{m.first_name} {m.last_name}</p>
+                                            <p className="text-[10px] text-slate-400 dark:text-slate-500">{m.membership_number || 'MMS Member'}</p>
                                         </div>
                                     </div>
-                                    <span className="text-[9px] font-black uppercase text-emerald-600">
+                                    <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 flex-shrink-0 ml-2">
                                         HCP {m.handicap || 18.0}
                                     </span>
                                 </div>

@@ -617,7 +617,7 @@ const MemberProfile = () => {
 
                 {/* ID Action Buttons - Grouped with Sidebar */}
                 <div className="flex gap-2 flex-shrink-0">
-                    <button onClick={downloadIdCard} className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-[#E11D48] transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <button onClick={downloadIdCard} className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-[#059669] transition-all flex items-center justify-center gap-2 active:scale-95">
                         <Download size={14} /> Digital ID
                     </button>
                     <button onClick={downloadCertificate} className="flex-1 py-3 bg-white border border-gray-200 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center justify-center gap-2 active:scale-95">
@@ -675,7 +675,7 @@ const MemberProfile = () => {
                 </div>
 
                 {/* Tabbed Content Container */}
-                <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex-1 min-h-0 flex flex-col overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex-1 min-h-0 flex flex-col overflow-hidden">
                     {/* Tab Navigation */}
                     <div className="flex items-center justify-between border-b border-gray-100 px-8 bg-white/50 backdrop-blur-md sticky top-0 z-20">
                         <div className="flex gap-8">
@@ -686,11 +686,11 @@ const MemberProfile = () => {
                                         onClick={() => setActiveTab(tab)}
                                         className={clsx(
                                             "relative py-5 text-xs font-black uppercase tracking-[0.2em] transition-all",
-                                            activeTab === tab ? "text-[#E11D48]" : "text-gray-400 hover:text-gray-600"
+                                            activeTab === tab ? "text-[#059669]" : "text-gray-400 hover:text-gray-600"
                                         )}
                                     >
                                         {tab}
-                                        {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#E11D48] rounded-t-full animate-in slide-in-from-bottom-1 duration-300"></div>}
+                                        {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#059669] rounded-t-full animate-in slide-in-from-bottom-1 duration-300"></div>}
                                     </button>
                                 )
                             ))}
@@ -1027,3 +1027,4 @@ const InfoRow = ({ label, value, icon: Icon }) => (
 );
 
 export default MemberProfile;
+

@@ -184,34 +184,34 @@ const ScorecardsPage = () => {
     });
 
     return (
-        <div className="flex flex-col gap-6 pb-12 animate-fade-in">
+        <div className="flex flex-col gap-5 pb-12 animate-fade-in max-w-[1600px] mx-auto">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <FileText className="text-emerald-600" size={24} />
-                        Digital Golf Scorecards
+                    <h1 className="text-xl lg:text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <FileText className="text-emerald-700 dark:text-emerald-400" size={22} />
+                        Digital Scorecards & Scoring Registry
                     </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">
-                        MMS Golf Club • World Handicap System Official Score Registry
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        MMS Golf Club • World Handicap System official score validation and gross/net records
                     </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setIsEntryOpen(true)}
-                        className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-sm active:scale-95"
+                        className="flex items-center gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition shadow-xs active:scale-98"
                     >
-                        <Plus size={14} strokeWidth={3} />
+                        <Plus size={14} strokeWidth={2.5} />
                         Enter Scorecard
                     </button>
                 </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700/60 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 max-w-sm w-full">
-                    <Search size={15} className="text-slate-400" />
+            <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 max-w-sm w-full">
+                    <Search size={14} className="text-slate-400" />
                     <input
                         type="text"
                         placeholder="Search golfer name, member #..."
@@ -221,22 +221,22 @@ const ScorecardsPage = () => {
                     />
                 </div>
 
-                <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                     <button
                         onClick={() => setStatusFilter('all')}
-                        className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                     >
                         All ({scorecards.length})
                     </button>
                     <button
                         onClick={() => setStatusFilter('approved')}
-                        className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'approved' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'approved' ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                     >
                         Verified
                     </button>
                     <button
                         onClick={() => setStatusFilter('pending')}
-                        className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'pending' ? 'bg-white dark:bg-slate-900 text-amber-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'pending' ? 'bg-white dark:bg-slate-900 text-amber-600 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                     >
                         Pending Review
                     </button>
@@ -244,24 +244,24 @@ const ScorecardsPage = () => {
             </div>
 
             {/* Scorecards Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-100 dark:border-white/5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                <th className="p-3.5 pl-5">Golfer</th>
-                                <th className="p-3.5">Course</th>
-                                <th className="p-3.5">Date</th>
-                                <th className="p-3.5 text-center">Playing HCP</th>
-                                <th className="p-3.5 text-center">Gross</th>
-                                <th className="p-3.5 text-center font-black text-emerald-600">Net</th>
-                                <th className="p-3.5 text-center">Stableford Pts</th>
-                                <th className="p-3.5 text-center">Marker</th>
-                                <th className="p-3.5 text-center">Status</th>
-                                <th className="p-3.5 pr-5 text-right">Actions</th>
+                            <tr className="border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-900">
+                                <th className="p-3 pl-5">Golfer</th>
+                                <th className="p-3">Course</th>
+                                <th className="p-3">Date</th>
+                                <th className="p-3 text-center">Playing HCP</th>
+                                <th className="p-3 text-center">Gross</th>
+                                <th className="p-3 text-center font-bold text-emerald-700 dark:text-emerald-400">Net</th>
+                                <th className="p-3 text-center">Points</th>
+                                <th className="p-3 text-center">Attesting Marker</th>
+                                <th className="p-3 text-center">Status</th>
+                                <th className="p-3 pr-5 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                             {loading ? (
                                 <tr>
                                     <td colSpan={10} className="p-8 text-center text-slate-400">Loading scorecards...</td>
@@ -275,45 +275,45 @@ const ScorecardsPage = () => {
                                     const name = sc.player_name || `${sc.first_name || ''} ${sc.last_name || ''}`;
                                     const isApproved = sc.status === 'approved';
                                     return (
-                                        <tr key={sc.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
-                                            <td className="p-3.5 pl-5">
-                                                <div className="font-black text-slate-900 dark:text-white">{name}</div>
-                                                <span className="text-[10px] text-slate-400 font-bold">{sc.member_number || 'Member'}</span>
+                                        <tr key={sc.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                                            <td className="p-3 pl-5">
+                                                <div className="font-semibold text-slate-900 dark:text-white">{name}</div>
+                                                <span className="text-[10px] text-slate-400 dark:text-slate-500">{sc.member_number || 'Member'}</span>
                                             </td>
-                                            <td className="p-3.5 font-bold text-slate-600 dark:text-slate-300">
+                                            <td className="p-3 font-medium text-slate-700 dark:text-slate-300">
                                                 {sc.course_name}
                                             </td>
-                                            <td className="p-3.5 text-slate-500 font-medium">
+                                            <td className="p-3 text-slate-500 font-medium">
                                                 {sc.play_date}
                                             </td>
-                                            <td className="p-3.5 text-center font-bold text-slate-600 dark:text-slate-300">
+                                            <td className="p-3 text-center font-medium text-slate-600 dark:text-slate-300">
                                                 {sc.playing_handicap || 0}
                                             </td>
-                                            <td className="p-3.5 text-center font-black text-slate-800 dark:text-slate-200">
+                                            <td className="p-3 text-center font-medium text-slate-800 dark:text-slate-200">
                                                 {sc.gross_score || '—'}
                                             </td>
-                                            <td className="p-3.5 text-center font-black text-sm text-emerald-600 dark:text-emerald-400">
+                                            <td className="p-3 text-center font-bold text-emerald-700 dark:text-emerald-400">
                                                 {sc.net_score || '—'}
                                             </td>
-                                            <td className="p-3.5 text-center font-black text-amber-600 dark:text-amber-400">
+                                            <td className="p-3 text-center font-semibold text-slate-800 dark:text-slate-200">
                                                 {sc.stableford_points || '—'}
                                             </td>
-                                            <td className="p-3.5 text-center text-slate-500 text-[11px]">
-                                                {sc.marker_name || 'Marker Signed'}
+                                            <td className="p-3 text-center text-slate-500 text-xs">
+                                                {sc.marker_name || 'Signed Marker'}
                                             </td>
-                                            <td className="p-3.5 text-center">
-                                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            <td className="p-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                                     isApproved
-                                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                                                        : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                                        : 'bg-amber-50 text-amber-800 border border-amber-200/70 dark:bg-amber-950/60 dark:text-amber-300'
                                                 }`}>
                                                     {isApproved ? 'Verified' : 'Pending'}
                                                 </span>
                                             </td>
-                                            <td className="p-3.5 pr-5 text-right space-x-1.5">
+                                            <td className="p-3 pr-5 text-right space-x-1.5">
                                                 <button
                                                     onClick={() => setViewingCard(sc)}
-                                                    className="p-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 rounded-lg text-slate-600 dark:text-slate-300"
+                                                    className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition"
                                                     title="View Hole by Hole"
                                                 >
                                                     <Eye size={13} />
@@ -321,8 +321,8 @@ const ScorecardsPage = () => {
                                                 {!isApproved && (
                                                     <button
                                                         onClick={() => handleApprove(sc.id)}
-                                                        className="p-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg"
-                                                        title="Approve Scorecard"
+                                                        className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg transition"
+                                                        title="Verify Scorecard"
                                                     >
                                                         <Check size={13} />
                                                     </button>

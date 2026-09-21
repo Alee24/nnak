@@ -160,7 +160,7 @@ const Members = () => {
                         for (const el of elements) {
                             if (el.classList.contains('bg-white')) el.style.backgroundColor = '#ffffff';
                             if (el.classList.contains('text-slate-900')) el.style.color = '#0f172a';
-                            if (el.classList.contains('bg-[#E11D48]')) el.style.backgroundColor = '#E11D48';
+                            if (el.classList.contains('bg-[#059669]')) el.style.backgroundColor = '#059669';
                         }
                     }
                 });
@@ -567,7 +567,7 @@ const Members = () => {
                                 </h1>
 
                                 {/* Tagline */}
-                                <p className="text-lg font-bold text-[#E11D48] italic tracking-tight mb-12" style={{ color: '#E11D48' }}>
+                                <p className="text-lg font-bold text-[#059669] italic tracking-tight mb-12" style={{ color: '#059669' }}>
                                     "{branding.association_tagline || 'Voice of the Nursing Profession'}"
                                 </p>
 
@@ -852,3 +852,4 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }) => {
 };
 
 export default Members;
+

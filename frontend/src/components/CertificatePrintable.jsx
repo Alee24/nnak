@@ -15,7 +15,7 @@ const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
 
     // Authority Design System
     const brandGreen = '#006400';
-    const brandCrimson = '#E11D48';
+    const brandCrimson = '#059669';
     const bodyText = '#333333';
     const labelText = '#64748b';
     const serifFont = 'Cambria, Georgia, serif';
@@ -231,3 +231,4 @@ const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
 CertificatePrintable.displayName = 'CertificatePrintable';
 
 export default CertificatePrintable;
+

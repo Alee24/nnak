@@ -206,34 +206,34 @@ const CompetitionsPage = () => {
     });
 
     return (
-        <div className="flex flex-col gap-6 pb-12 animate-fade-in">
+        <div className="flex flex-col gap-5 pb-12 animate-fade-in max-w-[1600px] mx-auto">
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <Trophy className="text-amber-500" size={24} />
+                    <h1 className="text-xl lg:text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Trophy className="text-amber-500" size={22} />
                         Club Tournaments & Competitions
                     </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">
-                        MMS Golf Club • World Handicap System sanctioned events
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        MMS Golf Club • World Handicap System sanctioned medals & fixtures
                     </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setIsCreateOpen(true)}
-                        className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-sm active:scale-95"
+                        className="flex items-center gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition shadow-xs active:scale-98"
                     >
-                        <Plus size={14} strokeWidth={3} />
+                        <Plus size={14} strokeWidth={2.5} />
                         Create Tournament
                     </button>
                 </div>
             </div>
 
             {/* Controls Bar: Search & Status Filters */}
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700/60 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 max-w-sm w-full">
-                    <Search size={15} className="text-slate-400" />
+            <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 max-w-sm w-full">
+                    <Search size={14} className="text-slate-400" />
                     <input
                         type="text"
                         placeholder="Search tournament name, sponsor, format..."
@@ -243,22 +243,22 @@ const CompetitionsPage = () => {
                     />
                 </div>
 
-                <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                     <button
                         onClick={() => setStatusFilter('all')}
-                        className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                     >
                         All ({competitions.length})
                     </button>
                     <button
                         onClick={() => setStatusFilter('upcoming')}
-                        className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'upcoming' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'upcoming' ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                     >
                         Upcoming
                     </button>
                     <button
                         onClick={() => setStatusFilter('completed')}
-                        className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'completed' ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'completed' ? 'bg-white dark:bg-slate-900 text-blue-600 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                     >
                         Completed
                     </button>
@@ -267,16 +267,16 @@ const CompetitionsPage = () => {
 
             {/* Competitions Grid */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5">
-                    <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin mb-3"></div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Tournaments...</p>
+                <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800">
+                    <div className="w-8 h-8 border-3 border-emerald-500/20 border-t-emerald-700 rounded-full animate-spin mb-3"></div>
+                    <p className="text-xs font-medium text-slate-400">Loading Tournaments...</p>
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 space-y-4">
-                    <Trophy size={36} className="mx-auto text-slate-300 dark:text-slate-600" />
+                <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-3">
+                    <Trophy size={32} className="mx-auto text-slate-300 dark:text-slate-600" />
                     <div>
                         <h3 className="font-serif font-bold text-slate-800 dark:text-white text-base">No Tournaments Found</h3>
-                        <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria or create a new tournament.</p>
+                        <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria or create a new tournament fixture.</p>
                     </div>
                 </div>
             ) : (
@@ -287,28 +287,28 @@ const CompetitionsPage = () => {
                         return (
                             <div
                                 key={comp.id}
-                                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition space-y-5"
+                                className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 flex flex-col justify-between hover:border-emerald-600/40 transition space-y-4"
                             >
                                 <div className="space-y-3">
                                     <div className="flex items-start justify-between gap-3">
                                         <div>
-                                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-1">
+                                            <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 block mb-0.5">
                                                 {comp.format} • {comp.holes} Holes
                                             </span>
-                                            <h3 className="text-lg font-serif font-black text-slate-900 dark:text-white leading-tight">
+                                            <h3 className="text-base font-serif font-bold text-slate-900 dark:text-white leading-tight">
                                                 {comp.name}
                                             </h3>
                                             {comp.sponsor && (
-                                                <p className="text-xs text-slate-400 font-medium mt-1">
-                                                    Sponsored by <span className="font-bold text-slate-600 dark:text-slate-300">{comp.sponsor}</span>
+                                                <p className="text-xs text-slate-400 font-medium mt-0.5">
+                                                    Presented by <span className="font-semibold text-slate-700 dark:text-slate-300">{comp.sponsor}</span>
                                                 </p>
                                             )}
                                         </div>
 
-                                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider flex-shrink-0 ${
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ${
                                             isCompleted
-                                                ? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-                                                : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                                ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
                                         }`}>
                                             {isCompleted ? 'Completed' : 'Upcoming'}
                                         </span>
@@ -321,22 +321,22 @@ const CompetitionsPage = () => {
                                     )}
 
                                     {/* Tournament Meta Info Bar */}
-                                    <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-slate-700/40 rounded-xl text-center">
+                                    <div className="grid grid-cols-3 gap-2 p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center border border-slate-100 dark:border-slate-800">
                                         <div>
-                                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Date</span>
-                                            <span className="text-xs font-black text-slate-800 dark:text-slate-200 mt-0.5 block">
+                                            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Date</span>
+                                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
                                                 {comp.competition_date}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Entry Fee</span>
-                                            <span className="text-xs font-black text-emerald-600 mt-0.5 block">
+                                            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Entry Fee</span>
+                                            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-0.5 block">
                                                 KES {Number(comp.entry_fee || 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Field Size</span>
-                                            <span className="text-xs font-black text-slate-800 dark:text-slate-200 mt-0.5 block">
+                                            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Field</span>
+                                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
                                                 {comp.registered_count || 0} / {comp.max_participants || 100}
                                             </span>
                                         </div>
@@ -344,14 +344,14 @@ const CompetitionsPage = () => {
 
                                     {/* Progress Bar for Entries */}
                                     <div className="space-y-1">
-                                        <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                                            <span>Registration Capacity</span>
+                                        <div className="flex justify-between text-[11px] font-medium text-slate-400">
+                                            <span>Field Capacity</span>
                                             <span>{percentFilled}% Filled</span>
                                         </div>
-                                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                             <div
-                                                className={`h-full rounded-full transition-all duration-500 ${
-                                                    percentFilled >= 90 ? 'bg-rose-500' : 'bg-emerald-500'
+                                                className={`h-full rounded-full transition-all duration-300 ${
+                                                    percentFilled >= 90 ? 'bg-rose-500' : 'bg-emerald-700'
                                                 }`}
                                                 style={{ width: `${percentFilled}%` }}
                                             />
@@ -359,9 +359,9 @@ const CompetitionsPage = () => {
                                     </div>
 
                                     {comp.prizes && (
-                                        <div className="flex items-start gap-2 text-xs bg-amber-50/50 dark:bg-amber-950/20 p-2.5 rounded-xl border border-amber-100/50 dark:border-amber-900/20 text-amber-900 dark:text-amber-200">
+                                        <div className="flex items-start gap-2 text-xs bg-amber-50/60 dark:bg-amber-950/20 p-2.5 rounded-lg border border-amber-200/60 dark:border-amber-900/30 text-amber-900 dark:text-amber-200">
                                             <Award size={14} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                                            <span className="text-[11px] font-bold">
+                                            <span className="text-[11px] font-medium">
                                                 {comp.prizes}
                                             </span>
                                         </div>
@@ -369,19 +369,19 @@ const CompetitionsPage = () => {
                                 </div>
 
                                 {/* Actions Footer */}
-                                <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-3">
+                                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
                                     <a
                                         href={`/dashboard/leaderboard?comp=${comp.id}`}
-                                        className="text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 flex items-center gap-1 transition"
+                                        className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 flex items-center gap-1 transition"
                                     >
-                                        Tournament Leaderboard
+                                        Live Leaderboard
                                         <ChevronRight size={13} />
                                     </a>
 
                                     {!isCompleted && (
                                         <button
                                             onClick={() => handleOpenRegister(comp)}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-xl transition shadow-sm active:scale-95 flex items-center gap-1.5"
+                                            className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-2xs active:scale-98 flex items-center gap-1.5"
                                         >
                                             <UserCheck size={13} />
                                             Register Golfer

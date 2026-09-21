@@ -177,7 +177,7 @@ const SettingsPage = () => {
 
     if (loading) return (
         <div className="flex items-center justify-center h-[400px]">
-            <div className="w-12 h-12 border-4 border-[#E11D48]/20 border-t-[#E11D48] rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-[#059669]/20 border-t-[#059669] rounded-full animate-spin"></div>
         </div>
     );
 
@@ -263,7 +263,7 @@ const SettingsPage = () => {
             text: 'This will wipe all tee times, tournament registrations, scorecards, orders, invoices, and guest records. Core admin accounts and system schema will be preserved.',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#e11d48',
+            confirmButtonColor: '#059669',
             cancelButtonColor: '#64748b',
             confirmButtonText: 'Yes, Clear All Data'
         });
@@ -303,19 +303,19 @@ const SettingsPage = () => {
     return (
         <div className="max-w-6xl mx-auto space-y-10 animate-fade-in-up pb-16 font-inter">
             {/* Premium Header */}
-            <div className="flex justify-between items-center px-6 py-8 bg-white/40 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-xl shadow-slate-200/50 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-rose-500/10 transition-colors duration-1000"></div>
+            <div className="flex justify-between items-center px-6 py-8 bg-white/40 backdrop-blur-xl rounded-2xl border border-white/60 shadow-xl shadow-slate-200/50 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-emerald-600/10 transition-colors duration-1000"></div>
                 <div className="relative z-10">
                     <h1 className="text-4xl font-bold text-slate-900 tracking-tight">{isAdmin ? 'System Settings' : 'My Settings'}</h1>
-                    <p className="text-xs text-[#E11D48] font-black uppercase tracking-[0.25em] mt-2 flex items-center gap-2">
-                        <span className="w-8 h-px bg-[#E11D48]/30"></span>
+                    <p className="text-xs text-[#059669] font-black uppercase tracking-[0.25em] mt-2 flex items-center gap-2">
+                        <span className="w-8 h-px bg-[#059669]/30"></span>
                         {isAdmin ? 'Architectural Configuration' : 'Personal Preferences'}
                     </p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-slate-900/20 hover:bg-[#E11D48] transition-all active:scale-95 disabled:opacity-50 group"
+                    className="flex items-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-slate-900/20 hover:bg-[#059669] transition-all active:scale-95 disabled:opacity-50 group"
                 >
                     {saving ? (
                         <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -346,7 +346,7 @@ const SettingsPage = () => {
                 {activeTab === 'demo' ? (
                     <>
                         {/* Demo Mode Toggle Card */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-8">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner">
                                     <Sparkles size={24} strokeWidth={2} />
@@ -392,7 +392,7 @@ const SettingsPage = () => {
                         </div>
 
                         {/* Database Seed & Wipe Actions Card */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-8">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
                                     <Database size={24} strokeWidth={2} />
@@ -424,7 +424,7 @@ const SettingsPage = () => {
                                     </button>
                                 </div>
 
-                                <div className="p-4 bg-rose-50/60 rounded-2xl border border-rose-100 flex items-center justify-between">
+                                <div className="p-4 bg-emerald-50/60 rounded-2xl border border-rose-100 flex items-center justify-between">
                                     <div>
                                         <h4 className="text-xs font-black uppercase tracking-wider text-rose-900">Clear Operational Data</h4>
                                         <p className="text-[11px] text-slate-600 mt-0.5">Wipes tee bookings, scorecards, orders, invoices & guest passes cleanly</p>
@@ -445,21 +445,21 @@ const SettingsPage = () => {
                 ) : activeTab === 'account' ? (
                     <>
                         {/* Account Basic Info */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-[#E11D48] shadow-inner group-hover:scale-110 transition-transform duration-500">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-[#059669] shadow-inner group-hover:scale-110 transition-transform duration-500">
                                     <User size={24} strokeWidth={2} />
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-slate-900">Personal Details</h3>
-                                    <div className="h-1 w-8 bg-rose-500 rounded-full mt-1"></div>
+                                    <div className="h-1 w-8 bg-emerald-600 rounded-full mt-1"></div>
                                 </div>
                             </div>
 
                             <div className="space-y-6 text-xs text-black">
                                 <div className="flex flex-col items-center mb-8">
                                     <div className="relative group/avatar">
-                                        <div className="w-32 h-32 rounded-[2rem] bg-slate-50 border-2 border-slate-100 flex items-center justify-center overflow-hidden shadow-xl group-hover/avatar:border-[#E11D48]/30 transition-all duration-500">
+                                        <div className="w-32 h-32 rounded-[2rem] bg-slate-50 border-2 border-slate-100 flex items-center justify-center overflow-hidden shadow-xl group-hover/avatar:border-[#059669]/30 transition-all duration-500">
                                             {settings.profile_photo ? (
                                                 <img src={settings.profile_photo} alt="Profile" className="w-full h-full object-cover" />
                                             ) : (
@@ -468,7 +468,7 @@ const SettingsPage = () => {
                                         </div>
                                         <button
                                             onClick={() => logoInputRef.current.click()}
-                                            className="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[#E11D48] transition-all active:scale-90"
+                                            className="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[#059669] transition-all active:scale-90"
                                         >
                                             <Upload size={18} strokeWidth={2.5} />
                                         </button>
@@ -480,31 +480,31 @@ const SettingsPage = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">First Name</label>
-                                        <input type="text" value={settings.personal_first_name || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_first_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                        <input type="text" value={settings.personal_first_name || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_first_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Last Name</label>
-                                        <input type="text" value={settings.personal_last_name || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_last_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                        <input type="text" value={settings.personal_last_name || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_last_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Phone Number</label>
-                                    <input type="text" value={settings.personal_phone || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_phone: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    <input type="text" value={settings.personal_phone || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_phone: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Current City</label>
-                                    <input type="text" value={settings.personal_city || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_city: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    <input type="text" value={settings.personal_city || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_city: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Address</label>
-                                    <input type="text" value={settings.personal_address || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_address: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    <input type="text" value={settings.personal_address || ''} onChange={(e) => setSettings(prev => ({ ...prev, personal_address: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Security Section */}
                         <div className="space-y-8">
-                            <div className="bg-slate-900 p-10 rounded-[3rem] border border-slate-800 shadow-2xl space-y-10 relative overflow-hidden group">
+                            <div className="bg-slate-900 p-10 rounded-2xl border border-slate-800 shadow-2xl space-y-10 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
                                 <div className="flex items-center gap-4 relative z-10">
                                     <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white shadow-inner group-hover:scale-110 transition-transform duration-500">
@@ -528,7 +528,7 @@ const SettingsPage = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-gradient-to-br from-blue-500/5 to-blue-500/10 backdrop-blur-md rounded-[2.5rem] p-8 border border-blue-500/20 flex gap-5">
+                            <div className="bg-gradient-to-br from-blue-500/5 to-blue-500/10 backdrop-blur-md rounded-2xl p-8 border border-blue-500/20 flex gap-5">
                                 <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-blue-600 shadow-md flex-shrink-0 animate-pulse"><Info size={32} strokeWidth={3} /></div>
                                 <div><h4 className="text-sm font-bold text-blue-900 uppercase tracking-widest">Privacy Note</h4><p className="text-[11px] text-blue-800/80 mt-2 leading-relaxed font-bold uppercase tracking-tight">Your data is secured using enterprise-grade encryption. Changes to your contact information are processed instantly.</p></div>
                             </div>
@@ -537,21 +537,21 @@ const SettingsPage = () => {
                 ) : activeTab === 'branding' ? (
                     <>
                         {/* Visual Branding Section */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 h-fit transition-all hover:border-rose-100/50 group">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 h-fit transition-all hover:border-emerald-100/50 group">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-[#E11D48] shadow-inner group-hover:scale-110 transition-transform duration-500">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-[#059669] shadow-inner group-hover:scale-110 transition-transform duration-500">
                                     <ImageIcon size={24} strokeWidth={2} />
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-slate-900">Visual Identity</h3>
-                                    <div className="h-1 w-8 bg-rose-500 rounded-full mt-1"></div>
+                                    <div className="h-1 w-8 bg-emerald-600 rounded-full mt-1"></div>
                                 </div>
                             </div>
 
                             {/* Logo Upload */}
                             <div className="space-y-4">
                                 <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Association Logo</label>
-                                <div className="flex items-center gap-6 p-6 rounded-3xl bg-slate-50/50 border border-dashed border-slate-200 group hover:border-[#E11D48]/50 transition-all duration-300">
+                                <div className="flex items-center gap-6 p-6 rounded-3xl bg-slate-50/50 border border-dashed border-slate-200 group hover:border-[#059669]/50 transition-all duration-300">
                                     <div className="w-24 h-24 rounded-2xl bg-white border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
                                         {settings.system_logo ? (
                                             <img src={settings.system_logo} alt="Logo" className="w-full h-full object-contain p-2" />
@@ -570,7 +570,7 @@ const SettingsPage = () => {
                             {/* Signature Upload */}
                             <div className="space-y-4 pt-4 border-t border-slate-50">
                                 <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Authorised Signature</label>
-                                <div className="flex items-center gap-6 p-6 rounded-3xl bg-slate-50/50 border border-dashed border-slate-200 group hover:border-[#E11D48]/50 transition-all duration-300">
+                                <div className="flex items-center gap-6 p-6 rounded-3xl bg-slate-50/50 border border-dashed border-slate-200 group hover:border-[#059669]/50 transition-all duration-300">
                                     <div className="w-24 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
                                         {settings.authorised_signature ? (
                                             <img src={settings.authorised_signature} alt="Signature" className="w-full h-full object-contain p-2" />
@@ -589,7 +589,7 @@ const SettingsPage = () => {
 
                         {/* Text Settings Section */}
                         <div className="space-y-8">
-                            <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
+                            <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner group-hover:scale-110 transition-transform duration-500">
                                         <Info size={24} strokeWidth={2} />
@@ -602,15 +602,15 @@ const SettingsPage = () => {
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Association Name</label>
-                                        <input type="text" value={settings.association_name} onChange={(e) => setSettings(prev => ({ ...prev, association_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" placeholder="e.g., National Nurses Association" />
+                                        <input type="text" value={settings.association_name} onChange={(e) => setSettings(prev => ({ ...prev, association_name: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" placeholder="e.g., National Nurses Association" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Association Tagline</label>
-                                        <input type="text" value={settings.association_tagline} onChange={(e) => setSettings(prev => ({ ...prev, association_tagline: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" placeholder="e.g., Voice of Nursing" />
+                                        <input type="text" value={settings.association_tagline} onChange={(e) => setSettings(prev => ({ ...prev, association_tagline: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" placeholder="e.g., Voice of Nursing" />
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 backdrop-blur-md rounded-[2.5rem] p-8 border border-emerald-500/20 flex gap-5">
+                            <div className="bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 backdrop-blur-md rounded-2xl p-8 border border-emerald-500/20 flex gap-5">
                                 <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-emerald-600 shadow-md flex-shrink-0 animate-pulse"><Check size={32} strokeWidth={3} /></div>
                                 <div><h4 className="text-sm font-bold text-emerald-900 uppercase tracking-widest">Branding Integrated</h4><p className="text-sm text-emerald-800/80 mt-2 leading-relaxed font-medium">These assets are automatically synchronized with ID card and Certificate generation. Updates will reflect on all new downloads instantly.</p></div>
                             </div>
@@ -619,7 +619,7 @@ const SettingsPage = () => {
                 ) : activeTab === 'payments' ? (
                     <div className="col-span-2 grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* M-Pesa Settings */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col group transition-all hover:border-emerald-100/50">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col group transition-all hover:border-emerald-100/50">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg shadow-inner group-hover:scale-110 transition-transform duration-500">M</div>
                                 <div>
@@ -630,36 +630,36 @@ const SettingsPage = () => {
                             <div className="space-y-5 flex-1 relative z-10">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Environment</label>
-                                    <select value={settings.mpesa_env} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_env: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all">
+                                    <select value={settings.mpesa_env} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_env: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all">
                                         <option value="sandbox">Sandbox</option>
                                         <option value="production">Production</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Shortcode</label>
-                                    <input type="text" value={settings.mpesa_shortcode} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_shortcode: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="text" value={settings.mpesa_shortcode} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_shortcode: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Consumer Key</label>
-                                    <input type="password" value={settings.mpesa_consumer_key} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_consumer_key: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="password" value={settings.mpesa_consumer_key} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_consumer_key: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Consumer Secret</label>
-                                    <input type="password" value={settings.mpesa_consumer_secret} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_consumer_secret: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="password" value={settings.mpesa_consumer_secret} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_consumer_secret: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Passkey</label>
-                                    <input type="password" value={settings.mpesa_passkey} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_passkey: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="password" value={settings.mpesa_passkey} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_passkey: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Callback URL</label>
-                                    <input type="text" value={settings.mpesa_callback_url} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_callback_url: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" placeholder="https://api.domain.com/callback" />
+                                    <input type="text" value={settings.mpesa_callback_url} onChange={(e) => setSettings(prev => ({ ...prev, mpesa_callback_url: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" placeholder="https://api.domain.com/callback" />
                                 </div>
                             </div>
                         </div>
 
                         {/* PayPal Settings */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col group transition-all hover:border-blue-100/50">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col group transition-all hover:border-blue-100/50">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-lg shadow-inner group-hover:scale-110 transition-transform duration-500">P</div>
                                 <div>
@@ -670,24 +670,24 @@ const SettingsPage = () => {
                             <div className="space-y-5 flex-1 relative z-10">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Environment</label>
-                                    <select value={settings.paypal_env} onChange={(e) => setSettings(prev => ({ ...prev, paypal_env: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all">
+                                    <select value={settings.paypal_env} onChange={(e) => setSettings(prev => ({ ...prev, paypal_env: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all">
                                         <option value="sandbox">Sandbox</option>
                                         <option value="live">Live</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Client ID</label>
-                                    <input type="text" value={settings.paypal_client_id} onChange={(e) => setSettings(prev => ({ ...prev, paypal_client_id: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="text" value={settings.paypal_client_id} onChange={(e) => setSettings(prev => ({ ...prev, paypal_client_id: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Secret Key</label>
-                                    <input type="password" value={settings.paypal_secret} onChange={(e) => setSettings(prev => ({ ...prev, paypal_secret: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="password" value={settings.paypal_secret} onChange={(e) => setSettings(prev => ({ ...prev, paypal_secret: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Visa/Stripe Settings */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col group transition-all hover:border-indigo-100/50">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col group transition-all hover:border-indigo-100/50">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg shadow-inner group-hover:scale-110 transition-transform duration-500">V</div>
                                 <div>
@@ -698,18 +698,18 @@ const SettingsPage = () => {
                             <div className="space-y-5 flex-1 relative z-10">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Environment</label>
-                                    <select value={settings.stripe_env} onChange={(e) => setSettings(prev => ({ ...prev, stripe_env: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all">
+                                    <select value={settings.stripe_env} onChange={(e) => setSettings(prev => ({ ...prev, stripe_env: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all">
                                         <option value="sandbox">Test</option>
                                         <option value="production">Live</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Publishable Key</label>
-                                    <input type="text" value={settings.stripe_publishable_key} onChange={(e) => setSettings(prev => ({ ...prev, stripe_publishable_key: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="text" value={settings.stripe_publishable_key} onChange={(e) => setSettings(prev => ({ ...prev, stripe_publishable_key: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Secret Key</label>
-                                    <input type="password" value={settings.stripe_secret_key} onChange={(e) => setSettings(prev => ({ ...prev, stripe_secret_key: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="password" value={settings.stripe_secret_key} onChange={(e) => setSettings(prev => ({ ...prev, stripe_secret_key: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                             </div>
                         </div>
@@ -717,7 +717,7 @@ const SettingsPage = () => {
                 ) : (
                     <>
                         {/* Contact Information */}
-                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
+                        <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 shadow-inner group-hover:scale-110 transition-transform duration-500">
                                     <Phone size={24} strokeWidth={2} />
@@ -730,26 +730,26 @@ const SettingsPage = () => {
                             <div className="space-y-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Email Address</label>
-                                    <input type="email" value={settings.contact_email} onChange={(e) => setSettings(prev => ({ ...prev, contact_email: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-base font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    <input type="email" value={settings.contact_email} onChange={(e) => setSettings(prev => ({ ...prev, contact_email: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-base font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Phone Number</label>
-                                    <input type="text" value={settings.contact_phone} onChange={(e) => setSettings(prev => ({ ...prev, contact_phone: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-base font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300" />
+                                    <input type="text" value={settings.contact_phone} onChange={(e) => setSettings(prev => ({ ...prev, contact_phone: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-base font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Physical Address</label>
-                                    <textarea rows="3" value={settings.contact_address} onChange={(e) => setSettings(prev => ({ ...prev, contact_address: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all duration-300 resize-none"></textarea>
+                                    <textarea rows="3" value={settings.contact_address} onChange={(e) => setSettings(prev => ({ ...prev, contact_address: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all duration-300 resize-none"></textarea>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] block ml-1">Google Maps Embed URL</label>
-                                    <input type="text" value={settings.contact_map_url} onChange={(e) => setSettings(prev => ({ ...prev, contact_map_url: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-medium tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all" />
+                                    <input type="text" value={settings.contact_map_url} onChange={(e) => setSettings(prev => ({ ...prev, contact_map_url: e.target.value }))} className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-medium tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Social & Hours */}
                         <div className="space-y-8">
-                            <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
+                            <div className="bg-white/90 backdrop-blur-2xl p-10 rounded-2xl border border-white/60 shadow-2xl shadow-slate-200/50 space-y-10 group">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-600 shadow-inner group-hover:scale-110 transition-transform duration-500">
                                         <Globe size={24} strokeWidth={2} />
@@ -762,24 +762,24 @@ const SettingsPage = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Facebook</label>
-                                        <input type="text" value={settings.social_facebook} onChange={(e) => setSettings(prev => ({ ...prev, social_facebook: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all font-mono" />
+                                        <input type="text" value={settings.social_facebook} onChange={(e) => setSettings(prev => ({ ...prev, social_facebook: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all font-mono" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Twitter (X)</label>
-                                        <input type="text" value={settings.social_twitter} onChange={(e) => setSettings(prev => ({ ...prev, social_twitter: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all font-mono" />
+                                        <input type="text" value={settings.social_twitter} onChange={(e) => setSettings(prev => ({ ...prev, social_twitter: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all font-mono" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">Instagram</label>
-                                        <input type="text" value={settings.social_instagram} onChange={(e) => setSettings(prev => ({ ...prev, social_instagram: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all font-mono" />
+                                        <input type="text" value={settings.social_instagram} onChange={(e) => setSettings(prev => ({ ...prev, social_instagram: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all font-mono" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">LinkedIn</label>
-                                        <input type="text" value={settings.social_linkedin} onChange={(e) => setSettings(prev => ({ ...prev, social_linkedin: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#E11D48]/5 focus:bg-white focus:border-[#E11D48]/20 transition-all font-mono" />
+                                        <input type="text" value={settings.social_linkedin} onChange={(e) => setSettings(prev => ({ ...prev, social_linkedin: e.target.value }))} className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-black tracking-tight text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#059669]/5 focus:bg-white focus:border-[#059669]/20 transition-all font-mono" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-900 p-10 rounded-[3rem] border border-slate-800 shadow-2xl space-y-10 relative overflow-hidden group">
+                            <div className="bg-slate-900 p-10 rounded-2xl border border-slate-800 shadow-2xl space-y-10 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
                                 <div className="flex items-center gap-4 relative z-10">
                                     <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white shadow-inner group-hover:scale-110 transition-transform duration-500">
@@ -810,3 +810,4 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+

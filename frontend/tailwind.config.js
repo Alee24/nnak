@@ -8,9 +8,10 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Cambria"', '"Georgia"', 'serif'],
-                display: ['"Cambria"', '"Georgia"', 'serif'],
-                mono: ['"JetBrains Mono"', 'monospace'],
+                sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                display: ['"Playfair Display"', 'Georgia', 'serif'],
+                mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
             },
             colors: {
                 border: "hsl(var(--border))",
@@ -18,19 +19,33 @@ export default {
                 ring: "hsl(var(--ring))",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
+                golf: {
+                    50: '#f0fdf4',
+                    100: '#dcfce7',
+                    200: '#bbf7d0',
+                    300: '#86efac',
+                    400: '#4ade80',
+                    500: '#22c55e',
+                    600: '#16a34a',
+                    700: '#15803d',
+                    800: '#166534',
+                    900: '#064e3b',
+                    950: '#042f2e',
+                },
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     foreground: "hsl(var(--primary-foreground))",
-                    50: '#f0f9ff',
-                    100: '#e0f2fe',
-                    200: '#bae6fd',
-                    300: '#7dd3fc',
-                    400: '#38bdf8',
-                    500: '#0ea5e9',
-                    600: '#0284c7',
-                    700: '#0369a1',
-                    800: '#075985',
-                    900: '#0c4a6e',
+                    50: '#f0fdf4',
+                    100: '#dcfce7',
+                    200: '#bbf7d0',
+                    300: '#86efac',
+                    400: '#34d399',
+                    500: '#10b981',
+                    600: '#059669',
+                    700: '#047857',
+                    800: '#065f46',
+                    900: '#064e3b',
+                    950: '#042f2e',
                 },
                 secondary: {
                     DEFAULT: "hsl(var(--secondary))",
@@ -58,17 +73,19 @@ export default {
                 },
                 // Custom premium neutrals
                 slate: {
-                    850: '#15202b', // Special deep dark
+                    850: '#15202b',
+                    925: '#0b131e',
                 }
             },
             borderRadius: {
-                lg: "var(--radius)",
-                md: "calc(var(--radius) - 2px)",
-                sm: "calc(var(--radius) - 4px)",
-                'xl': '1.5rem',
-                '2xl': '2rem', // Increased for Donezo look
-                '3xl': '2.5rem',
-                '4xl': '3rem',
+                sm: "0.375rem",    // 6px
+                DEFAULT: "0.5rem",  // 8px
+                md: "0.625rem",     // 10px
+                lg: "0.75rem",      // 12px
+                xl: "0.875rem",     // 14px
+                '2xl': "1rem",      // 16px
+                '3xl': "1.25rem",   // 20px
+                'full': "9999px",
             },
             boxShadow: {
                 'glass': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',

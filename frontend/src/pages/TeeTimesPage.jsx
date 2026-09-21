@@ -240,23 +240,23 @@ const TeeTimesPage = () => {
     const totalPlayersBooked = teeTimes.reduce((acc, curr) => acc + (curr.booked_players || 0), 0);
 
     return (
-        <div className="flex flex-col gap-6 pb-12 animate-fade-in">
+        <div className="flex flex-col gap-5 pb-12 animate-fade-in max-w-[1600px] mx-auto">
             {/* Header with Title and Quick Controls */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <Flag className="text-emerald-600" size={24} />
-                        Tee Sheet & Slot Reservations
+                    <h1 className="text-xl lg:text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Flag className="text-emerald-700 dark:text-emerald-400" size={22} />
+                        Daily Tee Sheet & Slot Reservations
                     </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">
-                        MMS Golf Club • Daily Tee Sheet Management
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Manage tee intervals, flight bookings, and player rosters
                     </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                     <button
                         onClick={() => setIsGenModalOpen(true)}
-                        className="flex items-center gap-2 bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-emerald-600 transition-all shadow-sm active:scale-95"
+                        className="flex items-center gap-1.5 bg-slate-900 text-white dark:bg-slate-800 dark:hover:bg-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide hover:bg-slate-800 transition shadow-xs active:scale-98"
                     >
                         <Sparkles size={14} className="text-emerald-400" />
                         Generate Sheet
@@ -267,118 +267,118 @@ const TeeTimesPage = () => {
                             if (firstAvailable) handleOpenBooking(firstAvailable);
                             else Swal.fire('No Slot', 'No slots available on this date', 'info');
                         }}
-                        className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-sm active:scale-95"
+                        className="flex items-center gap-1.5 bg-emerald-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide hover:bg-emerald-900 transition shadow-xs active:scale-98"
                     >
-                        <Plus size={14} strokeWidth={3} />
+                        <Plus size={14} strokeWidth={2.5} />
                         Book Tee Time
                     </button>
                 </div>
             </div>
 
             {/* Quick KPI Counters */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Total Slots</span>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">{totalSlots}</span>
-                    <span className="text-[10px] text-slate-500 font-bold block mt-1">Daily Schedule</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1">Total Scheduled Slots</span>
+                    <span className="text-2xl font-bold font-serif text-slate-900 dark:text-white leading-none">{totalSlots}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">First Tee to Sunset</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 block mb-1">Available Slots</span>
-                    <span className="text-2xl font-black text-emerald-600 leading-none">{availableSlots}</span>
-                    <span className="text-[10px] text-slate-500 font-bold block mt-1">Open for Booking</span>
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400 block mb-1">Available Slots</span>
+                    <span className="text-2xl font-bold font-serif text-emerald-700 dark:text-emerald-400 leading-none">{availableSlots}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">Open for Booking</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-rose-500 block mb-1">Booked Slots</span>
-                    <span className="text-2xl font-black text-rose-500 leading-none">{bookedSlots}</span>
-                    <span className="text-[10px] text-slate-500 font-bold block mt-1">Fully Reserved</span>
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-rose-600 block mb-1">Full Flights</span>
+                    <span className="text-2xl font-bold font-serif text-rose-600 leading-none">{bookedSlots}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">4/4 Players Confirmed</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 block mb-1">Golfers on Sheet</span>
-                    <span className="text-2xl font-black text-blue-600 leading-none">{totalPlayersBooked}</span>
-                    <span className="text-[10px] text-slate-500 font-bold block mt-1">Active Players</span>
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <span className="text-xs font-medium text-blue-600 block mb-1">Golfers on Sheet</span>
+                    <span className="text-2xl font-bold font-serif text-blue-600 leading-none">{totalPlayersBooked}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">Active Players Today</span>
                 </div>
             </div>
 
             {/* Filter Bar: Date Picker + Course + Status Tabs */}
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
                 {/* Date Navigator */}
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handlePrevDay}
-                        className="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                        className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition text-slate-600 dark:text-slate-300"
                         title="Previous Day"
                     >
                         <ChevronLeft size={16} />
                     </button>
-                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-600">
-                        <Calendar size={14} className="text-emerald-600" />
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <Calendar size={14} className="text-emerald-700 dark:text-emerald-400" />
                         <input
                             type="date"
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="bg-transparent border-none outline-none text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider cursor-pointer"
+                            className="bg-transparent border-none outline-none text-xs font-semibold text-slate-800 dark:text-white cursor-pointer"
                         />
                     </div>
                     <button
                         onClick={handleNextDay}
-                        className="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                        className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition text-slate-600 dark:text-slate-300"
                         title="Next Day"
                     >
                         <ChevronRight size={16} />
                     </button>
                     <button
                         onClick={() => setSelectedDate(today)}
-                        className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition ${selectedDate === today ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600'}`}
+                        className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border transition ${selectedDate === today ? 'bg-emerald-800 text-white border-emerald-800' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
                     >
                         Today
                     </button>
                 </div>
 
                 {/* Course Switcher & Filter Tabs */}
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
                     <select
                         value={selectedCourse}
                         onChange={(e) => setSelectedCourse(Number(e.target.value))}
-                        className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-xs font-bold text-slate-800 dark:text-white px-3 py-2 rounded-xl outline-none"
+                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-white px-3 py-1.5 rounded-lg outline-none"
                     >
                         {DEFAULT_COURSES.map(c => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
                     </select>
 
-                    <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                         <button
                             onClick={() => setStatusFilter('all')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             All ({totalSlots})
                         </button>
                         <button
                             onClick={() => setStatusFilter('available')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'available' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'available' ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Open ({availableSlots})
                         </button>
                         <button
                             onClick={() => setStatusFilter('booked')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${statusFilter === 'booked' ? 'bg-white dark:bg-slate-900 text-rose-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${statusFilter === 'booked' ? 'bg-white dark:bg-slate-900 text-rose-600 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Full ({bookedSlots})
                         </button>
                     </div>
 
-                    <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                         <button
                             onClick={() => setViewMode('sheet')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${viewMode === 'sheet' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${viewMode === 'sheet' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
-                            Tee Grid
+                            Grid
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${viewMode === 'list' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${viewMode === 'list' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
-                            List View
+                            Table
                         </button>
                     </div>
                 </div>
@@ -386,20 +386,20 @@ const TeeTimesPage = () => {
 
             {/* Main Content Area */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5">
-                    <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin mb-3"></div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Tee Sheet...</p>
+                <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800">
+                    <div className="w-8 h-8 border-3 border-emerald-500/20 border-t-emerald-700 rounded-full animate-spin mb-3"></div>
+                    <p className="text-xs font-medium text-slate-400">Loading Tee Sheet...</p>
                 </div>
             ) : filteredSlots.length === 0 ? (
-                <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 space-y-4">
-                    <Clock size={36} className="mx-auto text-slate-300 dark:text-slate-600" />
+                <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-3">
+                    <Clock size={32} className="mx-auto text-slate-300 dark:text-slate-600" />
                     <div>
                         <h3 className="font-serif font-bold text-slate-800 dark:text-white text-base">No Tee Slots Found</h3>
                         <p className="text-xs text-slate-400 mt-1">There are no slots matching your current filter for this date.</p>
                     </div>
                     <button
                         onClick={() => setIsGenModalOpen(true)}
-                        className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl"
+                        className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-4 py-2 rounded-lg"
                     >
                         Generate Tee Times for Today
                     </button>
@@ -413,44 +413,44 @@ const TeeTimesPage = () => {
                         return (
                             <div
                                 key={slot.id}
-                                className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
+                                className={`p-4 rounded-xl border transition-all duration-150 flex flex-col justify-between shadow-2xs ${
                                     isFull
-                                        ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30'
+                                        ? 'bg-rose-50/30 dark:bg-rose-950/20 border-rose-200/70 dark:border-rose-900/40'
                                         : isPartially
-                                        ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30'
-                                        : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-white/5 shadow-sm hover:border-emerald-200 dark:hover:border-emerald-800'
+                                        ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-200/70 dark:border-amber-900/40'
+                                        : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-emerald-600/50'
                                 }`}
                             >
                                 <div>
                                     {/* Slot Header */}
-                                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-white/5">
+                                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
-                                                <Clock size={16} strokeWidth={2.5} />
+                                            <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
+                                                <Clock size={14} strokeWidth={2} />
                                             </div>
                                             <div>
-                                                <span className="text-base font-black text-slate-900 dark:text-white leading-none block">
+                                                <span className="text-sm font-bold font-mono text-slate-900 dark:text-white leading-none block">
                                                     {slot.tee_time}
                                                 </span>
-                                                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
                                                     Hole #{slot.starting_hole || 1}
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                             isFull
                                                 ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300'
                                                 : isPartially
                                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300'
-                                                : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
+                                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
                                         }`}>
                                             {slot.booked_players}/{slot.max_players} Golfer{slot.booked_players !== 1 ? 's' : ''}
                                         </span>
                                     </div>
 
                                     {/* Player Slots */}
-                                    <div className="py-3 space-y-1.5 min-h-[90px]">
+                                    <div className="py-2.5 space-y-1.5 min-h-[90px]">
                                         {Array.from({ length: slot.max_players }).map((_, pIdx) => {
                                             const player = slot.players?.[pIdx];
                                             return (
@@ -458,18 +458,18 @@ const TeeTimesPage = () => {
                                                     key={pIdx}
                                                     className={`px-2.5 py-1.5 rounded-lg flex items-center justify-between text-xs ${
                                                         player
-                                                            ? 'bg-white dark:bg-slate-700/60 border border-slate-100 dark:border-white/5 text-slate-800 dark:text-slate-100 shadow-2xs'
-                                                            : 'bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-slate-400'
+                                                            ? 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/60 text-slate-800 dark:text-slate-100'
+                                                            : 'bg-slate-50/50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 text-slate-400'
                                                     }`}
                                                 >
                                                     <div className="flex items-center gap-1.5 truncate">
-                                                        <User size={12} className={player ? 'text-emerald-600' : 'text-slate-300'} />
-                                                        <span className="font-bold truncate text-[11px]">
+                                                        <User size={12} className={player ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-300'} />
+                                                        <span className="font-medium truncate text-[11px]">
                                                             {player ? `${player.first_name} ${player.last_name}` : `Slot ${pIdx + 1} Open`}
                                                         </span>
                                                     </div>
                                                     {player && (
-                                                        <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-600 text-slate-600 dark:text-slate-300">
+                                                        <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-200/70 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
                                                             HCP {player.handicap || 0}
                                                         </span>
                                                     )}
@@ -480,17 +480,17 @@ const TeeTimesPage = () => {
                                 </div>
 
                                 {/* Slot Action Button */}
-                                <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+                                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                                     {slot.booked_players < slot.max_players ? (
                                         <button
                                             onClick={() => handleOpenBooking(slot)}
-                                            className="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-[11px] font-black uppercase tracking-wider py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
+                                            className="w-full bg-emerald-800 hover:bg-emerald-900 active:scale-98 text-white text-xs font-semibold py-1.5 rounded-lg transition flex items-center justify-center gap-1.5 shadow-2xs"
                                         >
-                                            <Plus size={13} strokeWidth={3} />
+                                            <Plus size={13} strokeWidth={2.5} />
                                             Book Golfer
                                         </button>
                                     ) : (
-                                        <div className="w-full text-center py-2 bg-slate-100 dark:bg-slate-700/50 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center justify-center gap-1">
+                                        <div className="w-full text-center py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium text-slate-400 flex items-center justify-center gap-1">
                                             <CheckCircle size={13} className="text-rose-500" />
                                             Flight Complete
                                         </div>
@@ -502,61 +502,61 @@ const TeeTimesPage = () => {
                 </div>
             ) : (
                 /* List View Table */
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-100 dark:border-white/5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                    <th className="p-3.5 pl-5">Tee Time</th>
-                                    <th className="p-3.5">Hole</th>
-                                    <th className="p-3.5">Registered Flight Members</th>
-                                    <th className="p-3.5 text-center">Capacity</th>
-                                    <th className="p-3.5 text-center">Status</th>
-                                    <th className="p-3.5 pr-5 text-right">Action</th>
+                                <tr className="border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-900">
+                                    <th className="p-3 pl-5">Tee Time</th>
+                                    <th className="p-3">Hole</th>
+                                    <th className="p-3">Registered Flight Members</th>
+                                    <th className="p-3 text-center">Capacity</th>
+                                    <th className="p-3 text-center">Status</th>
+                                    <th className="p-3 pr-5 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                                 {filteredSlots.map((slot) => {
                                     const isFull = slot.booked_players >= slot.max_players;
                                     return (
-                                        <tr key={slot.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
-                                            <td className="p-3.5 pl-5 font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                                <Clock size={14} className="text-emerald-600" />
+                                        <tr key={slot.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                                            <td className="p-3 pl-5 font-mono font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                                <Clock size={14} className="text-emerald-700 dark:text-emerald-400" />
                                                 {slot.tee_time}
                                             </td>
-                                            <td className="p-3.5 font-bold text-slate-500">#{slot.starting_hole || 1}</td>
-                                            <td className="p-3.5">
+                                            <td className="p-3 font-medium text-slate-500">Hole #{slot.starting_hole || 1}</td>
+                                            <td className="p-3">
                                                 <div className="flex flex-wrap gap-1.5">
                                                     {slot.players && slot.players.length > 0 ? (
                                                         slot.players.map((p, idx) => (
-                                                            <span key={idx} className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-800 dark:text-slate-200">
+                                                            <span key={idx} className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-[11px] font-medium text-slate-800 dark:text-slate-200">
                                                                 {p.first_name} {p.last_name} (HCP {p.handicap || 0})
                                                             </span>
                                                         ))
                                                     ) : (
-                                                        <span className="text-slate-400 italic text-[11px]">No players booked yet</span>
+                                                        <span className="text-slate-400 italic text-xs">No players booked yet</span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="p-3.5 text-center font-bold text-slate-600 dark:text-slate-300">
+                                            <td className="p-3 text-center font-medium text-slate-600 dark:text-slate-300">
                                                 {slot.booked_players} / {slot.max_players}
                                             </td>
-                                            <td className="p-3.5 text-center">
-                                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            <td className="p-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                                     isFull
                                                         ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
                                                         : slot.booked_players > 0
                                                         ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-                                                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                                        : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
                                                 }`}>
                                                     {isFull ? 'Full' : slot.booked_players > 0 ? 'Partially Booked' : 'Available'}
                                                 </span>
                                             </td>
-                                            <td className="p-3.5 pr-5 text-right">
+                                            <td className="p-3 pr-5 text-right">
                                                 {slot.booked_players < slot.max_players && (
                                                     <button
                                                         onClick={() => handleOpenBooking(slot)}
-                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition"
+                                                        className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-3 py-1 rounded-lg transition"
                                                     >
                                                         Book Slot
                                                     </button>
@@ -573,29 +573,29 @@ const TeeTimesPage = () => {
 
             {/* Booking Modal */}
             {isBookingModalOpen && selectedSlot && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden">
-                        <div className="p-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-white dark:bg-slate-900 rounded-xl max-w-md w-full shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                             <div>
-                                <h3 className="text-base font-serif font-black text-slate-900 dark:text-white">
+                                <h3 className="text-base font-serif font-bold text-slate-900 dark:text-white">
                                     Book Tee Slot — {selectedSlot.tee_time}
                                 </h3>
-                                <p className="text-[10px] text-emerald-600 font-black uppercase tracking-wider mt-0.5">
+                                <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
                                     {selectedSlot.course_name} • {selectedDate}
                                 </p>
                             </div>
                             <button
                                 onClick={() => setIsBookingModalOpen(false)}
-                                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 hover:text-slate-800"
+                                className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                             >
-                                <X size={16} />
+                                <X size={15} />
                             </button>
                         </div>
 
-                        <form onSubmit={handleConfirmBooking} className="p-5 space-y-4">
+                        <form onSubmit={handleConfirmBooking} className="p-4 space-y-3.5">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                                    Golfer Full Name * (Search member or type)
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+                                    Golfer Full Name *
                                 </label>
                                 <MemberSearchInput
                                     value={bookingForm.member_name}
@@ -618,7 +618,7 @@ const TeeTimesPage = () => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                                         Member ID (Optional)
                                     </label>
                                     <input
@@ -626,11 +626,11 @@ const TeeTimesPage = () => {
                                         placeholder="MMS-0042"
                                         value={bookingForm.member_number}
                                         onChange={(e) => setBookingForm({ ...bookingForm, member_number: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500"
+                                        className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-800 dark:text-white outline-none focus:border-emerald-600"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                                         Handicap Index
                                     </label>
                                     <input
@@ -639,34 +639,34 @@ const TeeTimesPage = () => {
                                         placeholder="12.4"
                                         value={bookingForm.handicap}
                                         onChange={(e) => setBookingForm({ ...bookingForm, handicap: e.target.value })}
-                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500"
+                                        className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-800 dark:text-white outline-none focus:border-emerald-600"
                                     />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3 pt-1">
-                                <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                            <div className="grid grid-cols-2 gap-2.5 pt-1">
+                                <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                     <input
                                         type="checkbox"
                                         checked={bookingForm.requires_cart}
                                         onChange={(e) => setBookingForm({ ...bookingForm, requires_cart: e.target.checked })}
-                                        className="rounded text-emerald-600 focus:ring-emerald-500"
+                                        className="rounded text-emerald-700 focus:ring-emerald-600"
                                     />
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Rent Golf Cart</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Rent Golf Cart</span>
                                 </label>
-                                <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                     <input
                                         type="checkbox"
                                         checked={bookingForm.requires_caddy}
                                         onChange={(e) => setBookingForm({ ...bookingForm, requires_caddy: e.target.checked })}
-                                        className="rounded text-emerald-600 focus:ring-emerald-500"
+                                        className="rounded text-emerald-700 focus:ring-emerald-600"
                                     />
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Assign Caddy</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Assign Caddy</span>
                                 </label>
                             </div>
 
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                                     Special Notes
                                 </label>
                                 <textarea
@@ -674,7 +674,7 @@ const TeeTimesPage = () => {
                                     placeholder="Playing with guests, rental clubs..."
                                     value={bookingForm.notes}
                                     onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })}
-                                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs text-slate-800 dark:text-white outline-none focus:border-emerald-500"
+                                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-white outline-none focus:border-emerald-600"
                                 />
                             </div>
 
@@ -682,13 +682,13 @@ const TeeTimesPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsBookingModalOpen(false)}
-                                    className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                                    className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition active:scale-95"
+                                    className="px-4 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-semibold shadow-xs transition active:scale-98"
                                 >
                                     Confirm Reservation
                                 </button>

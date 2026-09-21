@@ -83,45 +83,45 @@ const LeaderboardPage = () => {
     const top3 = filtered.slice(0, 3);
 
     return (
-        <div className="flex flex-col gap-6 pb-12 animate-fade-in">
+        <div className="flex flex-col gap-5 pb-12 animate-fade-in max-w-[1600px] mx-auto">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <Trophy className="text-amber-500" size={24} />
-                        Tournament Leaderboard
+                    <h1 className="text-xl lg:text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Trophy className="text-amber-500" size={22} />
+                        Live Tournament Leaderboard
                     </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">
-                        MMS Golf Club • Live tournament standings & gross/net scores
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Real-time scores, gross & net standings, and WHS stroke play rankings
                     </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2">
                     <button
                         onClick={() => fetchLeaderboard(selectedComp)}
-                        className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-600 transition"
+                        className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-2xs"
                     >
-                        <RefreshCw size={14} className={loading ? 'animate-spin text-emerald-600' : ''} />
+                        <RefreshCw size={13} className={loading ? 'animate-spin text-emerald-700' : ''} />
                         Refresh
                     </button>
                     <button
                         onClick={() => window.print()}
-                        className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-emerald-700 transition shadow-sm"
+                        className="flex items-center gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs"
                     >
-                        <Printer size={14} />
-                        Print Scores
+                        <Printer size={13} />
+                        Print Leaderboard
                     </button>
                 </div>
             </div>
 
             {/* Tournament Selector & Filter Bar */}
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Tournament:</span>
+            <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Tournament:</span>
                     <select
                         value={selectedComp}
                         onChange={(e) => setSelectedComp(e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-xs font-bold text-slate-800 dark:text-white px-3 py-2 rounded-xl outline-none"
+                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-white px-3 py-1.5 rounded-lg outline-none"
                     >
                         {competitions.map((c) => (
                             <option key={c.id} value={c.id}>
@@ -133,103 +133,103 @@ const LeaderboardPage = () => {
 
                 {/* Division Filters */}
                 <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                         <button
                             onClick={() => setDivisionFilter('all')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${divisionFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${divisionFilter === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             All
                         </button>
                         <button
                             onClick={() => setDivisionFilter('Division A')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${divisionFilter === 'Division A' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${divisionFilter === 'Division A' ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Div A
                         </button>
                         <button
                             onClick={() => setDivisionFilter('Division B')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${divisionFilter === 'Division B' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${divisionFilter === 'Division B' ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Div B
                         </button>
                         <button
                             onClick={() => setDivisionFilter('Ladies')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${divisionFilter === 'Ladies' ? 'bg-white dark:bg-slate-900 text-rose-600 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${divisionFilter === 'Ladies' ? 'bg-white dark:bg-slate-900 text-rose-600 shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Ladies
                         </button>
                     </div>
 
-                    <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                         <button
                             onClick={() => setScoringView('net')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${scoringView === 'net' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${scoringView === 'net' ? 'bg-emerald-800 text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Net Score
                         </button>
                         <button
                             onClick={() => setScoringView('gross')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${scoringView === 'gross' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${scoringView === 'gross' ? 'bg-emerald-800 text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             Gross Score
                         </button>
                         <button
                             onClick={() => setScoringView('stableford')}
-                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition ${scoringView === 'stableford' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition ${scoringView === 'stableford' ? 'bg-emerald-800 text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400'}`}
                         >
-                            Points
+                            Stableford Pts
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Top 3 Podium Cards */}
+            {/* Top 3 Leaders Podium */}
             {top3.length >= 3 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                     {/* 2nd Place */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 relative overflow-hidden order-2 md:order-1">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-black text-xl text-slate-500 shadow-inner flex-shrink-0">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center gap-3.5 order-2 md:order-1">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sm text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex-shrink-0">
                             2
                         </div>
-                        <div>
-                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">1st Runner Up</span>
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-base leading-tight">
+                        <div className="min-w-0">
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">1st Runner Up</span>
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-sm truncate">
                                 {top3[1].name}
                             </h3>
-                            <p className="text-xs text-slate-500 font-bold mt-0.5">
-                                Net: <span className="text-emerald-600 font-black">{top3[1].net}</span> • Gross: {top3[1].gross}
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                                Net: <span className="text-emerald-700 dark:text-emerald-400 font-bold">{top3[1].net}</span> • Gross: {top3[1].gross}
                             </p>
                         </div>
                     </div>
 
                     {/* 1st Place Champion */}
-                    <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-slate-800 dark:to-amber-950/20 p-5 rounded-2xl border-2 border-amber-400/50 shadow-md flex items-center gap-4 relative overflow-hidden order-1 md:order-2">
-                        <div className="w-14 h-14 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg flex-shrink-0">
-                            <Trophy size={26} />
+                    <div className="bg-emerald-950 text-white p-4 rounded-xl border border-emerald-800/80 shadow-xs flex items-center gap-3.5 order-1 md:order-2">
+                        <div className="w-11 h-11 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base shadow-xs flex-shrink-0">
+                            <Trophy size={20} />
                         </div>
-                        <div>
-                            <span className="text-[9px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 block">Tournament Leader</span>
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-lg leading-tight">
+                        <div className="min-w-0">
+                            <span className="text-[10px] font-semibold text-amber-400 uppercase tracking-wider block">Tournament Leader</span>
+                            <h3 className="font-serif font-bold text-white text-base truncate">
                                 {top3[0].name}
                             </h3>
-                            <p className="text-xs text-slate-700 dark:text-slate-300 font-bold mt-0.5">
-                                Net: <span className="text-emerald-700 dark:text-emerald-400 font-black text-sm">{top3[0].net}</span> • Gross: {top3[0].gross} • Thru: {top3[0].thru}
+                            <p className="text-xs text-emerald-200 font-medium mt-0.5">
+                                Net: <span className="text-white font-bold text-sm">{top3[0].net}</span> • Gross: {top3[0].gross} • Thru: {top3[0].thru}
                             </p>
                         </div>
                     </div>
 
                     {/* 3rd Place */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 relative overflow-hidden order-3">
-                        <div className="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-950/40 flex items-center justify-center font-black text-xl text-orange-700 dark:text-orange-400 shadow-inner flex-shrink-0">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center gap-3.5 order-3">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sm text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex-shrink-0">
                             3
                         </div>
-                        <div>
-                            <span className="text-[9px] font-black uppercase tracking-wider text-orange-600 block">2nd Runner Up</span>
-                            <h3 className="font-serif font-black text-slate-900 dark:text-white text-base leading-tight">
+                        <div className="min-w-0">
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">2nd Runner Up</span>
+                            <h3 className="font-serif font-bold text-slate-900 dark:text-white text-sm truncate">
                                 {top3[2].name}
                             </h3>
-                            <p className="text-xs text-slate-500 font-bold mt-0.5">
-                                Net: <span className="text-emerald-600 font-black">{top3[2].net}</span> • Gross: {top3[2].gross}
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                                Net: <span className="text-emerald-700 dark:text-emerald-400 font-bold">{top3[2].net}</span> • Gross: {top3[2].gross}
                             </p>
                         </div>
                     </div>
@@ -237,75 +237,75 @@ const LeaderboardPage = () => {
             )}
 
             {/* Leaderboard Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-100 dark:border-white/5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                <th className="p-3.5 pl-5 text-center w-12">POS</th>
-                                <th className="p-3.5">Golfer</th>
-                                <th className="p-3.5 text-center">HCP</th>
-                                <th className="p-3.5 text-center">Division</th>
-                                <th className="p-3.5 text-center">Thru</th>
-                                <th className="p-3.5 text-center">To Par</th>
-                                <th className="p-3.5 text-center">Gross</th>
-                                <th className="p-3.5 text-center font-black text-emerald-600">Net</th>
-                                <th className="p-3.5 pr-5 text-center">Stableford Pts</th>
+                            <tr className="border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-900">
+                                <th className="p-3 pl-5 text-center w-12">POS</th>
+                                <th className="p-3">Golfer</th>
+                                <th className="p-3 text-center">HCP</th>
+                                <th className="p-3 text-center">Division</th>
+                                <th className="p-3 text-center">Thru</th>
+                                <th className="p-3 text-center">To Par</th>
+                                <th className="p-3 text-center">Gross</th>
+                                <th className="p-3 text-center font-bold text-emerald-700 dark:text-emerald-400">Net</th>
+                                <th className="p-3 pr-5 text-center">Points</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                             {filtered.map((player, idx) => {
                                 const isLeader = idx === 0;
                                 return (
                                     <tr
                                         key={idx}
-                                        className={`hover:bg-slate-50 dark:hover:bg-slate-700/30 transition ${
-                                            isLeader ? 'bg-amber-50/20 dark:bg-amber-950/10 font-bold' : ''
+                                        className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${
+                                            isLeader ? 'bg-emerald-50/30 dark:bg-emerald-950/20' : ''
                                         }`}
                                     >
-                                        <td className="p-3.5 pl-5 text-center">
+                                        <td className="p-3 pl-5 text-center">
                                             {idx < 3 ? (
-                                                <span className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-[10px] font-black ${
-                                                    idx === 0 ? 'bg-amber-400 text-slate-950' :
-                                                    idx === 1 ? 'bg-slate-200 text-slate-700' :
-                                                    'bg-orange-200 text-orange-800'
+                                                <span className={`w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-bold ${
+                                                    idx === 0 ? 'bg-amber-400 text-slate-950 font-black' :
+                                                    idx === 1 ? 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200' :
+                                                    'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                                                 }`}>
                                                     {idx + 1}
                                                 </span>
                                             ) : (
-                                                <span className="font-bold text-slate-400">{idx + 1}</span>
+                                                <span className="font-semibold text-slate-400">{idx + 1}</span>
                                             )}
                                         </td>
-                                        <td className="p-3.5">
-                                            <div className="font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <td className="p-3">
+                                            <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                                                 {player.name}
-                                                {isLeader && <Sparkles size={13} className="text-amber-500" />}
+                                                {isLeader && <Trophy size={13} className="text-amber-500" />}
                                             </div>
-                                            <span className="text-[10px] text-slate-400 font-bold">{player.member_number}</span>
+                                            <span className="text-[10px] text-slate-400 dark:text-slate-500">{player.member_number}</span>
                                         </td>
-                                        <td className="p-3.5 text-center font-bold text-slate-600 dark:text-slate-300">
+                                        <td className="p-3 text-center font-medium text-slate-600 dark:text-slate-300">
                                             {player.hcp}
                                         </td>
-                                        <td className="p-3.5 text-center">
-                                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                        <td className="p-3 text-center">
+                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                                                 {player.division}
                                             </span>
                                         </td>
-                                        <td className="p-3.5 text-center font-black text-slate-800 dark:text-slate-200">
+                                        <td className="p-3 text-center font-medium text-slate-800 dark:text-slate-200 font-mono">
                                             {player.thru}
                                         </td>
-                                        <td className="p-3.5 text-center font-black">
-                                            <span className={player.to_par?.toString().startsWith('-') ? 'text-emerald-600' : 'text-slate-700 dark:text-slate-300'}>
+                                        <td className="p-3 text-center font-semibold">
+                                            <span className={player.to_par?.toString().startsWith('-') ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}>
                                                 {player.to_par}
                                             </span>
                                         </td>
-                                        <td className="p-3.5 text-center font-bold text-slate-800 dark:text-slate-200">
+                                        <td className="p-3 text-center font-medium text-slate-800 dark:text-slate-200">
                                             {player.gross}
                                         </td>
-                                        <td className="p-3.5 text-center font-black text-sm text-emerald-600 dark:text-emerald-400">
+                                        <td className="p-3 text-center font-bold text-emerald-700 dark:text-emerald-400">
                                             {player.net}
                                         </td>
-                                        <td className="p-3.5 pr-5 text-center font-black text-slate-900 dark:text-white">
+                                        <td className="p-3 pr-5 text-center font-semibold text-slate-900 dark:text-white">
                                             {player.points || '—'}
                                         </td>
                                     </tr>

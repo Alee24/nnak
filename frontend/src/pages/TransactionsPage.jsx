@@ -208,19 +208,19 @@ const TransactionsPage = () => {
     };
 
     return (
-        <div className="flex flex-col h-full gap-4 animate-fade-in font-inter pb-8">
+        <div className="flex flex-col h-full gap-4 animate-fade-in font-sans pb-8">
             {/* Header */}
             <div className="flex justify-between items-end px-1">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Financial Ledger</h1>
-                    <p className="text-xs text-[#E11D48] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
-                        <span className="w-4 h-px bg-[#E11D48]/30"></span>
+                    <h1 className="text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight">Financial Ledger</h1>
+                    <p className="text-xs text-emerald-600 font-bold uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
+                        <span className="w-4 h-px bg-emerald-600/30"></span>
                         Real-time Transaction Monitoring
                     </p>
                 </div>
                 <button
                     onClick={exportToCSV}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md hover:bg-[#E11D48] transition-all active:scale-95 group"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-95 group"
                 >
                     <Download size={12} strokeWidth={2.5} />
                     <span>Export Ledger</span>
@@ -458,7 +458,7 @@ const TransactionsPage = () => {
                                 </button>
                                 <button
                                     onClick={handlePrint}
-                                    className="flex items-center gap-2 px-6 py-2 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-[#E11D48] transition-all active:scale-95"
+                                    className="flex items-center gap-2 px-6 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:bg-emerald-600 transition-all active:scale-95"
                                 >
                                     <Printer size={14} /> Print Receipt
                                 </button>
