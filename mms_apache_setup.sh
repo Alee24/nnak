@@ -23,12 +23,21 @@ git checkout MMS
 git reset --hard origin/MMS
 git pull origin MMS
 
-# 3. Build React Frontend
-echo "⚛️  Building React Production Bundle..."
-cd "$PROJECT_DIR/frontend"
-npm install --legacy-peer-deps
-npm run build
-cd "$PROJECT_DIR"
+# 3. Build React Frontend (Node 20+ / Docker / Pre-compiled bundle)
+echo "⚛️  Ensuring React Production Bundle is ready..."
+NODE_MAJOR=$(node -v 2>/dev/null | cut -d'.' -f1 | tr -d 'v' || echo "0")
+if [ "$NODE_MAJOR" -ge 20 ]; then
+    echo "Using host Node $NODE_MAJOR to build frontend..."
+    cd "$PROJECT_DIR/frontend"
+    npm install --legacy-peer-deps
+    npm run build
+    cd "$PROJECT_DIR"
+elif command -v docker &> /dev/null; then
+    echo "Host Node ($NODE_MAJOR) is below v20. Using Docker Node 20 builder..."
+    docker run --rm -v "$PROJECT_DIR/frontend:/app" -w /app node:20-alpine sh -c "npm install --legacy-peer-deps && npm run build" || true
+else
+    echo "Using pre-compiled production bundle in frontend/dist..."
+fi
 
 # 4. Set Permissions
 echo "🔒 Setting File & Directory Permissions..."
