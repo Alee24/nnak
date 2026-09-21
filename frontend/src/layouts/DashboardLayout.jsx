@@ -73,7 +73,7 @@ const DashboardLayout = () => {
                                 {user.role === 'admin' || user.role === 'super_admin' ? 'Management Center' : 'Member Portal'}
                             </h1>
                             <p className="text-[8px] text-[#059669] mt-1 uppercase tracking-[0.2em] font-black">
-                                {user.role === 'admin' || user.role === 'super_admin' ? 'NNAK Professional Suite' : 'NNAK Member Services'}
+                                {user.role === 'admin' || user.role === 'super_admin' ? 'MMS Golf Club Management Suite' : 'MMS Member Services'}
                             </p>
                         </div>
                     </div>

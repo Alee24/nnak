@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutGrid,
-  Users,
-  BarChart2,
-  CreditCard,
-  Calendar,
-  Award,
-  FileCheck,
-  Wand2,
-  Settings,
-  LogOut,
-  Mail
+  LayoutGrid, Users, BarChart2, CreditCard, Calendar, Award,
+  FileCheck, Wand2, Settings, LogOut, Mail, Flag, Clock,
+  Trophy, Target, UserCheck, ShoppingBag, Coffee, Truck,
+  Wrench, Package, Briefcase, Bell, FileText, HardDrive,
+  ChevronDown, ChevronRight, DollarSign, UserPlus, Map, Car
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminAPI from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 
-/**
- * Sidebar Sub-component for individual navigation items
- * Uses useLocation to manually track isActive for 100% reliability
- */
 const NavItem = ({ to, icon: Icon, label, badge, onClick, theme }) => {
   const location = useLocation();
   const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
@@ -30,7 +20,7 @@ const NavItem = ({ to, icon: Icon, label, badge, onClick, theme }) => {
       to={to}
       onClick={onClick}
       className={`
-        flex items-center gap-3 px-4 py-2.5 text-[11px] font-black rounded-xl transition-all duration-300 group relative
+        flex items-center gap-3 px-3 py-2 text-[10px] font-black rounded-xl transition-all duration-200 group relative
         ${isActive
           ? (theme === 'dark'
             ? 'text-white bg-emerald-600 shadow-lg shadow-emerald-600/20'
@@ -40,27 +30,42 @@ const NavItem = ({ to, icon: Icon, label, badge, onClick, theme }) => {
             : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50/50')}
       `}
     >
-      <Icon size={16} strokeWidth={isActive ? 3 : 2} className={`
+      <Icon size={14} strokeWidth={isActive ? 3 : 2} className={`
+        flex-shrink-0
         ${isActive
           ? (theme === 'dark' ? 'text-white' : 'text-emerald-600')
           : (theme === 'dark' ? 'text-slate-500 group-hover:text-emerald-400' : 'text-slate-400 group-hover:text-emerald-600')}
         transition-colors
       `} />
-      <span className="flex-1 tracking-wider uppercase">{label}</span>
+      <span className="flex-1 tracking-wider uppercase truncate">{label}</span>
       {badge && (
         <span className={`
           ${isActive
             ? (theme === 'dark' ? 'bg-white text-emerald-600' : 'bg-emerald-600 text-white')
             : 'bg-emerald-500 text-white'}
-          text-[9px] font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center shadow-sm
+          text-[8px] font-black px-1.5 py-0.5 rounded-md min-w-[18px] text-center shadow-sm flex-shrink-0
         `}>
           {badge}
         </span>
       )}
-      {isActive && (
-        <div className={`absolute right-2 w-1.5 h-1.5 rounded-full animate-pulse ${theme === 'dark' ? 'bg-white' : 'bg-emerald-600'}`}></div>
-      )}
     </NavLink>
+  );
+};
+
+const NavGroup = ({ label, children, theme, defaultOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full flex items-center justify-between px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.25em] mb-1 rounded-lg transition-colors
+          ${theme === 'dark' ? 'text-slate-500 hover:text-slate-400' : 'text-slate-400 hover:text-slate-600'}`}
+      >
+        <span>{label}</span>
+        {isOpen ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+      </button>
+      {isOpen && <div className="space-y-0.5 mb-2">{children}</div>}
+    </div>
   );
 };
 
@@ -68,33 +73,31 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { theme } = useTheme();
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {
     fetchCounts();
-
     const handleUpdate = () => fetchCounts();
     window.addEventListener('membership-updated', handleUpdate);
-    // Add listener for message updates if needed
     window.addEventListener('messages-updated', handleUpdate);
-
+    const interval = setInterval(fetchCounts, 60000);
     return () => {
       window.removeEventListener('membership-updated', handleUpdate);
       window.removeEventListener('messages-updated', handleUpdate);
+      clearInterval(interval);
     };
   }, []);
 
   const fetchCounts = async () => {
     try {
       const [pendingRes, messagesRes] = await Promise.all([
-        AdminAPI.getPendingCount(),
-        AdminAPI.getUnreadMessagesCount()
+        AdminAPI.getPendingCount().catch(() => ({ count: 0 })),
+        AdminAPI.getUnreadMessagesCount().catch(() => ({ count: 0 }))
       ]);
-
       if (pendingRes.count !== undefined) setPendingCount(pendingRes.count);
-      if (messagesRes.success) setUnreadMessages(messagesRes.count);
-
+      if (messagesRes.count !== undefined) setUnreadMessages(messagesRes.count);
     } catch (error) {
-      console.error("Failed to fetch sidebar counts:", error);
+      console.error('Failed to fetch sidebar counts:', error);
     }
   };
 
@@ -102,7 +105,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     e.preventDefault();
     Swal.fire({
       title: 'Logout?',
-      text: "Are you sure you want to end your session?",
+      text: 'Are you sure you want to end your session?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#059669',
@@ -110,7 +113,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       confirmButtonText: 'Yes, logout'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Handle Logout Logic
+        AdminAPI.logout().catch(() => {});
+        localStorage.removeItem('user');
         window.location.href = '/login';
       }
     });
@@ -118,31 +122,11 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
-  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
-
-  const navItems = isAdmin ? [
-    { to: '/dashboard', icon: LayoutGrid, label: 'Dashboard' },
-    { to: '/dashboard/members', icon: Users, label: 'Members' },
-    { to: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
-    { to: '/dashboard/transactions', icon: CreditCard, label: 'Transactions' },
-  ] : [
-    { to: '/dashboard', icon: LayoutGrid, label: 'Dashboard' },
-    { to: '/dashboard/profile', icon: Users, label: 'My Profile' },
-    { to: '/dashboard/cpd-points', icon: Award, label: 'CPD Points' },
-  ];
-
-  const managementItems = isAdmin ? [
-    { to: '/dashboard/events', icon: Calendar, label: 'Events' },
-    { to: '/dashboard/cpd-points', icon: Award, label: 'CPD Points' },
-    { to: '/dashboard/applications', icon: FileCheck, label: 'Applications', badge: pendingCount > 0 ? pendingCount.toString() : null },
-    { to: '/dashboard/generate-ids', icon: Wand2, label: 'Generate IDs' },
-    { to: '/dashboard/messages', icon: Mail, label: 'Messages', badge: unreadMessages > 0 ? unreadMessages.toString() : null },
-    { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
-  ] : [
-    { to: '/dashboard/events', icon: Calendar, label: 'Events' },
-    { to: '/dashboard/transactions', icon: CreditCard, label: 'Payments' },
-    { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
-  ];
+  const role = user?.role || 'member';
+  const isAdmin = ['admin', 'super_admin', 'general_manager'].includes(role);
+  const isFinance = ['admin', 'super_admin', 'general_manager', 'finance_manager', 'cashier'].includes(role);
+  const isGolf = ['admin', 'super_admin', 'general_manager', 'golf_manager', 'golf_professional', 'receptionist'].includes(role);
+  const isMember = role === 'member';
 
   return (
     <>
@@ -150,62 +134,111 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div
         className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
         onClick={onClose}
-      ></div>
+      />
 
       {/* Sidebar Container */}
       <aside className={`
-        fixed inset-y-0 left-0 w-60 flex flex-col z-50 transition-all duration-300 ease-out
+        fixed inset-y-0 left-0 w-56 flex flex-col z-50 transition-all duration-300 ease-out
         lg:static lg:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         ${theme === 'dark'
           ? 'bg-[#0f172a] border-r border-white/5 shadow-2xl'
           : 'bg-white border-r border-slate-200 shadow-sm'}
       `}>
-        <div className="h-16 flex items-center px-6 mb-6 flex-shrink-0">
-          <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-black mr-3 shadow-lg shadow-emerald-500/20">
-            N
+        {/* Logo */}
+        <div className="h-14 flex items-center px-4 flex-shrink-0 border-b border-slate-100 dark:border-white/5">
+          <div className="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-black mr-2.5 shadow-lg shadow-emerald-500/20 text-xs">
+            MMS
           </div>
           <div className="flex flex-col">
-            <span className={`font-black text-[13px] tracking-tight uppercase leading-none ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-              NNAK <span className="text-emerald-500">Admin</span>
+            <span className={`font-black text-[11px] tracking-tight uppercase leading-none ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+              Golf Club <span className="text-emerald-500">MMS</span>
             </span>
-            <span className={`text-[7px] uppercase tracking-[0.3em] font-black mt-1 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-              Professional Suite
+            <span className={`text-[7px] uppercase tracking-[0.3em] font-black mt-0.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+              Management Suite
             </span>
           </div>
         </div>
 
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-          <div className={`text-[10px] font-black uppercase tracking-[0.25em] mb-4 px-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-            Main Systems
-          </div>
-          {navItems.map((item) => (
-            <NavItem key={item.to} {...item} onClick={onClose} theme={theme} />
-          ))}
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto custom-scrollbar text-[10px]">
+          {/* Main */}
+          <NavGroup label="Main" theme={theme} defaultOpen={true}>
+            <NavItem to="/dashboard" icon={LayoutGrid} label="Dashboard" onClick={onClose} theme={theme} />
+            {isAdmin && <NavItem to="/dashboard/members" icon={Users} label="Members" onClick={onClose} theme={theme} />}
+            {isAdmin && <NavItem to="/dashboard/analytics" icon={BarChart2} label="Analytics" onClick={onClose} theme={theme} />}
+            {isMember && <NavItem to="/dashboard/profile" icon={Users} label="My Profile" onClick={onClose} theme={theme} />}
+          </NavGroup>
 
-          <div className="pt-8 mb-4">
-            <div className={`h-px mx-2 mb-6 ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'}`}></div>
-            <div className={`text-[10px] font-black uppercase tracking-[0.25em] mb-4 px-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-              Management
-            </div>
-          </div>
+          {/* Golf Operations */}
+          <NavGroup label="Golf" theme={theme} defaultOpen={isGolf}>
+            <NavItem to="/dashboard/tee-times" icon={Clock} label="Tee Times" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/competitions" icon={Trophy} label="Competitions" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/leaderboard" icon={Target} label="Leaderboard" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/scorecards" icon={FileText} label="Scorecards" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/handicaps" icon={Flag} label="Handicaps" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/check-in" icon={UserCheck} label="Check-In" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/guests" icon={UserPlus} label="Guests" onClick={onClose} theme={theme} />
+          </NavGroup>
 
-          {managementItems.map((item) => (
-            <NavItem key={item.to} {...item} onClick={onClose} theme={theme} />
-          ))}
+          {/* Finance */}
+          {(isAdmin || isFinance) && (
+            <NavGroup label="Finance" theme={theme} defaultOpen={isFinance}>
+              <NavItem to="/dashboard/finance" icon={DollarSign} label="Overview" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/invoices" icon={FileText} label="Invoices" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/transactions" icon={CreditCard} label="Payments" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/statements" icon={FileText} label="Statements" onClick={onClose} theme={theme} />
+            </NavGroup>
+          )}
+
+          {/* Club Services */}
+          <NavGroup label="Club Services" theme={theme} defaultOpen={false}>
+            <NavItem to="/dashboard/facilities" icon={Map} label="Facilities" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/events" icon={Calendar} label="Events" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/restaurant" icon={Coffee} label="Restaurant" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/golf-shop" icon={ShoppingBag} label="Golf Shop" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/caddies" icon={Users} label="Caddies" onClick={onClose} theme={theme} />
+            <NavItem to="/dashboard/golf-carts" icon={Car} label="Golf Carts" onClick={onClose} theme={theme} />
+          </NavGroup>
+
+          {/* Course & Operations */}
+          {isAdmin && (
+            <NavGroup label="Operations" theme={theme} defaultOpen={false}>
+              <NavItem to="/dashboard/courses" icon={Flag} label="Courses" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/maintenance" icon={Wrench} label="Maintenance" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/assets" icon={HardDrive} label="Assets" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/suppliers" icon={Truck} label="Suppliers" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/staff" icon={Briefcase} label="Staff" onClick={onClose} theme={theme} />
+              <NavItem to="/dashboard/cpd-points" icon={Award} label="CPD Points" onClick={onClose} theme={theme} />
+            </NavGroup>
+          )}
+
+          {/* Administration */}
+          <NavGroup label="Administration" theme={theme} defaultOpen={false}>
+            {isAdmin && <NavItem to="/dashboard/applications" icon={FileCheck} label="Applications" onClick={onClose} theme={theme} badge={pendingCount > 0 ? pendingCount.toString() : null} />}
+            {isAdmin && <NavItem to="/dashboard/generate-ids" icon={Wand2} label="Generate IDs" onClick={onClose} theme={theme} />}
+            <NavItem to="/dashboard/notifications" icon={Bell} label="Notifications" onClick={onClose} theme={theme} />
+            {isAdmin && <NavItem to="/dashboard/messages" icon={Mail} label="Messages" onClick={onClose} theme={theme} badge={unreadMessages > 0 ? unreadMessages.toString() : null} />}
+            {(isAdmin || role === 'auditor') && <NavItem to="/dashboard/audit-log" icon={FileCheck} label="Audit Log" onClick={onClose} theme={theme} />}
+            <NavItem to="/dashboard/settings" icon={Settings} label="Settings" onClick={onClose} theme={theme} />
+          </NavGroup>
         </nav>
 
-        <div className={`p-4 flex-shrink-0 border-t ${theme === 'dark' ? 'bg-slate-800/20 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+        {/* Logout */}
+        <div className={`p-3 flex-shrink-0 border-t ${theme === 'dark' ? 'bg-slate-800/20 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+          <div className={`text-[9px] font-black mb-2 px-1 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+            {user?.first_name} {user?.last_name} • {role?.replace(/_/g, ' ').toUpperCase()}
+          </div>
           <button
             onClick={handleLogout}
             className={`
-              w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-black text-[10px] uppercase tracking-widest border
+              w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 font-black text-[9px] uppercase tracking-widest border
               ${theme === 'dark'
                 ? 'text-rose-400 border-rose-500/20 hover:text-white hover:bg-rose-500/10 hover:border-rose-500/40'
                 : 'text-rose-600 border-rose-100 hover:bg-rose-50 hover:border-rose-200'}
             `}
           >
-            <LogOut size={14} strokeWidth={3} /> Logout Session
+            <LogOut size={12} strokeWidth={3} /> Logout Session
           </button>
         </div>
       </aside>

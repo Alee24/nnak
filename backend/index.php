@@ -55,6 +55,7 @@ register_shutdown_function(function() {
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/Database.php';
 require_once __DIR__ . '/utils/Normalization.php';
+require_once __DIR__ . '/utils/Auth.php';
 
 // Start session
 session_start();
@@ -88,8 +89,8 @@ try {
     
     if (empty($requestParts)) {
         sendResponse(200, [
-            'message' => 'NNAK Membership API',
-            'version' => '1.0',
+            'message' => 'MMS Golf Club Management System API',
+            'version' => '2.0.0',
             'status' => 'active'
         ]);
     }

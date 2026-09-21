@@ -6,53 +6,6 @@ import MemberDashboard from './pages/MemberDashboard';
 import Members from './pages/Members';
 import MemberProfile from './pages/MemberProfile';
 import Analytics from './pages/Analytics';
-import ProjectDashboard from './pages/ProjectDashboard';
-
-// Dashboard Switcher based on role
-const DashboardSwitcher = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user?.role === 'admin' || user?.role === 'super_admin') {
-      return <Dashboard />;
-    }
-    return <MemberDashboard />;
-  } catch (e) {
-    return <Navigate to="/login" replace />;
-  }
-};
-
-// Route Protection Components
-const AdminRoute = ({ children }) => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user?.role === 'admin' || user?.role === 'super_admin') {
-      return children;
-    }
-    return <Navigate to="/dashboard" replace />;
-  } catch (e) {
-    return <Navigate to="/login" replace />;
-  }
-};
-
-const MemberRoute = ({ children }) => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user?.role === 'member' || !user?.role) { // Default to member if role is missing but authenticated
-      return children;
-    }
-    return <Navigate to="/dashboard" replace />;
-  } catch (e) {
-    return <Navigate to="/login" replace />;
-  }
-};
-
-// Placeholder components for routes we haven't implemented yet
-const Placeholder = ({ title }) => (
-  <div className="p-8 text-center text-gray-500">
-    <h2 className="text-2xl font-bold mb-2">{title}</h2>
-    <p>This page is under construction.</p>
-  </div>
-);
 
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -69,6 +22,45 @@ import MessagesPage from './pages/MessagesPage';
 import FAQ from './pages/FAQ';
 import TransactionsPage from './pages/TransactionsPage';
 import GenerateIDs from './pages/GenerateIDs';
+
+// MMS Golf Club Pages
+import InvoicesPage from './pages/InvoicesPage';
+import TeeTimesPage from './pages/TeeTimesPage';
+import CompetitionsPage from './pages/CompetitionsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+import CheckInPage from './pages/CheckInPage';
+import GuestsPage from './pages/GuestsPage';
+import CoursesPage from './pages/CoursesPage';
+import MemberStatementPage from './pages/MemberStatementPage';
+import FinancePage from './pages/FinancePage';
+import FacilitiesPage from './pages/FacilitiesPage';
+import ScorecardsPage from './pages/ScorecardsPage';
+import HandicapPage from './pages/HandicapPage';
+
+// Dashboard Switcher based on role
+const DashboardSwitcher = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (['admin', 'super_admin', 'general_manager'].includes(user?.role)) {
+      return <Dashboard />;
+    }
+    return <MemberDashboard />;
+  } catch (e) {
+    return <Navigate to="/login" replace />;
+  }
+};
+
+const AdminRoute = ({ children }) => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (['admin', 'super_admin', 'general_manager'].includes(user?.role)) {
+      return children;
+    }
+    return <Navigate to="/dashboard" replace />;
+  } catch (e) {
+    return <Navigate to="/login" replace />;
+  }
+};
 
 function App() {
   return (
@@ -99,6 +91,20 @@ function App() {
           <Route path="generate-ids" element={<AdminRoute><GenerateIDs /></AdminRoute>} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="messages" element={<AdminRoute><MessagesPage /></AdminRoute>} />
+
+          {/* MMS Golf Routes */}
+          <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="tee-times" element={<TeeTimesPage />} />
+          <Route path="competitions" element={<CompetitionsPage />} />
+          <Route path="leaderboard" element={<LeaderboardPage />} />
+          <Route path="check-in" element={<CheckInPage />} />
+          <Route path="guests" element={<GuestsPage />} />
+          <Route path="courses" element={<AdminRoute><CoursesPage /></AdminRoute>} />
+          <Route path="statements" element={<MemberStatementPage />} />
+          <Route path="finance" element={<FinancePage />} />
+          <Route path="facilities" element={<FacilitiesPage />} />
+          <Route path="scorecards" element={<ScorecardsPage />} />
+          <Route path="handicaps" element={<HandicapPage />} />
         </Route>
 
         {/* Catch all redirect */}
