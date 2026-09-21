@@ -96,18 +96,81 @@ try {
     }
     
     // Get controller name
-    $controllerName = $requestParts[0];
-    $controllerFile = __DIR__ . '/controllers/' . ucfirst($controllerName) . 'Controller.php';
+    $rawControllerName = $requestParts[0];
+    
+    // Normalization: e.g. 'tee-time' -> 'TeeTime', 'check-in' -> 'CheckIn', 'golf-cart' -> 'GolfCart'
+    $pascal = str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', strtolower($rawControllerName))));
+    
+    // Alias map for routes to controllers
+    $routeMap = [
+        'Teetime' => 'TeeTime',
+        'Teetimes' => 'TeeTime',
+        'TeeTime' => 'TeeTime',
+        'TeeTimes' => 'TeeTime',
+        'Checkin' => 'CheckIn',
+        'Checkins' => 'CheckIn',
+        'CheckIn' => 'CheckIn',
+        'CheckIns' => 'CheckIn',
+        'Golfcart' => 'GolfCart',
+        'Golfcarts' => 'GolfCart',
+        'GolfCart' => 'GolfCart',
+        'GolfCarts' => 'GolfCart',
+        'Facilitybooking' => 'Facility',
+        'Facilitybookings' => 'Facility',
+        'FacilityBooking' => 'Facility',
+        'FacilityBookings' => 'Facility',
+        'Facilities' => 'Facility',
+        'Memberdependant' => 'MemberDependants',
+        'Memberdependants' => 'MemberDependants',
+        'MemberDependant' => 'MemberDependants',
+        'MemberDependants' => 'MemberDependants',
+        'Dependants' => 'MemberDependants',
+        'Expense' => 'Finance',
+        'Expenses' => 'Finance',
+        'Invoices' => 'Invoice',
+        'Courses' => 'Course',
+        'Guests' => 'Guest',
+        'Competitions' => 'Competition',
+        'Scorecards' => 'Scorecard',
+        'Handicaps' => 'Handicap',
+        'Caddies' => 'Caddy',
+        'Products' => 'Product',
+        'Suppliers' => 'Supplier',
+        'Audits' => 'Audit',
+        'Notifications' => 'Notification',
+        'Members' => 'Member',
+        'Events' => 'Event',
+        'Payments' => 'Payment',
+    ];
+
+    $controllerBase = $routeMap[$pascal] ?? $pascal;
+    $controllerFile = __DIR__ . '/controllers/' . $controllerBase . 'Controller.php';
+
+    // Fallback checks
+    if (!file_exists($controllerFile)) {
+        if (substr($controllerBase, -1) === 's') {
+            $singular = rtrim($controllerBase, 's');
+            if (file_exists(__DIR__ . '/controllers/' . $singular . 'Controller.php')) {
+                $controllerBase = $singular;
+                $controllerFile = __DIR__ . '/controllers/' . $controllerBase . 'Controller.php';
+            }
+        }
+    }
     
     if (!file_exists($controllerFile)) {
-        sendResponse(404, ['error' => 'Controller not found']);
+        $controllerFile = __DIR__ . '/controllers/' . ucfirst($rawControllerName) . 'Controller.php';
+        $controllerBase = ucfirst($rawControllerName);
+    }
+    
+    if (!file_exists($controllerFile)) {
+        sendResponse(404, ['error' => "Controller not found for '$rawControllerName'"]);
     }
     
     require_once $controllerFile;
     
-    $controllerClass = ucfirst($controllerName) . 'Controller';
+    $controllerClass = $controllerBase . 'Controller';
     if (!class_exists($controllerClass)) {
-        sendResponse(500, ['error' => 'Controller class not found']);
+        sendResponse(500, ['error' => "Controller class '$controllerClass' not found"]);
     }
     
     $controller = new $controllerClass();

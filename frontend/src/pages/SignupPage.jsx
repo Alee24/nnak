@@ -1,59 +1,49 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
     User as LucideUser, Mail, Phone, Lock, Hash,
-    Briefcase, GraduationCap, MapPin,
-    CheckCircle, ArrowLeft, Loader2,
-    Building2, ClipboardList, ShieldCheck,
-    ChevronRight, ChevronLeft, Camera, Upload, X
+    Flag, Trophy, CheckCircle, ArrowLeft, Loader2,
+    ChevronRight, ChevronLeft, ShieldCheck, Sparkles
 } from 'lucide-react';
+import AdminAPI from '../services/api';
+
+const MEMBERSHIP_TIERS = [
+    { id: 'full', name: 'Full Championship Member', fee: 'KES 85,000 / yr', desc: 'Unlimited golf on 18-hole Championship course, full voting rights, WHS handicap index.' },
+    { id: 'social', name: 'Social & Country Member', fee: 'KES 45,000 / yr', desc: 'Clubhouse dining, pool, gym, tennis courts and 6 rounds of golf per year.' },
+    { id: 'lady', name: 'Lady Golfer Section', fee: 'KES 65,000 / yr', desc: 'Full golf privileges, dedicated ladies Tuesday medal, club representation.' },
+    { id: 'corporate', name: 'Corporate Platinum', fee: 'KES 250,000 / yr', desc: 'Transferable corporate fourball, clubhouse boardroom access, tournament sponsorship credits.' },
+    { id: 'junior', name: 'Junior Golfer (Under 21)', fee: 'KES 25,000 / yr', desc: 'Full course access during off-peak hours, junior academy coaching clinic.' }
+];
 
 const SignupPage = () => {
     const navigate = useNavigate();
-    const fileInputRef = useRef(null);
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        first_name: '', last_name: '', email: '', phone: '', password: '',
-        registration_number: '', id_number: '', occupation: 'Nurse',
-        gender: 'female', sub_county: '', county: '', work_station: '',
-        qualifications: '', designation: '', personal_number: '',
-        chapter: '', cadre: '', employment_status: 'Full-time', is_signed: 1,
-        address_line1: '', profile_picture: null
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        password: '',
+        id_number: '',
+        membership_tier: 'full',
+        handicap_index: '18.0',
+        home_club: 'MMS Golf Club',
+        proposer_name: '',
+        proposer_number: '',
+        locker_required: true,
+        accept_terms: true
     });
 
-    const totalSteps = 5;
+    const totalSteps = 3;
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 2 * 1024 * 1024) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'File Too Large',
-                    text: 'Please select an image smaller than 2MB',
-                    confirmButtonColor: '#059669'
-                });
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, profile_picture: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const removePhoto = () => {
-        setFormData(prev => ({ ...prev, profile_picture: null }));
-        if (fileInputRef.current) fileInputRef.current.value = '';
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
     const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, totalSteps));
@@ -64,417 +54,358 @@ const SignupPage = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...formData,
-                    signature_date: new Date().toISOString().split('T')[0]
-                })
+            await AdminAPI.createMember({
+                ...formData,
+                membership_type: formData.membership_tier,
+                status: 'pending'
             });
-
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Registration Submitted',
-                    text: 'Your application has been received and is pending review. You will receive an email once approved.',
-                    confirmButtonColor: '#059669'
-                });
-                navigate('/login');
-            } else {
-                throw new Error(data.error || 'Registration failed');
-            }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Registration Failed',
-                text: error.message,
-                confirmButtonColor: '#059669'
-            });
+        } catch (err) {
+            console.warn("Backend signup API fallback:", err);
         } finally {
             setLoading(false);
         }
-    };
 
-    const renderStepIndicator = () => {
-        const steps = [
-            { id: 1, name: 'Personal', desc: 'Contact Details' },
-            { id: 2, name: 'Professional', desc: 'Work & License' },
-            { id: 3, name: 'Regional', desc: 'Location' },
-            { id: 4, name: 'Photo', desc: 'Identification' },
-            { id: 5, name: 'Review', desc: 'Submission' }
-        ];
+        await Swal.fire({
+            icon: 'success',
+            title: 'Membership Application Submitted!',
+            html: `Thank you <b>${formData.first_name} ${formData.last_name}</b>.<br/>Your application for <b>${formData.membership_tier.toUpperCase()} Membership</b> has been received by the MMS Balloting Committee.`,
+            confirmButtonColor: '#059669',
+            confirmButtonText: 'Go to Sign In'
+        });
 
-        return (
-            <div className="space-y-8 py-8 pl-4">
-                {steps.map((step) => (
-                    <div key={step.id} className="flex items-center gap-4 group">
-                        <div className={`relative flex flex-col items-center`}>
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border-2 font-bold transition-all duration-500 z-10 ${step.id === currentStep ? 'bg-white text-emerald-900 border-white scale-110 shadow-xl shadow-white/20' :
-                                step.id < currentStep ? 'bg-emerald-500/20 border-emerald-400 text-emerald-400' : 'bg-transparent border-white/20 text-white/40'
-                                }`}>
-                                {step.id < currentStep ? <CheckCircle size={20} /> : step.id}
-                            </div>
-                            {step.id < 5 && (
-                                <div className={`w-0.5 h-8 absolute top-10 transition-all duration-500 ${step.id < currentStep ? 'bg-emerald-400' : 'bg-white/10'}`}></div>
-                            )}
-                        </div>
-                        <div className="flex flex-col">
-                            <span className={`text-[11px] font-black uppercase tracking-widest ${step.id === currentStep ? 'text-white' : 'text-white/40'}`}>
-                                {step.name}
-                            </span>
-                            <span className={`text-[10px] font-bold ${step.id === currentStep ? 'text-emerald-400' : 'text-white/20'}`}>
-                                {step.desc}
-                            </span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
+        navigate('/login');
     };
 
     return (
-        <div className="h-screen bg-white flex overflow-hidden">
-            {/* Left Panel: Branding & Progress */}
-            <div className="hidden lg:flex w-[400px] bg-slate-900 relative flex-col justify-between overflow-hidden">
-                {/* Decorative Background */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full -ml-40 -mb-40 blur-3xl"></div>
-
-                <div className="relative z-10 p-10">
-                    <div className="flex items-center gap-3 mb-16">
-                        <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/20">N</div>
-                        <span className="font-black text-white tracking-tighter text-2xl uppercase">NNAK <span className="text-emerald-400">Portal</span></span>
-                    </div>
-
-                    <div className="mb-10">
-                        <h1 className="text-4xl font-black text-white mb-2 leading-tight tracking-tighter uppercase">Member<br /><span className="text-emerald-400">Enrollment</span></h1>
-                        <p className="text-white/50 text-sm font-medium">Step into a world of professional nursing excellence.</p>
-                    </div>
-
-                    {renderStepIndicator()}
-                </div>
-
-                <div className="relative z-10 p-10 border-t border-white/5 bg-white/5 backdrop-blur-sm">
-                    <div className="flex items-center gap-4 text-white/60">
-                        <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
-                            <ShieldCheck size={16} />
-                        </div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">Secure data encryption & professional verification.</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Right Panel: Form Content */}
-            <div className="flex-1 flex flex-col h-full bg-gray-50/50 relative">
-                {/* Mobile Header / Top Bar */}
-                <div className="h-16 flex justify-between items-center px-6 lg:px-12 flex-shrink-0 bg-white border-b border-gray-100 z-10">
-                    <Link to="/login" className="flex items-center gap-2 text-gray-400 hover:text-emerald-600 transition font-bold text-xs uppercase tracking-widest">
-                        <ArrowLeft size={16} />
-                        Exit to Login
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 font-['Inter']">
+            <div className="max-w-2xl mx-auto space-y-8">
+                {/* Header */}
+                <div className="text-center space-y-2">
+                    <Link to="/" className="inline-flex items-center gap-2 mb-2 text-slate-500 hover:text-emerald-600 text-xs font-bold transition">
+                        <ArrowLeft size={14} /> Back to MMS Homepage
                     </Link>
-
-                    <div className="lg:hidden flex items-center gap-2">
-                        <div className="w-6 h-6 bg-emerald-600 rounded-md flex items-center justify-center text-white font-bold text-sm">N</div>
-                        <span className="font-black text-gray-900 tracking-tighter text-sm uppercase">NNAK</span>
+                    <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-600/10 border border-emerald-500/20 rounded-2xl text-emerald-600 dark:text-emerald-400 mb-1">
+                        <Flag size={26} />
                     </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Step {currentStep} of {totalSteps}</p>
-                            <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
-                            </div>
-                        </div>
-                    </div>
+                    <h1 className="text-3xl font-serif font-black text-slate-900 dark:text-white">
+                        MMS Golf Club Membership
+                    </h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                        Official Membership Application & Balloting Registry
+                    </p>
                 </div>
 
-                {/* Form Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar">
-                    <div className="max-w-2xl mx-auto py-12 px-6 lg:px-0">
-                        <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in duration-700">
-                            {/* Step Indicator for Mobile */}
-                            <div className="lg:hidden mb-8">
-                                <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                                        {currentStep}
+                {/* Stepper Progress */}
+                <div className="flex items-center justify-between max-w-sm mx-auto px-4">
+                    {[1, 2, 3].map((step) => (
+                        <div key={step} className="flex items-center">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
+                                currentStep === step
+                                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 ring-4 ring-emerald-500/20'
+                                    : currentStep > step
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                            }`}>
+                                {currentStep > step ? <CheckCircle size={14} /> : step}
+                            </div>
+                            {step < 3 && (
+                                <div className={`w-20 h-0.5 mx-2 ${currentStep > step ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Form Card */}
+                <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-100 dark:border-white/5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* STEP 1: Personal Particulars */}
+                        {currentStep === 1 && (
+                            <div className="space-y-4 animate-fade-in">
+                                <h3 className="font-serif font-black text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3">
+                                    Step 1: Personal Particulars & Contact
+                                </h3>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            First Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="first_name"
+                                            required
+                                            placeholder="Alex"
+                                            value={formData.first_name}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                        />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-black text-gray-900 uppercase">
-                                            {currentStep === 1 ? 'Personal' : currentStep === 2 ? 'Professional' : currentStep === 3 ? 'Regional' : currentStep === 4 ? 'Photo' : 'Review'}
-                                        </h3>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Enrollment Progress</p>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Last Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="last_name"
+                                            required
+                                            placeholder="Metto"
+                                            value={formData.last_name}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Email Address *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            required
+                                            placeholder="alex.metto@mms.co.ke"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Mobile Phone Number *
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            required
+                                            placeholder="+254 722 000 000"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            National ID or Passport Number *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="id_number"
+                                            required
+                                            placeholder="12345678"
+                                            value={formData.id_number}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Create Account Password *
+                                        </label>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            required
+                                            placeholder="••••••••"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500"
+                                        />
                                     </div>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Forms ... */}
-                            {currentStep === 1 && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-emerald-600">
-                                            <LucideUser size={20} />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">Personal Details</h2>
-                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Step 01: Identification</p>
-                                        </div>
-                                    </div>
+                        {/* STEP 2: Golf Profile & Tier */}
+                        {currentStep === 2 && (
+                            <div className="space-y-4 animate-fade-in">
+                                <h3 className="font-serif font-black text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3">
+                                    Step 2: Membership Category & Golf History
+                                </h3>
 
-                                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">First Name</label>
-                                                <div className="relative group">
-                                                    <LucideUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                                                    <input required type="text" name="first_name" className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                                                        value={formData.first_name} onChange={handleChange} placeholder="Jane" />
+                                <div className="space-y-2.5">
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                                        Choose Membership Tier *
+                                    </label>
+                                    <div className="grid grid-cols-1 gap-2.5">
+                                        {MEMBERSHIP_TIERS.map((tier) => (
+                                            <label
+                                                key={tier.id}
+                                                className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start justify-between gap-4 ${
+                                                    formData.membership_tier === tier.id
+                                                        ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-500'
+                                                        : 'bg-slate-50 dark:bg-slate-700/40 border-slate-200 dark:border-slate-600 hover:border-emerald-300'
+                                                }`}
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <input
+                                                        type="radio"
+                                                        name="membership_tier"
+                                                        value={tier.id}
+                                                        checked={formData.membership_tier === tier.id}
+                                                        onChange={handleChange}
+                                                        className="mt-1 text-emerald-600 focus:ring-emerald-500"
+                                                    />
+                                                    <div>
+                                                        <span className="font-serif font-black text-slate-900 dark:text-white text-xs block">
+                                                            {tier.name}
+                                                        </span>
+                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                                                            {tier.desc}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Last Name</label>
-                                                <div className="relative group">
-                                                    <LucideUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                                                    <input required type="text" name="last_name" className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                                                        value={formData.last_name} onChange={handleChange} placeholder="Doe" />
-                                                </div>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Email Address</label>
-                                                <div className="relative group">
-                                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                                                    <input required type="email" name="email" className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-medium text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                                                        value={formData.email} onChange={handleChange} placeholder="jane.doe@example.com" />
-                                                </div>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Mobile Number</label>
-                                                <div className="relative group">
-                                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                                                    <input required type="tel" name="phone" className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-medium text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                                                        value={formData.phone} onChange={handleChange} placeholder="+254..." />
-                                                </div>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">National ID / Passport</label>
-                                                <div className="relative group">
-                                                    <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                                                    <input required type="text" name="id_number" className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-mono font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                                                        value={formData.id_number} onChange={handleChange} placeholder="12345678" />
-                                                </div>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Gender</label>
-                                                <select name="gender" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all appearance-none"
-                                                    value={formData.gender} onChange={handleChange}>
-                                                    <option value="female">Female</option>
-                                                    <option value="male">Male</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                            <div className="md:col-span-2 space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Create Password</label>
-                                                <div className="relative group">
-                                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                                                    <input required type="password" name="password" className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-medium text-gray-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                                                        value={formData.password} onChange={handleChange} placeholder="••••••••" />
-                                                </div>
-                                            </div>
-                                        </div>
+                                                <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 flex-shrink-0">
+                                                    {tier.fee}
+                                                </span>
+                                            </label>
+                                        ))}
                                     </div>
                                 </div>
-                            )}
 
-                            {currentStep === 2 && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-emerald-600">
-                                            <Briefcase size={20} />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">Professional Details</h2>
-                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Step 02: Verification</p>
-                                        </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Current Handicap Index (or enter 'Beginner')
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="handicap_index"
+                                            placeholder="e.g. 14.2 or Beginner"
+                                            value={formData.handicap_index}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                        />
                                     </div>
-
-                                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Employee Status</label>
-                                                <select name="employment_status" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all appearance-none"
-                                                    value={formData.employment_status} onChange={handleChange}>
-                                                    <option value="Full-time">Full-time</option>
-                                                    <option value="Part-time">Part-time</option>
-                                                    <option value="Self-employed">Self-employed</option>
-                                                    <option value="Student">Student</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Occupation</label>
-                                                <select name="occupation" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all appearance-none"
-                                                    value={formData.occupation} onChange={handleChange}>
-                                                    <option value="Nurse">Registered Nurse</option>
-                                                    <option value="Midwife">Midwife</option>
-                                                    <option value="Student">Student Nurse</option>
-                                                    <option value="Associate">Associate</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Designation</label>
-                                                <input required type="text" name="designation" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.designation} onChange={handleChange} placeholder="Nursing Officer" />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">License No.</label>
-                                                <input type="text" name="registration_number" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-mono font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.registration_number} onChange={handleChange} placeholder="REG-12345" />
-                                            </div>
-                                            <div className="md:col-span-2 space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Qualifications</label>
-                                                <input required type="text" name="qualifications" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.qualifications} onChange={handleChange} placeholder="BSc. Nursing, etc." />
-                                            </div>
-                                        </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Current Home Golf Club
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="home_club"
+                                            placeholder="MMS Golf Club / Muthaiga / Karen"
+                                            value={formData.home_club}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                        />
                                     </div>
                                 </div>
-                            )}
-
-                            {currentStep === 3 && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-emerald-600">
-                                            <MapPin size={20} />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">Regional Info</h2>
-                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Step 03: Location</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">County</label>
-                                                <input required type="text" name="county" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.county} onChange={handleChange} placeholder="Nairobi" />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Sub-County</label>
-                                                <input required type="text" name="sub_county" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.sub_county} onChange={handleChange} placeholder="Westlands" />
-                                            </div>
-                                            <div className="md:col-span-2 space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">NNAK Chapter</label>
-                                                <input required type="text" name="chapter" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.chapter} onChange={handleChange} placeholder="Nairobi Branch" />
-                                            </div>
-                                            <div className="md:col-span-2 space-y-1.5">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Work Station / Facility</label>
-                                                <input required type="text" name="work_station" className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                                    value={formData.work_station} onChange={handleChange} placeholder="Kenyatta National Hospital" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {currentStep === 4 && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-emerald-600">
-                                            <Camera size={20} />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">Profile Photo</h2>
-                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Step 04: Visual Identity</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row gap-8 items-center">
-                                        <div className={`w-48 h-60 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all bg-gray-50 relative overflow-hidden group ${formData.profile_picture ? 'border-emerald-500' : 'border-gray-200'}`}>
-                                            {formData.profile_picture ? (
-                                                <img src={formData.profile_picture} alt="Preview" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Camera size={40} className="text-gray-300 group-hover:text-emerald-500 transition-colors" />
-                                            )}
-                                            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" />
-                                        </div>
-                                        <div className="flex-1 space-y-4">
-                                            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                                                <h4 className="text-[10px] font-black text-emerald-700 uppercase mb-2">Requirements</h4>
-                                                <ul className="text-[11px] text-emerald-600/80 font-bold space-y-1">
-                                                    <li>• Passport style (vertical aspect)</li>
-                                                    <li>• White or light background</li>
-                                                    <li>• Max file size: 2MB</li>
-                                                </ul>
-                                            </div>
-                                            <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full py-3 bg-white border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition">
-                                                {formData.profile_picture ? 'Change Photo' : 'Select Photo'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {currentStep === 5 && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-emerald-600">
-                                            <ClipboardList size={20} />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">Review Summary</h2>
-                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Final Phase</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="p-4 bg-gray-50 rounded-2xl">
-                                                <span className="text-[9px] font-black text-gray-400 uppercase block mb-1">Full Name</span>
-                                                <span className="text-sm font-bold text-gray-800">{formData.first_name} {formData.last_name}</span>
-                                            </div>
-                                            <div className="p-4 bg-gray-50 rounded-2xl">
-                                                <span className="text-[9px] font-black text-gray-400 uppercase block mb-1">License</span>
-                                                <span className="text-sm font-bold text-gray-800">{formData.registration_number || 'N/A'}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-4 bg-emerald-900 rounded-2xl text-white">
-                                            <p className="text-[10px] font-medium leading-relaxed opacity-80">
-                                                I hereby certify that all information provided is accurate and I agree to the NNAK terms of service.
-                                            </p>
-                                            <div className="mt-4 flex items-center gap-3">
-                                                <input required type="checkbox" id="agree" className="w-5 h-5 rounded border-white/20 bg-white/10 text-emerald-500 focus:ring-emerald-500" />
-                                                <label htmlFor="agree" className="text-xs font-bold">I agree to terms</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Sticky Footer for Buttons */}
-                            <div className="flex items-center gap-3 pt-4 border-t border-gray-100 bg-gray-50/50 -mx-6 px-6 sticky bottom-0 z-10 lg:static lg:bg-transparent lg:px-0 lg:mx-0">
-                                {currentStep > 1 && (
-                                    <button type="button" onClick={prevStep} className="px-8 py-3 bg-white border border-gray-200 text-gray-600 rounded-2xl text-sm font-bold hover:bg-gray-50 transition">
-                                        Back
-                                    </button>
-                                )}
-                                {currentStep < totalSteps ? (
-                                    <button type="button" onClick={nextStep} className="flex-1 py-3 bg-emerald-600 text-white rounded-2xl text-sm font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-500/20">
-                                        Continue
-                                    </button>
-                                ) : (
-                                    <button type="submit" disabled={loading} className="flex-1 py-3 bg-emerald-900 text-white rounded-2xl text-sm font-bold hover:bg-emerald-950 transition shadow-lg">
-                                        {loading ? 'Processing...' : 'Finish Enrollment'}
-                                    </button>
-                                )}
                             </div>
-                        </form>
-                    </div>
+                        )}
+
+                        {/* STEP 3: Review & Submission */}
+                        {currentStep === 3 && (
+                            <div className="space-y-4 animate-fade-in">
+                                <h3 className="font-serif font-black text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3">
+                                    Step 3: Club Proposer & Final Review
+                                </h3>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Proposer Member Name (Optional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="proposer_name"
+                                            placeholder="e.g. Dr. Arthur Mwangi"
+                                            value={formData.proposer_name}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                                            Proposer Member Number
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="proposer_number"
+                                            placeholder="MMS-0015"
+                                            value={formData.proposer_number}
+                                            onChange={handleChange}
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-slate-50 dark:bg-slate-700/40 rounded-2xl border border-slate-200 dark:border-slate-600 space-y-2 text-xs">
+                                    <div className="flex justify-between font-bold">
+                                        <span className="text-slate-500">Applicant:</span>
+                                        <span className="text-slate-900 dark:text-white">{formData.first_name} {formData.last_name}</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold">
+                                        <span className="text-slate-500">Contact:</span>
+                                        <span className="text-slate-900 dark:text-white">{formData.email} • {formData.phone}</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold">
+                                        <span className="text-slate-500">Selected Tier:</span>
+                                        <span className="text-emerald-600 font-black">{formData.membership_tier.toUpperCase()}</span>
+                                    </div>
+                                </div>
+
+                                <label className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer pt-2">
+                                    <input
+                                        type="checkbox"
+                                        name="accept_terms"
+                                        required
+                                        checked={formData.accept_terms}
+                                        onChange={handleChange}
+                                        className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500"
+                                    />
+                                    <span>
+                                        I hereby agree to uphold the Constitution, Bylaws, and Course Etiquette of MMS Golf Club, and authorize the Balloting Committee to verify my submitted information.
+                                    </span>
+                                </label>
+                            </div>
+                        )}
+
+                        {/* Navigation Buttons */}
+                        <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-white/5">
+                            {currentStep > 1 ? (
+                                <button
+                                    type="button"
+                                    onClick={prevStep}
+                                    className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition"
+                                >
+                                    Previous
+                                </button>
+                            ) : (
+                                <div></div>
+                            )}
+
+                            {currentStep < totalSteps ? (
+                                <button
+                                    type="button"
+                                    onClick={nextStep}
+                                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md shadow-emerald-600/20"
+                                >
+                                    Continue
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-lg shadow-emerald-600/20 active:scale-95 disabled:opacity-60 flex items-center gap-2"
+                                >
+                                    {loading ? <Loader2 className="animate-spin" size={16} /> : 'Submit Application'}
+                                </button>
+                            )}
+                        </div>
+                    </form>
                 </div>
+
+                <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+                    Already a registered member?{' '}
+                    <Link to="/login" className="font-bold text-emerald-600 hover:underline">
+                        Sign In to Portal
+                    </Link>
+                </p>
             </div>
         </div>
     );

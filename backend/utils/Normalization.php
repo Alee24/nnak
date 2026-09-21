@@ -57,3 +57,9 @@ class Normalization {
         }
     }
 }
+
+if (!function_exists('numeric_id')) {
+    function numeric_id($val) {
+        return is_numeric($val) && (int)$val > 0;
+    }
+}

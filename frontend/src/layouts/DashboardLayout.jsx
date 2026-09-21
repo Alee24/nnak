@@ -126,8 +126,8 @@ const DashboardLayout = () => {
                         <Outlet />
                     </div>
                     {/* Footer - Compact */}
-                    <div className="mt-8 pt-4 border-t border-slate-50 flex justify-between items-center pb-4 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                        <span>&copy; 2024 NNAK SYSTEM</span>
+                    <div className="mt-8 pt-4 border-t border-slate-100 dark:border-white/5 flex justify-between items-center pb-4 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                        <span>&copy; 2025 MMS GOLF CLUB MANAGEMENT SYSTEM</span>
                         <div className="flex items-center gap-1">
                             ENGINEERED BY <a href="https://www.kkdes.co.ke" target="_blank" rel="noopener noreferrer" className="text-[#059669] hover:text-[#047857] transition-colors">KKDES ENGINE</a>
                         </div>
