@@ -67,8 +67,8 @@ require_once __DIR__ . '/config/Database.php';
 <?php
 
 try {
-    // Connect without selecting database
-    $dsn = "mysql:host=" . DB_HOST;
+    $port = defined('DB_PORT') ? DB_PORT : '3306';
+    $dsn = "mysql:host=" . DB_HOST . ";port=" . $port;
     $pdo = new PDO($dsn, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     

@@ -16,20 +16,20 @@ if (!defined('APP_INIT')) {
 
 // Helper to safely get environment variables
 function getEnvSafe(string $key, $default = null) {
-    // Check $_ENV
-    if (array_key_exists($key, $_ENV)) return $_ENV[$key];
-    
-    // Check getenv()
+    // 1. Check getenv() first (set by Docker / Container / Server environment)
     $val = getenv($key);
-    if ($val !== false) return $val;
+    if ($val !== false && $val !== '') return $val;
     
-    // Check $_SERVER
-    if (array_key_exists($key, $_SERVER)) return $_SERVER[$key];
+    // 2. Check $_SERVER
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
+
+    // 3. Check $_ENV
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
     
     return $default;
 }
 
-// Load .env file manually if safe
+// Load .env file manually if safe, but do not overwrite environment variables
 $envPath = __DIR__ . '/../../.env';
 if (file_exists($envPath)) {
     $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -40,7 +40,8 @@ if (file_exists($envPath)) {
             $key = trim($key);
             $value = trim($value, " \t\n\r\0\x0B\"'");
             
-            if (!array_key_exists($key, $_ENV)) {
+            // Only set if not already present in environment
+            if (getenv($key) === false && !array_key_exists($key, $_ENV)) {
                 $_ENV[$key] = $value;
                 putenv("$key=$value");
                 $_SERVER[$key] = $value;
@@ -51,7 +52,8 @@ if (file_exists($envPath)) {
 
 // --- Database Configuration ---
 define('DB_HOST', getEnvSafe('DB_HOST', 'localhost'));
-define('DB_NAME', getEnvSafe('DB_NAME', 'nnak_system')); // Corrected DB name from previous files
+define('DB_PORT', getEnvSafe('DB_PORT', '3306'));
+define('DB_NAME', getEnvSafe('DB_NAME', 'nnak_system'));
 define('DB_USER', getEnvSafe('DB_USER', 'root'));
 define('DB_PASS', getEnvSafe('DB_PASS', ''));
 define('DB_CHARSET', 'utf8mb4');
