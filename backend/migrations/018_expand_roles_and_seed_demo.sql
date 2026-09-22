@@ -1,20 +1,54 @@
 ﻿-- ============================================================
 -- MMS Golf Club Management System
 -- Migration: 018_expand_roles_and_seed_demo.sql
--- Compatible with MySQL 5.7+ and MySQL 8.0+
+-- Safely ensures columns exist before inserting demo accounts
 -- ============================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- 1. Expand role ENUM to include all staff roles
+-- 1. Ensure all golf-specific columns exist on members table
+CALL -; -- procedure container to safely add columns if missing
+DROP PROCEDURE IF EXISTS AddGcmsColumns;
+
+DELIMITER $$
+CREATE PROCEDURE AddGcmsColumns()
+BEGIN
+    -- membership_number
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='members' AND column_name='membership_number') THEN
+        ALTER TABLE `members` ADD COLUMN `membership_number` VARCHAR(50) DEFAULT NULL AFTER `member_id`;
+    END IF;
+
+    -- handicap_index
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='members' AND column_name='handicap_index') THEN
+        ALTER TABLE `members` ADD COLUMN `handicap_index` DECIMAL(5,1) DEFAULT NULL;
+    END IF;
+
+    -- membership_start_date
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='members' AND column_name='membership_start_date') THEN
+        ALTER TABLE `members` ADD COLUMN `membership_start_date` DATE DEFAULT NULL;
+    END IF;
+
+    -- membership_expiry_date
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='members' AND column_name='membership_expiry_date') THEN
+        ALTER TABLE `members` ADD COLUMN `membership_expiry_date` DATE DEFAULT NULL;
+    END IF;
+END $$
+DELIMITER ;
+
+CALL AddGcmsColumns();
+DROP PROCEDURE IF EXISTS AddGcmsColumns;
+
+-- 2. Expand role ENUM to include all staff roles
 ALTER TABLE `members`
 MODIFY COLUMN `role` ENUM(
-    'member', 'admin', 'super_admin', 'user',
-    'general_manager', 'finance_manager', 'golf_manager',
-    'golf_professional', 'cashier', 'receptionist', 'auditor'
+    'member','admin','super_admin',
+    'general_manager','finance_manager','membership_officer',
+    'golf_manager','golf_professional','receptionist',
+    'cashier','restaurant_manager','store_manager',
+    'course_manager','staff','auditor','user'
 ) DEFAULT 'member';
 
--- 2. Seed all demo accounts with a valid bcrypt hash for password "Digital2025"
+-- 3. Seed all demo accounts with a valid bcrypt hash for password "Digital2025"
 INSERT INTO `members` (
     `member_id`, `membership_number`, `first_name`, `last_name`, `email`,
     `password_hash`, `role`, `status`, `handicap_index`, `phone`,
@@ -41,7 +75,7 @@ ON DUPLICATE KEY UPDATE
     `membership_number` = VALUES(`membership_number`),
     `handicap_index` = VALUES(`handicap_index`);
 
--- 3. Ensure demo_mode is enabled in settings
+-- 4. Ensure demo_mode is enabled in settings
 INSERT INTO `settings` (`setting_key`, `setting_value`)
 VALUES ('demo_mode', '1')
 ON DUPLICATE KEY UPDATE `setting_value` = '1';
