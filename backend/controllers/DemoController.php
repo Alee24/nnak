@@ -14,6 +14,8 @@ class DemoController {
     public function handleRequest($method, $parts) {
         $action = $parts[0] ?? '';
 
+        // populate and status are public (no auth needed — allow seeding before login)
+        // clear and toggle require an authenticated admin session
         switch ($action) {
             case 'populate':
                 if ($method === 'POST') {
@@ -25,6 +27,10 @@ class DemoController {
 
             case 'clear':
                 if ($method === 'POST') {
+                    if (!isset($_SESSION['user_id'])) {
+                        $this->sendResponse(401, ['error' => 'Authentication required']);
+                        return;
+                    }
                     $this->clearDemoData();
                 } else {
                     $this->methodNotAllowed();
@@ -33,6 +39,10 @@ class DemoController {
 
             case 'toggle':
                 if ($method === 'POST') {
+                    if (!isset($_SESSION['user_id'])) {
+                        $this->sendResponse(401, ['error' => 'Authentication required']);
+                        return;
+                    }
                     $this->toggleDemoMode();
                 } else {
                     $this->methodNotAllowed();

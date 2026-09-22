@@ -1,250 +1,174 @@
-import React from 'react';
+﻿import React from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { toTitleCase } from '../utils/formatters';
 
-/**
- * Pure HTML/CSS ID Card Component for Export
- * NO TAILWIND CLASSES - Only inline styles with standard CSS
- */
 const IDCardPrintable = React.forwardRef(({ member, branding }, ref) => {
+    const photoUrl = member?.profile_picture || member?.profile_photo || member?.profile_image;
+    const fullName = `${member?.first_name || ''} ${member?.last_name || ''}`.trim() || 'MEMBER NAME';
+    const memberNo = member?.membership_number || member?.member_id || 'MMS-0000';
+    const handicap = member?.handicap_index !== undefined ? member.handicap_index : '0.0';
+    const role = member?.role?.replace(/_/g, ' ') || 'Full Member';
+
     return (
         <div ref={ref} style={{
             position: 'relative',
             width: '480px',
             height: '300px',
-            backgroundColor: '#ffffff',
             borderRadius: '16px',
-            fontFamily: 'Cambria, Georgia, serif',
+            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
             overflow: 'hidden',
-            boxShadow: 'none',
-            background: 'linear-gradient(to bottom, #f9fafb, #f3f4f6, #e5e7eb)',
-            border: '1px solid #d1d5db'
+            boxSizing: 'border-box',
+            background: 'linear-gradient(135deg, #022c22 0%, #064e3b 50%, #0f172a 100%)',
+            color: '#ffffff',
+            border: '2px solid #059669',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)'
         }}>
-
-            {/* Top Red Header Bar */}
+            {/* Top Gold Crest Bar */}
             <div style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                width: '100%',
-                height: '85px',
-                zIndex: 2,
-                paddingLeft: '100px',
-                paddingRight: '16px',
+                height: '65px',
+                padding: '0 20px',
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                background: 'linear-gradient(to bottom, #dc2626, #b91c1c)',
-                borderBottom: '2px solid #991b1b'
-            }}>
-                <h1 style={{
-                    fontSize: '15px',
-                    fontWeight: 'bold',
-                    color: '#ffffff',
-                    textTransform: 'uppercase',
-                    letterSpacing: '-0.01em',
-                    textAlign: 'right',
-                    lineHeight: 1.1,
-                    margin: 0,
-                    maxWidth: '300px'
-                }}>
-                    National Nurses Association of Kenya
-                </h1>
-                <p style={{
-                    fontSize: '10px',
-                    color: '#fca5a5',
-                    fontStyle: 'italic',
-                    textAlign: 'right',
-                    marginTop: '2px',
-                    marginBottom: 0
-                }}>
-                    Voice of the Nursing Profession
-                </p>
-                <div style={{
-                    width: '60%',
-                    height: '1px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    margin: '3px 0'
-                }}></div>
-                <p style={{
-                    fontSize: '10px',
-                    color: '#ffffff',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    textAlign: 'right',
-                    margin: 0,
-                    opacity: 0.9
-                }}>
-                    MEMBER OF THE INTERNATIONAL COUNCIL OF NURSES
-                </p>
-                <p style={{
-                    fontSize: '10px',
-                    fontWeight: '900',
-                    color: '#ffe4e6',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.12em',
-                    textAlign: 'right',
-                    marginTop: '1px',
-                    marginBottom: 0
-                }}>
-                    MEMBERSHIP CARD
-                </p>
-            </div>
-
-            {/* Logo Container - Overhanging */}
-            <div style={{
-                position: 'absolute',
-                top: '10px',
-                left: '20px',
-                zIndex: 10,
-                width: '90px',
-                height: '100px',
-                backgroundColor: '#ffffff',
-                borderBottomLeftRadius: '20px',
-                borderBottomRightRadius: '20px',
-                borderTopLeftRadius: '10px',
-                borderTopRightRadius: '10px',
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px',
-                border: '1px solid #e5e7eb'
+                justifyContent: 'space-between',
+                borderBottom: '1px solid rgba(255,255,255,0.15)',
+                background: 'rgba(255,255,255,0.03)'
             }}>
-                {branding?.system_logo ? (
-                    <img src={branding.system_logo} alt="Logo" style={{ width: '75px', height: '75px', objectFit: 'contain' }} crossOrigin="anonymous" />
-                ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
-                        width: '70px',
-                        height: '70px',
-                        backgroundColor: '#d1fae5',
-                        borderRadius: '9999px',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        background: 'linear-gradient(135deg, #059669, #047857)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        color: '#065f46',
-                        border: '2px solid #10b981'
-                    }}>NNAK</div>
-                )}
+                        fontWeight: '900',
+                        fontSize: '14px',
+                        color: '#ffffff',
+                        border: '1px solid #10b981'
+                    }}>
+                        MMS
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '13px', fontWeight: '900', letterSpacing: '0.05em', textTransform: 'uppercase', color: '#f8fafc' }}>
+                            MMS Golf Club
+                        </div>
+                        <div style={{ fontSize: '8px', fontWeight: '700', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#34d399' }}>
+                            Official Gold Privilege Card
+                        </div>
+                    </div>
+                </div>
+                <div style={{
+                    fontSize: '9px',
+                    fontWeight: '900',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    background: 'rgba(16, 185, 129, 0.2)',
+                    color: '#6ee7b7',
+                    border: '1px solid rgba(16, 185, 129, 0.4)'
+                }}>
+                    WHS SANCTIONED
+                </div>
             </div>
 
-            {/* Left Red Vertical Line */}
-            <div style={{
-                position: 'absolute',
-                top: '100px',
-                left: 0,
-                width: '12px',
-                height: '140px',
-                backgroundColor: '#dc2626',
-                borderTopRightRadius: '12px',
-                borderBottomRightRadius: '12px',
-                zIndex: 1
-            }}></div>
-
-            {/* Main Content Container */}
-            <div style={{
-                position: 'absolute',
-                top: '85px',
-                left: 0,
-                width: '100%',
-                height: '215px',
-                display: 'flex',
-                padding: '16px 20px',
-                zIndex: 5
-            }}>
-
-                {/* Left Side: Details & Signature */}
+            {/* Main Card Body */}
+            <div style={{ display: 'flex', padding: '16px 20px', gap: '16px', height: '175px' }}>
+                {/* Photo frame */}
                 <div style={{
-                    flex: 1,
-                    paddingLeft: '20px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
+                    width: '105px',
+                    height: '130px',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    border: '2px solid #059669',
+                    backgroundColor: '#0f172a',
+                    flexShrink: 0,
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
                 }}>
-                    <div style={{ marginTop: '0', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                        {/* Vertical stack of rows with horizontal label/value */}
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: '800', minWidth: '70px' }}>Name:</span>
-                            <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                                {toTitleCase(member?.first_name)} {toTitleCase(member?.last_name)}
-                            </span>
+                    {photoUrl ? (
+                        <img src={photoUrl} alt="Member" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
+                    ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '36px' }}>
+                            👤
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>ID No:</span>
-                            <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827' }}>{member?.id_number}</span>
+                    )}
+                </div>
+
+                {/* Details */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                        <div style={{ fontSize: '8px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8' }}>
+                            MEMBER NAME
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>Member No:</span>
-                            <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827' }}>{member?.member_id?.replace('NNAK', '')}</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold', minWidth: '70px' }}>Valid Till:</span>
-                            <span style={{ fontSize: '14px', fontWeight: '900', color: '#111827' }}>31/12/2027</span>
+                        <div style={{ fontSize: '15px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '-0.01em', marginTop: '1px' }}>
+                            {fullName}
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', paddingBottom: '4px' }}>
-                        <div style={{ padding: '3px', backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '4px', flexShrink: 0 }}>
-                            <QRCodeCanvas
-                                value={`https://portal.nnak.or.ke/verify/${member?.member_id}`}
-                                size={48}
-                                level="M"
-                                includeMargin={false}
-                            />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                            <div style={{ height: '30px', display: 'flex', alignItems: 'flex-end', borderBottom: '1px solid #d1d5db', minWidth: '110px' }}>
-                                {branding?.authorised_signature && (
-                                    <img src={branding.authorised_signature} alt="Sign" style={{ height: '38px', objectFit: 'contain' }} crossOrigin="anonymous" />
-                                )}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '6px' }}>
+                        <div>
+                            <div style={{ fontSize: '8px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8' }}>
+                                MEMBER NO
                             </div>
-                            <span style={{ fontSize: '10px', color: '#6b7280', fontWeight: 'bold', marginTop: '4px', textTransform: 'uppercase' }}>Authorized Signature</span>
+                            <div style={{ fontSize: '12px', fontWeight: '900', color: '#34d399', fontFamily: 'monospace' }}>
+                                {memberNo}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '8px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8' }}>
+                                WHS HANDICAP
+                            </div>
+                            <div style={{ fontSize: '12px', fontWeight: '900', color: '#fbbf24' }}>
+                                {handicap}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '8px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8' }}>
+                                CATEGORY
+                            </div>
+                            <div style={{ fontSize: '10px', fontWeight: '800', color: '#f1f5f9', textTransform: 'uppercase' }}>
+                                {role}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '8px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8' }}>
+                                EXPIRES
+                            </div>
+                            <div style={{ fontSize: '10px', fontWeight: '800', color: '#f1f5f9' }}>
+                                {member?.membership_expiry_date || '31 DEC 2027'}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Side: Photo with Red Frame */}
-                <div style={{
-                    width: '140px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    paddingLeft: '8px'
-                }}>
-                    <div style={{
-                        width: '120px',
-                        height: '140px',
-                        background: 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)',
-                        padding: '6px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-                        borderRadius: '2px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative'
-                    }}>
-                        <div style={{
-                            width: '100%',
-                            height: '100%',
-                            border: '3px solid #e5e7eb',
-                            backgroundColor: '#ffffff',
-                            overflow: 'hidden',
-                            position: 'relative'
-                        }}>
-                            {(member?.profile_picture || member?.profile_photo || member?.profile_image) ? (
-                                <img src={member.profile_picture || member.profile_photo || member.profile_image} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
-                            ) : (
-                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', color: '#d1d5db', fontSize: '48px' }}>
-                                    👤
-                                </div>
-                            )}
-                        </div>
+                {/* QR Code */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                    <div style={{ padding: '4px', backgroundColor: '#ffffff', borderRadius: '6px' }}>
+                        <QRCodeCanvas
+                            value={`https://mms.kkdes.co.ke/verify/${memberNo}`}
+                            size={56}
+                            level="M"
+                        />
                     </div>
+                    <span style={{ fontSize: '7px', fontWeight: '800', color: '#94a3b8', letterSpacing: '0.1em' }}>SCAN VERIFY</span>
                 </div>
+            </div>
+
+            {/* Bottom Footer Bar */}
+            <div style={{
+                height: '35px',
+                background: 'rgba(0,0,0,0.4)',
+                borderTop: '1px solid rgba(255,255,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 20px',
+                fontSize: '8px',
+                color: '#94a3b8',
+                fontWeight: '700'
+            }}>
+                <span>MMS GOLF CLUB • CHAMPIONSHIP COURSE</span>
+                <span style={{ color: '#34d399' }}>WWW.MMSGOLFCLUB.CO.KE</span>
             </div>
         </div>
     );

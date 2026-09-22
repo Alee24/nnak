@@ -1,25 +1,10 @@
-import React from 'react';
-import { toTitleCase } from '../utils/formatters';
+﻿import React from 'react';
 
-/**
- * Senior UI/UX Architectural Certificate Component
- * Optimized for high-fidelity PDF export
- * Zero-overlap Flexbox architecture
- */
 const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
-    const currentDate = new Date().toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-
-    // Authority Design System
-    const brandGreen = '#006400';
-    const brandCrimson = '#059669';
-    const bodyText = '#333333';
-    const labelText = '#64748b';
-    const serifFont = 'Cambria, Georgia, serif';
-    const sansFont = 'Cambria, Georgia, serif';
+    const fullName = `${member?.first_name || ''} ${member?.last_name || ''}`.trim() || 'MEMBER NAME';
+    const memberNo = member?.membership_number || member?.member_id || 'MMS-0000';
+    const category = member?.role?.replace(/_/g, ' ').toUpperCase() || 'FULL CHAMPIONSHIP MEMBER';
+    const joinDate = member?.join_date || member?.created_at || new Date().toISOString().split('T')[0];
 
     return (
         <div ref={ref} style={{
@@ -27,201 +12,119 @@ const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
             height: '1123px',
             backgroundColor: '#ffffff',
             position: 'relative',
-            padding: '60px 80px',
+            padding: '60px',
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: 'space-between',
             boxSizing: 'border-box',
             overflow: 'hidden',
-            fontFamily: sansFont
+            fontFamily: 'Inter, Georgia, serif',
+            border: '16px solid #064e3b'
         }}>
-            {/* 1. Architectural Frame System - BORDERS REMOVED AS REQUESTED */}
-
-
-            {/* Visual Corner Anchors */}
-            <div style={{ position: 'absolute', top: '32px', left: '32px', width: '80px', height: '80px', borderTop: `6px solid ${brandCrimson}`, borderLeft: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
-            <div style={{ position: 'absolute', top: '32px', right: '32px', width: '80px', height: '80px', borderTop: `6px solid ${brandCrimson}`, borderRight: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
-            <div style={{ position: 'absolute', bottom: '32px', left: '32px', width: '80px', height: '80px', borderBottom: `6px solid ${brandCrimson}`, borderLeft: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
-            <div style={{ position: 'absolute', bottom: '32px', right: '32px', width: '80px', height: '80px', borderBottom: `6px solid ${brandCrimson}`, borderRight: `6px solid ${brandCrimson}`, zIndex: 10 }}></div>
-
-            {/* 2. Content Stack */}
+            {/* Inner Gold Border */}
             <div style={{
-                position: 'relative',
-                zIndex: 20,
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
+                position: 'absolute',
+                top: '12px',
+                left: '12px',
+                right: '12px',
+                bottom: '12px',
+                border: '2px solid #059669',
+                pointerEvents: 'none'
+            }} />
 
-                {/* Header Section */}
-                <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>
-                    {branding?.system_logo ? (
-                        <img src={branding.system_logo} alt="NNAK Logo" style={{ display: 'block', margin: '0 auto 24px auto', height: '120px', width: 'auto' }} crossOrigin="anonymous" />
-                    ) : (
-                        <div style={{ width: '100px', height: '100px', borderRadius: '50px', backgroundColor: brandGreen, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '32px', fontWeight: 'bold', margin: '0 auto 20px auto' }}>NNAK</div>
-                    )}
-
-                    <h1 style={{
-                        fontFamily: serifFont,
-                        fontSize: '36px',
-                        fontWeight: '900',
-                        color: brandGreen,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        margin: '0 0 8px 0',
-                        lineHeight: '1.2'
-                    }}>
-                        {branding?.association_name || 'National Nurses Association of Kenya'}
-                    </h1>
-                    <p style={{
-                        color: brandCrimson,
-                        fontSize: '16px',
-                        fontWeight: '700',
-                        fontStyle: 'italic',
-                        letterSpacing: '0.2em',
-                        margin: 0
-                    }}>
-                        "{branding?.association_tagline || 'Advancing the Nursing Profession Through Excellence'}"
-                    </p>
+            {/* Header Crest */}
+            <div style={{ textTransform: 'center', textAlign: 'center', marginTop: '30px' }}>
+                <div style={{
+                    width: '70px',
+                    height: '70px',
+                    margin: '0 auto 16px',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #059669, #047857)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ffffff',
+                    fontWeight: '900',
+                    fontSize: '24px',
+                    boxShadow: '0 10px 15px -3px rgba(5,150,105,0.4)'
+                }}>
+                    MMS
                 </div>
+                <h1 style={{ fontSize: '28px', fontWeight: '900', color: '#064e3b', letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+                    MMS GOLF & COUNTRY CLUB
+                </h1>
+                <p style={{ fontSize: '12px', fontWeight: '700', color: '#059669', letterSpacing: '0.25em', textTransform: 'uppercase', marginTop: '6px' }}>
+                    Championship Estate & Links • Est. 1987
+                </p>
+            </div>
 
-                <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-                    <h2 style={{
-                        fontFamily: serifFont,
-                        fontSize: '48px',
-                        fontWeight: '400',
-                        color: '#1a1a1a',
-                        margin: 0,
-                        lineHeight: '1'
-                    }}>
-                        Certificate of Membership
-                    </h2>
+            {/* Main Title */}
+            <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                <h2 style={{ fontSize: '38px', fontFamily: 'Georgia, serif', fontWeight: '400', color: '#0f172a', fontStyle: 'italic', margin: 0 }}>
+                    Certificate of Official Membership
+                </h2>
+                <div style={{ width: '120px', height: '2px', backgroundColor: '#059669', margin: '16px auto 0' }} />
+            </div>
+
+            {/* Body Text */}
+            <div style={{ textAlign: 'center', padding: '0 40px', spaceY: '20px' }}>
+                <p style={{ fontSize: '14px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.15em', margin: '0 0 16px' }}>
+                    This is to certify that
+                </p>
+                <div style={{ fontSize: '36px', fontWeight: '900', color: '#064e3b', textTransform: 'uppercase', letterSpacing: '0.02em', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'inline-block', minWidth: '400px' }}>
+                    {fullName}
                 </div>
+                <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.8', maxWidth: '580px', margin: '24px auto 0', fontWeight: '500' }}>
+                    Is a duly registered and active member in good standing of MMS Golf Club, entitled to full golfing rights, World Handicap System (WHS) index tracking, and all privileges of the clubhouse.
+                </p>
 
-                {/* Recipient Section */}
-                <div style={{ textAlign: 'center', width: '100%', marginBottom: '50px' }}>
-                    <p style={{
-                        fontFamily: sansFont,
-                        fontSize: '14px',
-                        fontWeight: '800',
-                        color: labelText,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5em',
-                        marginBottom: '30px'
-                    }}>
-                        THIS IS TO CERTIFY THAT
-                    </p>
-
-                    <h3 style={{
-                        fontFamily: serifFont,
-                        fontSize: '48px',
-                        fontWeight: 'bold',
-                        color: brandGreen,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.02em',
-                        margin: '0 auto 20px auto',
-                        borderBottom: `1px solid #e2e8f0`,
-                        paddingBottom: '10px',
-                        display: 'inline-block',
-                        minWidth: '85%'
-                    }}>
-                        {toTitleCase(member?.first_name)} {toTitleCase(member?.last_name)}
-                    </h3>
-
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '60px',
-                        marginTop: '10px',
-                        fontFamily: sansFont,
-                        fontSize: '13px',
-                        fontWeight: '800',
-                        color: '#1a1a1a',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.15em'
-                    }}>
-                        <span>MEMBER NO: <span style={{ color: brandGreen, fontWeight: '900' }}>{member?.member_id || 'PENDING'}</span></span>
-                        <span>LICENSE NO: <span style={{ color: brandGreen, fontWeight: '900' }}>{member?.registration_number || member?.license_number || 'REQUIRED'}</span></span>
+                <div style={{ display: 'flex', justifyCenter: 'center', justifyContent: 'center', gap: '40px', marginTop: '30px' }}>
+                    <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 24px', borderRadius: '12px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', display: 'block' }}>Membership Number</span>
+                        <span style={{ fontSize: '16px', fontWeight: '900', color: '#059669', fontFamily: 'monospace' }}>{memberNo}</span>
+                    </div>
+                    <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 24px', borderRadius: '12px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', display: 'block' }}>Membership Category</span>
+                        <span style={{ fontSize: '16px', fontWeight: '900', color: '#0f172a' }}>{category}</span>
+                    </div>
+                    <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 24px', borderRadius: '12px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', display: 'block' }}>Date of Admission</span>
+                        <span style={{ fontSize: '16px', fontWeight: '900', color: '#0f172a' }}>{joinDate}</span>
                     </div>
                 </div>
+            </div>
 
-                {/* Declaration Paragraph - FIXED CONCATENATION */}
+            {/* Signatures */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 40px', marginBottom: '30px' }}>
+                <div style={{ textAlign: 'center', width: '200px' }}>
+                    <div style={{ borderBottom: '2px solid #0f172a', paddingBottom: '4px', marginBottom: '6px', fontWeight: '900', fontSize: '14px', color: '#0f172a' }}>
+                        General Manager
+                    </div>
+                    <span style={{ fontSize: '10px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Club Executive Committee</span>
+                </div>
+
                 <div style={{
+                    width: '70px',
+                    height: '70px',
+                    borderRadius: '50%',
+                    border: '3px double #059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontWeight: '900',
+                    color: '#059669',
                     textAlign: 'center',
-                    maxWidth: '660px',
-                    margin: '0 auto 60px auto',
-                    lineHeight: '1.6',
-                    fontSize: '18px',
-                    color: bodyText,
-                    fontFamily: sansFont
+                    textTransform: 'uppercase'
                 }}>
-                    Has been duly registered as a member in good standing of the National Nurses Association of Kenya, committed to upholding excellence in nursing practice
+                    OFFICIAL<br/>SEAL
                 </div>
 
-                {/* Footer Section - FLEXBOX ARCHITECTURE */}
-                <div style={{
-                    marginTop: 'auto',
-                    width: '100%',
-                    paddingBottom: '60px'
-                }}>
-                    {/* Top Row: Date & Signature */}
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-end',
-                        marginBottom: '40px',
-                        padding: '0 20px'
-                    }}>
-                        {/* Date Left-Aligned */}
-                        <div style={{ textAlign: 'left', minWidth: '220px' }}>
-                            <div style={{ fontSize: '12px', color: labelText, textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>Date of Issue</div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1a1a1a' }}>{currentDate}</div>
-                        </div>
-
-                        {/* Signature Right-Aligned */}
-                        <div style={{ textAlign: 'right', minWidth: '280px' }}>
-                            <div style={{ height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
-                                {branding?.authorised_signature ? (
-                                    <img src={branding.authorised_signature} alt="Signature" style={{ maxHeight: '50px', width: 'auto' }} crossOrigin="anonymous" />
-                                ) : (
-                                    <div style={{ height: '1px', width: '200px', backgroundColor: '#cbd5e1' }}></div>
-                                )}
-                            </div>
-                            <div style={{ height: '2px', width: '260px', backgroundColor: '#1a1a1a', marginLeft: 'auto', marginBottom: '10px' }}></div>
-                            <div style={{ fontSize: '14px', fontWeight: '900', color: '#1a1a1a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>National Executive Chairman</div>
-                            <div style={{ fontSize: '12px', color: labelText, fontWeight: '700', textTransform: 'uppercase', marginTop: '4px' }}>National Nurses Association of Kenya</div>
-                        </div>
+                <div style={{ textAlign: 'center', width: '200px' }}>
+                    <div style={{ borderBottom: '2px solid #0f172a', paddingBottom: '4px', marginBottom: '6px', fontWeight: '900', fontSize: '14px', color: '#0f172a' }}>
+                        Club Captain
                     </div>
-
-                    {/* Bottom Row: Status & Verification Center-Aligned */}
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '12px'
-                    }}>
-                        <div style={{
-                            backgroundColor: `${brandGreen}10`,
-                            color: brandGreen,
-                            padding: '6px 20px',
-                            borderRadius: '4px',
-                            fontSize: '14px',
-                            fontWeight: '900',
-                            letterSpacing: '0.1em',
-                            textTransform: 'uppercase'
-                        }}>
-                            Active Member
-                        </div>
-                        <div style={{
-                            fontSize: '12px',
-                            color: labelText,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.3em',
-                            fontWeight: 'bold'
-                        }}>
-                            Verification Portal: https://portal.nnak.or.ke/verify
-                        </div>
-                    </div>
+                    <span style={{ fontSize: '10px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>PGA Golf Committee</span>
                 </div>
             </div>
         </div>
@@ -231,4 +134,3 @@ const CertificatePrintable = React.forwardRef(({ member, branding }, ref) => {
 CertificatePrintable.displayName = 'CertificatePrintable';
 
 export default CertificatePrintable;
-

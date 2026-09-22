@@ -43,15 +43,25 @@ import GolfCartsPage from './pages/GolfCartsPage';
 import AssetsPage from './pages/AssetsPage';
 import SuppliersPage from './pages/SuppliersPage';
 import StaffPage from './pages/StaffPage';
+import GeneralManagerDashboard from './pages/GeneralManagerDashboard';
+import FinanceDashboard from './pages/FinanceDashboard';
+import GolfProDashboard from './pages/GolfProDashboard';
+import CashierDashboard from './pages/CashierDashboard';
+import ReceptionistDashboard from './pages/ReceptionistDashboard';
 
 // Dashboard Switcher based on role
 const DashboardSwitcher = () => {
   try {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (['admin', 'super_admin', 'general_manager'].includes(user?.role)) {
-      return <Dashboard />;
-    }
-    return <MemberDashboard />;
+    const role = user?.role;
+    if (['admin', 'super_admin'].includes(role)) return <Dashboard />;
+    if (role === 'general_manager') return <GeneralManagerDashboard />;
+    if (role === 'finance_manager') return <FinanceDashboard />;
+    if (role === 'golf_professional') return <GolfProDashboard />;
+    if (role === 'cashier') return <CashierDashboard />;
+    if (role === 'receptionist') return <ReceptionistDashboard />;
+    if (role === 'member') return <MemberDashboard />;
+    return <Dashboard />;
   } catch (e) {
     return <Navigate to="/login" replace />;
   }
