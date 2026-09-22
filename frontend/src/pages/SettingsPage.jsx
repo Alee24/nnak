@@ -166,7 +166,6 @@ const SettingsPage = () => {
 
                 // Clear password fields after save
                 setSettings(prev => ({ ...prev, new_password: '', confirm_password: '' }));
-                setProfileFile(null);
             }
         } catch (error) {
             Swal.fire('Error', error.message, 'error');
@@ -174,12 +173,6 @@ const SettingsPage = () => {
             setSaving(false);
         }
     };
-
-    if (loading) return (
-        <div className="flex items-center justify-center h-[400px]">
-            <div className="w-12 h-12 border-4 border-[#059669]/20 border-t-[#059669] rounded-full animate-spin"></div>
-        </div>
-    );
 
     const [demoMode, setDemoMode] = useState(true);
     const [demoLoading, setDemoLoading] = useState(false);
@@ -223,6 +216,12 @@ const SettingsPage = () => {
             setDemoLoading(false);
         }
     };
+
+    if (loading) return (
+        <div className="flex items-center justify-center h-[400px]">
+            <div className="w-12 h-12 border-4 border-[#059669]/20 border-t-[#059669] rounded-full animate-spin"></div>
+        </div>
+    );
 
     const handlePopulateDemoData = async () => {
         const result = await Swal.fire({
