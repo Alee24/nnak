@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     TrendingUp, Download, BarChart2, PieChart, ShoppingCart,
     DollarSign, FileText, Layers, CreditCard, AlertCircle
@@ -347,7 +347,7 @@ const Analytics = () => {
                             </table>
                         ) : (
                             <div className="an-empty">
-                                <Layers size={32} style={{ margin: "0 auto 8px", display: "block", color: "#cbd5e1" }} />
+                                <ShoppingCart size={32} style={{ margin: "0 auto 8px", display: "block", color: "#cbd5e1" }} />
                                 No product data available for this period
                             </div>
                         )}
