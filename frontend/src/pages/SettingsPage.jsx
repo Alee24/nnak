@@ -58,7 +58,7 @@ const SettingsPage = () => {
 
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
-    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+    const isAdmin = ['admin', 'super_admin', 'general_manager'].includes(user?.role);
 
     useEffect(() => {
         if (!isAdmin) {
