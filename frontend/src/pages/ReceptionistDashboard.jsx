@@ -1,48 +1,51 @@
-﻿import React, { useEffect, useState } from "react";
-import { UserCheck, UserPlus, Clock, Mail, CheckCircle, Flag } from "lucide-react";
+import React from "react";
+import { UserCheck, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { PageHeader, Button } from "../components/ui/Primitives";
 
 const ReceptionistDashboard = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white">Front Desk & Reception Desk</h1>
-                    <p className="text-xs text-slate-500 font-medium">Welcome back, {user.first_name || "Front Desk Lead"} • Golfer Arrival, Guests & Member Check-In</p>
-                </div>
-                <div className="flex gap-2">
-                    <button onClick={() => navigate("/dashboard/check-in")} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2">
-                        <UserCheck size={14} /> Golfer Check-In
-                    </button>
-                    <button onClick={() => navigate("/dashboard/guests")} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2">
-                        <UserPlus size={14} /> Register Guest Pass
-                    </button>
-                </div>
-            </div>
+        <div className="space-y-5">
+            <PageHeader
+                title="Front Desk & Reception Desk"
+                subtitle={`Welcome back, ${user.first_name || 'Front Desk Lead'} • Golfer Arrival, Guest Passes & Reception Desk`}
+                breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Front Desk' }]}
+                actions={
+                    <>
+                        <Button variant="secondary" size="sm" onClick={() => navigate("/dashboard/guests")}>
+                            <UserPlus size={13} /> Register Guest Pass
+                        </Button>
+                        <Button variant="primary" size="sm" onClick={() => navigate("/dashboard/check-in")}>
+                            <UserCheck size={13} /> Golfer Check-In
+                        </Button>
+                    </>
+                }
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Members Checked In</span>
-                    <div className="text-2xl font-black text-emerald-600">32 Golfers</div>
-                    <span className="text-[10px] text-emerald-600 font-bold">Checked in today</span>
+            {/* Metric Summary Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">Members Checked In</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100 block mt-1">32 Golfers</span>
+                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium block mt-0.5">Checked in today</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Guest Passes Issued</span>
-                    <div className="text-2xl font-black text-blue-600">8 Visitors</div>
-                    <span className="text-[10px] text-blue-500 font-bold">Green fee receipts printed</span>
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">Guest Passes Issued</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100 block mt-1">8 Visitors</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">Green fee receipts printed</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Tee Times Today</span>
-                    <div className="text-2xl font-black text-amber-600">18 Flights</div>
-                    <span className="text-[10px] text-amber-500 font-bold">First tee off 06:30 AM</span>
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">Tee Times Today</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100 block mt-1">18 Flights</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">First tee off 06:30 AM</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">General Inquiries</span>
-                    <div className="text-2xl font-black text-purple-600">3 Unread</div>
-                    <span className="text-[10px] text-purple-500 font-bold">Front desk mailbox</span>
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">General Inquiries</span>
+                    <span className="text-xl font-bold text-purple-700 dark:text-purple-400 block mt-1">3 Unread</span>
+                    <span className="text-[10px] text-purple-600 block mt-0.5">Front desk mailbox</span>
                 </div>
             </div>
         </div>

@@ -1,50 +1,52 @@
-﻿import React, { useEffect, useState } from "react";
-import { CreditCard, ShoppingBag, DollarSign, FileText, CheckCircle, Plus } from "lucide-react";
+import React, { useState } from "react";
+import { ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import AdminAPI from "../services/api";
+import { PageHeader, Button } from "../components/ui/Primitives";
 
 const CashierDashboard = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const [stats, setStats] = useState({ collections_today: 185000, mpesa: 142000, cash_card: 43000, pending_pos: 4 });
+    const [stats] = useState({ collections_today: 185000, mpesa: 142000, cash_card: 43000, pending_pos: 4 });
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-serif font-black text-slate-900 dark:text-white">Cashier & Point of Sale Station</h1>
-                    <p className="text-xs text-slate-500 font-medium">Welcome back, {user.first_name || "Club Cashier"} • Till Collections & Billing Desk</p>
-                </div>
-                <div className="flex gap-2">
-                    <button onClick={() => navigate("/dashboard/restaurant")} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2">
-                        <ShoppingBag size={14} /> F&B Till / POS
-                    </button>
-                    <button onClick={() => navigate("/dashboard/golf-shop")} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2">
-                        <ShoppingBag size={14} /> Pro Shop POS
-                    </button>
-                </div>
-            </div>
+        <div className="space-y-5">
+            <PageHeader
+                title="Cashier & Point of Sale Operations"
+                subtitle={`Welcome back, ${user.first_name || 'Club Cashier'} • POS Till Collections, Dining Tabs & Billing Desk`}
+                breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Cashier Station' }]}
+                actions={
+                    <>
+                        <Button variant="secondary" size="sm" onClick={() => navigate("/dashboard/golf-shop")}>
+                            <ShoppingBag size={13} /> Pro Shop POS
+                        </Button>
+                        <Button variant="primary" size="sm" onClick={() => navigate("/dashboard/restaurant")}>
+                            <ShoppingBag size={13} /> F&B Till / POS
+                        </Button>
+                    </>
+                }
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Till Today</span>
-                    <div className="text-2xl font-black text-emerald-600">KES {(stats.collections_today).toLocaleString()}</div>
-                    <span className="text-[10px] text-emerald-600 font-bold">Shift Open</span>
+            {/* Metric Summary Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">Total Till Today</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100 block mt-1">KES {(stats.collections_today).toLocaleString()}</span>
+                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium block mt-0.5">Shift Open</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">M-Pesa Express Total</span>
-                    <div className="text-2xl font-black text-emerald-700">KES {(stats.mpesa).toLocaleString()}</div>
-                    <span className="text-[10px] text-slate-400 font-bold">76.7% of Daily Volume</span>
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">M-Pesa Express Total</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100 block mt-1">KES {(stats.mpesa).toLocaleString()}</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">76.7% of Daily Volume</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Cash & PDQ Terminal</span>
-                    <div className="text-2xl font-black text-blue-600">KES {(stats.cash_card).toLocaleString()}</div>
-                    <span className="text-[10px] text-slate-400 font-bold">Visa / Mastercard / Cash</span>
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">Cash & PDQ Terminal</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100 block mt-1">KES {(stats.cash_card).toLocaleString()}</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">Visa / Mastercard / Cash</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Open Dining Tabs</span>
-                    <div className="text-2xl font-black text-amber-600">{stats.pending_pos} Active Tabs</div>
-                    <span className="text-[10px] text-amber-500 font-bold">Terrace & 19th Hole Bar</span>
+                <div className="p-3.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md">
+                    <span className="text-[11px] font-semibold text-slate-500 block">Open Dining Tabs</span>
+                    <span className="text-xl font-bold text-amber-700 dark:text-amber-400 block mt-1">{stats.pending_pos} Active Tabs</span>
+                    <span className="text-[10px] text-amber-600 block mt-0.5">Terrace & 19th Hole Bar</span>
                 </div>
             </div>
         </div>
