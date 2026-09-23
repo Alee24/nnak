@@ -319,7 +319,7 @@ class DemoController {
             $this->db->exec("SET FOREIGN_KEY_CHECKS = 0;");
             foreach ($tablesToClear as $tbl) {
                 // Check if table exists before truncating
-                $check = $this->db->prepare("SHOW TABLES LIKE ?");
+                $check = $this->db->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?");
                 $check->execute([$tbl]);
                 if ($check->fetch()) {
                     $this->db->exec("TRUNCATE TABLE `$tbl`");
