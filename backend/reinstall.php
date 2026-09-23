@@ -1,10 +1,14 @@
-﻿<?php
+<?php
+ob_start();
 /**
  * Master Fresh Installation & Migration Runner Script
  * Rebuilds database from scratch, applies all migrations, and seeds demo data
  */
 
 require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/utils/Normalization.php';
+require_once __DIR__ . '/utils/Auth.php';
 
 echo "\n============================================================\n";
 echo " MMS Golf Club Management System - Fresh Reinstall & Migrator \n";
