@@ -327,10 +327,15 @@ class DemoController {
             }
             $this->db->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-            // Reset table statuses in restaurant & carts
-            $this->db->exec("UPDATE restaurant_tables SET status = 'available'");
-            $this->db->exec("UPDATE golf_carts SET status = 'available'");
-            $this->db->exec("UPDATE caddies SET status = 'available'");
+            // Reset table statuses in restaurant & carts if tables exist
+            $tablesToReset = ['restaurant_tables', 'golf_carts', 'caddies'];
+            foreach ($tablesToReset as $tbl) {
+                $check = $this->db->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?");
+                $check->execute([$tbl]);
+                if ($check->fetch()) {
+                    $this->db->exec("UPDATE `$tbl` SET status = 'available'");
+                }
+            }
 
             $this->db->commit();
 
